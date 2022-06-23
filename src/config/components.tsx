@@ -1,10 +1,10 @@
 /* import { lazy, LazyExoticComponent, FC, ReactElement } from 'react' */
 import { lazy, ReactElement } from 'react'
 
-import { moduloNames, subModuloNames } from '../constants'
+import { Modulo, Submodulo } from 'types'
 
-interface Modulo { name: string, component: ReactElement }
-interface SubModulo extends Modulo {}
+type ModuloType = { name: Modulo, component: ReactElement }
+type SubModuloType = { name: Submodulo, component: ReactElement }
 
 /* » MOD'S  */
 const HomeMod = lazy(() => import('pages/modulo/HomeMod'))
@@ -24,49 +24,49 @@ const ExtraccionDatosSubMod = lazy(() => import('pages/submodulo/ExtraccionDatos
 const BuscarDnvSubMod = lazy(() => import('pages/submodulo/BuscarDnvSubMod'))
 
 /* » ITEM'S */
-const modulo: Array<Modulo> = [
+const modulo: Array<ModuloType> = [
    {
-      name: moduloNames.HOME,
+      name: 'HOME',
       component: <HomeMod />
    }, {
-      name: moduloNames.PERFIL,
+      name: 'PERFIL',
       component: <PerfilMod />
    }, {
-      name: moduloNames.PROCESOS,
+      name: 'PROCESOS',
       component: <ProcesosMod />
    }, {
-      name: moduloNames.GESTION_TRAMITES,
+      name: 'GESTIÓN TRÁMITES',
       component: <GestionTramitesMod />
    }, {
-      name: moduloNames.UTILIDADES,
+      name: 'UTILIDADES',
       component: <UtilidadesMod />
    }
 ]
 
-const subModulo: Array<SubModulo> = [
+const subModulo: Array<SubModuloType> = [
    {
-      name: subModuloNames.ANALISIS_INFORMACION,
+      name: 'ANALISIS DE INFORMACIÓN',
       component: <NuevoAnalisisInfSubMod />
    }, {
-      name: subModuloNames.DEPURACION_DATOS,
+      name: 'DEPURACIÓN DE DATOS',
       component: <NuevaDepuracionInfSubMod />
    }, {
-      name: subModuloNames.ASIGNAR_EXTRACCION,
+      name: 'ASIGNAR EXTRACCIÓN',
       component: <AsignarExtraccionSubMod />
    }, {
-      name: subModuloNames.NUEVO_EXPEDIENTE_SFM,
+      name: 'NUEVO EXPEDIENTE SFM',
       component: <NuevoExpedienteSFMSubMod />
    }, {
-      name: subModuloNames.RECEPCION_Y_ASIGNACION_SFM,
+      name: 'RECEPCIÓN Y ASIGNACIÓN SFM',
       component: <RecepcionAsignacionSFMSubMod />
    }, {
-      name: subModuloNames.EVALUACION_EXPEDIENTES_SFM,
+      name: 'EVALUACIÓN DE EXPEDIENTES SFM',
       component: <EvaluacionExpedientesSFMSubMod />
    }, {
-      name: subModuloNames.EXTRACCION_DATOS,
+      name: 'EXTRACCIÓN DE DATOS',
       component: <ExtraccionDatosSubMod />
    }, {
-      name: subModuloNames.BUSCAR_DNV,
+      name: 'BUSCAR DNV',
       component: <BuscarDnvSubMod />
    }
 ]

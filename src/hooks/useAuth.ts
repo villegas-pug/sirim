@@ -1,11 +1,17 @@
 import { useEffect, useState } from 'react'
 
-import { componentsType, httpStatus } from 'constants/'
-
-/* import useHttpStatus from './useHttpStatus' */
+import { httpStatus } from 'constants/'
 
 import { useAppActions, useAppSelector, useHttpStatus } from 'hooks'
 import { Procedimiento } from 'interfaces'
+import { Modulo } from 'types'
+
+export const componentsType = {
+   MODULO: 'MODULO',
+   SUB_MODULO: 'SUB_MODULO',
+   ITEM: 'ITEM',
+   SUB_ITEM: 'SUB_ITEM'
+}
 
 const { MODULO, SUB_ITEM, ITEM } = componentsType
 
@@ -31,7 +37,7 @@ export const useAuth = () => {
    const [componentsAuth, setComponentsAuth] = useState<Procedimiento[]>([])
    const [redirectComponentsAuth, setRedirectComponentsAuth] = useState<Procedimiento[]>([])
    const [modAuthenticated, setModAuthenticated] = useState<Procedimiento[]>([])
-   const [submodAuthenticated, setSubmodAuthenticated] = useState({})
+   const [submodAuthenticated, setSubmodAuthenticated] = useState({} as Record<Modulo, Array<any>>)
    const [pathAuthenticated, setPathAuthenticated] = useState({})
    const { status } = useHttpStatus()
 

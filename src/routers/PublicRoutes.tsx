@@ -1,14 +1,18 @@
-import { FC, ReactElement } from 'react'
-import { Navigate } from 'react-router-dom'
+import { FC } from 'react'
+import {
+   Navigate,
+   Outlet
+} from 'react-router-dom'
 
 import { useAuth } from 'hooks'
 
-type PublicRoutesType = {
-   children: ReactElement
-}
-
-export const PublicRoutes: FC<PublicRoutesType> = ({ children }) => {
+const PublicRoutes: FC = () => {
+   /* ► CUSTOM-HOOK'S ... */
    const { isAuthenticated } = useAuth()
 
-   return isAuthenticated ? <Navigate to='/' /> : children
+   if (isAuthenticated) return <Navigate to='/' />
+
+   return <Outlet />
 }
+
+export default PublicRoutes

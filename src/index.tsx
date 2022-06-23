@@ -4,9 +4,9 @@ import { Provider } from 'react-redux'
 import { ThemeProvider, CssBaseline } from '@mui/material'
 
 import { ligthTheme } from './themes'
-import { store } from './state/store'
+import { store } from 'state/store'
 
-import { App } from './components/app'
+import App from 'components/app'
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement

@@ -36,10 +36,11 @@ import Fade from 'react-reveal/Fade'
 import { styled, useTheme } from '@mui/material/styles'
 import { useNavigate } from 'react-router-dom'
 
-import { useAuth } from '../../hooks'
+import { useAuth } from 'hooks'
 
-import { elementIcons, layout, moduloNames } from '../../constants'
+import { elementIcons, layout } from 'constants/'
 import { DrawerTitle, ModalLoader } from '../styled'
+import { Modulo } from 'types'
 
 const drawerWidth = 190
 
@@ -102,7 +103,7 @@ export const Drawer: FC<Props> = ({ children }) => {
 
    const [selectedItemDrawer, setSelectedItemDrawer] = useState(0)
    const [anchorEl, setAnchorEl] = useState(null)
-   const [selectedTab, setSelectedTab] = useState<string>(moduloNames.HOME)
+   const [selectedTab, setSelectedTab] = useState<Modulo>('HOME')
    const navigate = useNavigate()
 
    /* » CUSTOM HOOK'S  */
@@ -114,8 +115,8 @@ export const Drawer: FC<Props> = ({ children }) => {
    } = useAuth()
 
    /* » EFFECT'S */
-   useEffect(() => { setSelectedTab(moduloNames.HOME) }, [isAuthenticated])
-   useEffect(() => { selectedTab !== '' && setSelectedItemDrawer(-1) }, [selectedTab])
+   useEffect(() => { setSelectedTab('HOME') }, [isAuthenticated])
+   useEffect(() => { selectedTab.length > 0 && setSelectedItemDrawer(-1) }, [selectedTab])
    useEffect(() => { selectedItemDrawer !== -1 && setSelectedTab('') }, [selectedItemDrawer])
 
    /* » HANDLER'S  */
@@ -123,17 +124,14 @@ export const Drawer: FC<Props> = ({ children }) => {
    const handleDrawerClose = () => { setOpen(false) }
 
    const handleOnClickOptSidebar = (path: string, iItemDrawer: number) => (navigate(path), setSelectedItemDrawer(iItemDrawer))
-   const handleTabs = (rutaPrincipal: string, value: string) => (setSelectedTab(value), navigate(rutaPrincipal))
+   const handleTabs = (rutaPrincipal: string, value: Modulo) => (setSelectedTab(value), navigate(rutaPrincipal))
 
    const handleOpenMenu = (e: any) => { setAnchorEl(e.currentTarget) }
    const handleCloseMenu = () => { setAnchorEl(null) }
    const handleRootLogout = () => (handleCloseMenu(), logout())
 
-   /* » RENDERING CONDITIONAL... */
-   if (!isAuthenticated) return <>{ children }</>
-
    return (
-      <Fade duration={2000} delay={500} top>
+      <Fade duration={1500} delay={250} top>
          <Box sx={{ display: 'flex' }}>
             <CssBaseline />
             <AppBar position="fixed" open={open}>
@@ -158,7 +156,7 @@ export const Drawer: FC<Props> = ({ children }) => {
                                  key={idProcedimiento}
                                  value={nombre}
                                  icon={ elementIcons[icono] }
-                                 onClick={() => handleTabs(rutaPrincipal, nombre)}
+                                 onClick={() => handleTabs(rutaPrincipal, nombre as Modulo)}
                               />
                            ))
                      }
@@ -275,7 +273,7 @@ export const Drawer: FC<Props> = ({ children }) => {
                {/* <Scrollbars autoHide> */}
                <DrawerHeader />
                <Suspense fallback={<ModalLoader />}>
-                  {children}
+                  { children }
                </Suspense>
                {/* </Scrollbars> */}
             </Main>

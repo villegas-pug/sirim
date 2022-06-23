@@ -1,14 +1,21 @@
-import { FC, ReactElement } from 'react'
-import { Navigate } from 'react-router-dom'
+import { FC } from 'react'
+import { Navigate, Outlet } from 'react-router-dom'
+
+import { Drawer } from 'components'
 
 import { useAuth } from 'hooks'
 
-type PrivateRoutesType = {
-   children: ReactElement
-}
-
-export const PrivateRoutes: FC<PrivateRoutesType> = ({ children }) => {
+const PrivateRoutes: FC = () => {
+   /* ► CUSTOM-HOOK'S ... */
    const { isAuthenticated } = useAuth()
 
-   return !isAuthenticated ? <Navigate to='/portal' /> : children
+   if (!isAuthenticated) return <Navigate to='/portal' />
+
+   return (
+      <Drawer>
+         <Outlet />
+      </Drawer>
+   )
 }
+
+export default PrivateRoutes

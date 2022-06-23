@@ -1,6 +1,5 @@
 export * from './areas'
 export * from './breakpoints'
-export * from './components'
 export * from './endpointBase'
 export * from './httpStatus'
 export * from './layout'

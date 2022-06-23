@@ -1,3 +1,2 @@
-export * from './DashboardRoutes'
-export * from './PrivateRoutes'
-export * from './PublicRoutes'
+export { default as PublicRoutes } from './PublicRoutes'
+export { default as PrivateRoutes } from './PrivateRoutes'

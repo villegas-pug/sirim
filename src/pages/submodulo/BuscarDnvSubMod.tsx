@@ -141,9 +141,9 @@ const BuscarDnvSubMod: FC = () => {
                      pageSize={ currentScreen === 'tabletLandscape'
                         ? 5
                         : currentScreen === 'desktopLarge'
-                           ? 10
+                           ? 8
                            : currentScreen === 'desktopWide'
-                              ? 14
+                              ? 12
                               : 5 }
                   />
                </Zoom>

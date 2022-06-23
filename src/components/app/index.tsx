@@ -2,25 +2,21 @@ import { FC, useEffect } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast'
 
-import './style.css'
-
-import {
-   DashboardRouters,
-   PrivateRoutes,
-   PublicRoutes
-} from 'routers'
-
-import { Drawer } from 'components/layout'
-import { Portal } from 'pages/Portal'
+import { Portal, NotFound } from 'pages/portal'
+import { PrivateRoutes, PublicRoutes } from 'routers'
 
 import { useAuth, useHttpStatus } from 'hooks'
 
+import { components } from 'config'
 import { httpStatus } from 'constants/'
 
-export const App: FC = () => {
+import './style.css'
+
+const App: FC = () => {
    /* » CUSTOM HOOK'S...  */
    const {
       token,
+      redirectComponentsAuth,
       findUserByLogin,
       logout
    } = useAuth()
@@ -28,29 +24,24 @@ export const App: FC = () => {
 
    /* » EFFECT'S:  */
    useEffect(() => { findUserByLogin() }, [token])
-
-   useEffect(() => {
-      if (status === httpStatus.FORBIDDEN) { logout() }
-   }, [status])
+   useEffect(() => { if (status === httpStatus.FORBIDDEN) { logout() } }, [status])
 
    return (
       <BrowserRouter basename='/sirim'>
-         <Drawer>
-            <Routes>
-               <Route path='/portal' element={
-                  <PublicRoutes>
-                     <Portal />
-                  </PublicRoutes>
-               }
-               />
-               <Route path='/*' element={
-                  <PrivateRoutes>
-                     <DashboardRouters />
-                  </PrivateRoutes>
-               } />
-            </Routes>
-         </Drawer>
+         <Routes>
+            <Route path='/' element={ <PrivateRoutes /> }>
+               {redirectComponentsAuth?.map(({ idProcedimiento, nombre, rutaPrincipal }) => (
+                  <Route key={idProcedimiento} path={rutaPrincipal} element={components[nombre]} />
+               ))}
+            </Route>
+            <Route path='/portal' element={ <PublicRoutes /> }>
+               <Route index element={ <Portal /> } />
+            </Route>
+            <Route path='*' element={ <NotFound /> } />
+         </Routes>
          <Toaster />
       </BrowserRouter>
    )
 }
+
+export default App
