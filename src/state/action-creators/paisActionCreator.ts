@@ -7,9 +7,8 @@ import { api } from 'config'
 import { noty } from 'helpers'
 
 import { Pais, Response } from 'interfaces'
-import { levelLog, localStorage } from 'constants/'
+import { localStorage } from 'constants/'
 
-const { SUCCESS, WARNING, ERROR } = levelLog
 const { AUTHORIZATION } = localStorage
 
 export const findAllPais = () => async (dispatch: Dispatch<PaisAction>, getStore: () => any): Promise<void> => {
@@ -25,11 +24,11 @@ export const findAllPais = () => async (dispatch: Dispatch<PaisAction>, getStore
       })
 
       switch (levelLog) {
-      case SUCCESS:
+      case 'SUCCESS':
          dispatch({ type: '[Pais] Find all pais success', payload: data })
          break
-      case WARNING:
-      case ERROR:
+      case 'WARNING':
+      case 'ERROR':
          dispatch({ type: '[Pais] Find all pais error', payload: message })
          noty('error', message)
          break

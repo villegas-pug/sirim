@@ -30,7 +30,8 @@ import {
    SaveOutlined,
    EditOutlined,
    AddCircleOutlined,
-   HistoryOutlined
+   HistoryOutlined,
+   DownloadRounded
 } from '@mui/icons-material'
 import { styled } from '@mui/styles'
 import { Formik, Form, FormikHelpers } from 'formik'
@@ -46,6 +47,8 @@ import { Scrollbar as MyScrollbars } from 'components/layout'
 import { useExtraccion } from 'hooks'
 import { NuevaDepuracionInfContext, NuevaDepuracionInfProvider } from 'context/nuevaDepuracionInf'
 import { SpeedDialActionProps, SpeedDialBackdrop } from 'components/speedDial'
+import { ExportToExcel, ExportToExcelRefProps } from 'components'
+import { convertMetaTypeToSqlType } from 'helpers'
 
 const MyItemPaper = styled(Paper)({
    height: '100%',
@@ -182,6 +185,9 @@ const optFieldType: Array<ItemType> = [
    { value: 'VARCHAR(MAX)', label: 'Texto' }
 ]
 
+const delayFadeTop: number = 270
+const durationFadeTop: number = 500
+
 const ListaTablasExtraccion: FC = () => {
    /* » HOOK'S  */
    const {
@@ -192,26 +198,32 @@ const ListaTablasExtraccion: FC = () => {
 
    const modalEditNombreTabla = useRef({} as SimpleModalRefProps)
    const modalAddFieldExtraccion = useRef({} as SimpleModalRefProps)
-   const confirmEliminarTabla = useRef({} as ConfirmDialogRefType)
    const modalAddGrupoAnalisis = useRef({} as SimpleModalRefProps)
+   const confirmEliminarTabla = useRef({} as ConfirmDialogRefType)
+   const downloadDepuracion = useRef({} as ExportToExcelRefProps)
    const inputFile = useRef({} as HTMLInputElement)
+
    const [isAcceptEliminarTabla, setIsAcceptEliminarTabla] = useState(false)
    const [selectedItem, setSelectedItem] = useState(-1)
    const [fileExtraccion, setFileExtraccion] = useState<{ fileName?: string, file?: File } | null>(null)
 
-   /* » CUSTOM - HOOK'S  */
+   /* ► CUSTOM - HOOK'S  */
    const {
       extraccionDb,
+      depuracion,
       loadingExtraccionDb,
       handleAlterFieldOfTablaDinamica,
       updateNameTablaDinamica,
       deleteTablaExtraccion,
-      findMetaTablaDinamicaExtraccion,
+      findMetaTablaDinamica,
       uploadExtraccion,
-      saveGrupoCamposAnalisis
+      saveGrupoCamposAnalisis,
+      findTablaDinamicaBySuffixOfField,
+      removeAllDepuracion
    } = useExtraccion()
 
-   useEffect(() => { /* » Delete: Tabla extracción ... */
+   /* ► EFFECT'S ...  */
+   useEffect(() => { /* ► Remove: Tabla extracción ... */
       if (!isAcceptEliminarTabla) return
       deleteTablaExtraccion(tablaDinamicaDto)
       /* » Clean-up `tablaDinamicaDto` ... */
@@ -219,7 +231,7 @@ const ListaTablasExtraccion: FC = () => {
       setIsAcceptEliminarTabla(false)
    }, [isAcceptEliminarTabla])
 
-   useEffect(() => {
+   useEffect(() => { /* ► Upload: Datos de extracción ... */
       if (fileExtraccion?.fileName && fileExtraccion?.file) {
          uploadExtraccion(fileExtraccion.fileName, fileExtraccion.file)
          setFileExtraccion(null)
@@ -227,7 +239,13 @@ const ListaTablasExtraccion: FC = () => {
       }
    }, [fileExtraccion])
 
-   /* » HANDLER'S  */
+   useEffect(() => { /* ► Download: Datos de depuración ... */
+      if (depuracion.length === 0) return
+      downloadDepuracion.current.handleExportToExcel()
+      removeAllDepuracion() /* ► Clean-up ... */
+   }, [depuracion])
+
+   /* ► HANDLER'S... */
    const handleChangeInputFile = ({ target: { files } }: ChangeEvent<HTMLInputElement>) => {
       setFileExtraccion(prev => ({ ...prev, file: files![0] }))
    }
@@ -242,7 +260,7 @@ const ListaTablasExtraccion: FC = () => {
             >
                {
                   extraccionDb?.map((tablaDinamica, i) => (
-                     <Fade key={ tablaDinamica.idTabla } top duration={ 2000 }>
+                     <Fade key={ tablaDinamica.idTabla } top duration={ durationFadeTop } delay={ delayFadeTop * (i + 1) }>
                         <ListItem>
                            <ListItemButton selected={ selectedItem === i }>
                               <ListItemText
@@ -253,13 +271,15 @@ const ListaTablasExtraccion: FC = () => {
                                     </Box>
                                  }
                                  onClick={ () => {
-                                    findMetaTablaDinamicaExtraccion(tablaDinamica)/* ► request ... */
+                                    findMetaTablaDinamica(tablaDinamica)/* ► request ... */
                                     handleSaveTablaDinamicaDto(tablaDinamica)
                                     handleSavegruposAnalisisDto(tablaDinamica.idTabla)
                                     setSelectedItem(i)
                                  }
                                  }
                               />
+
+                              {/* ► Action's ... */}
                               <ListItemSecondaryAction>
                                  <Tooltip title='Modificar nombre' placement='top' arrow>
                                     <IconButton onClick={() => {
@@ -286,7 +306,7 @@ const ListaTablasExtraccion: FC = () => {
                                     >
                                        <ViewWeekRounded fontSize='small' />
                                     </IconButton>
-                                 </Tooltip >
+                                 </Tooltip>
                                  <Tooltip title='Cargar datos de extracción' placement='top' arrow>
                                     <IconButton
                                        onClick={() => {
@@ -295,6 +315,13 @@ const ListaTablasExtraccion: FC = () => {
                                        }}
                                     >
                                        <UploadOutlined fontSize='small' />
+                                    </IconButton>
+                                 </Tooltip >
+                                 <Tooltip title='Descargar datos de extracción' placement='top' arrow>
+                                    <IconButton
+                                       onClick={() => { findTablaDinamicaBySuffixOfField(tablaDinamica.nombre, '_e') }}
+                                    >
+                                       <DownloadRounded fontSize='small' />
                                     </IconButton>
                                  </Tooltip >
                                  <Tooltip title='Crear grupo de analisis' placement='top' arrow>
@@ -315,6 +342,7 @@ const ListaTablasExtraccion: FC = () => {
                }
             </List>
          </MyScrollbars>
+
          {/* » MODAL: Editar nombre tabla extracción ...  */}
          <SimpleModal ref={ modalEditNombreTabla }>
             <Formik
@@ -418,6 +446,9 @@ const ListaTablasExtraccion: FC = () => {
             </Formik>
          </SimpleModal>
 
+         {/* ► DOWNLOAD: Depuración ...  */}
+         <ExportToExcel ref={ downloadDepuracion } data={ depuracion } />
+
          {/* » INPUT<fIle> ... */}
          <input type='file' ref={ inputFile } accept='.xlsx' hidden onChange={ handleChangeInputFile } />
       </>
@@ -447,7 +478,7 @@ const ListaCamposExtraccion: FC = () => {
             <List>
                {
                   camposExtraccionDb.map((metaCampo, i) => (
-                     <Fade top duration={ 2000 } key={ metaCampo.nombre }>
+                     <Fade key={ metaCampo.nombre } top duration={ durationFadeTop } delay={ delayFadeTop * (i + 1) }>
 
                         <ListItem>
                            <ListItemButton>
@@ -459,11 +490,12 @@ const ListaCamposExtraccion: FC = () => {
                               }
                               />
 
+                              {/* ► Action's  */}
                               <ListItemSecondaryAction>
                                  <Tooltip title='Editar campo' placement='top' arrow>
                                     <IconButton
                                        onClick={() => {
-                                          setPrevMetaField(metaCampo)
+                                          setPrevMetaField(convertMetaTypeToSqlType(metaCampo))
                                           modalEliminarCampo.current.setOpen(true)
                                        }}
                                     >
@@ -545,7 +577,7 @@ const ListaGrupoAnalisis:FC = () => {
             <List>
                {
                   gruposAnalisisDto.map((grupo, i) => (
-                     <Fade key={ grupo.idGrupo } top duration={ 2000 }>
+                     <Fade key={ grupo.idGrupo } top duration={ durationFadeTop } delay={ delayFadeTop * (i + 1) }>
                         <ListItem>
 
                            <ListItemButton
@@ -699,7 +731,7 @@ const ListaCamposAnalisis: FC = () => {
             <List>
                {
                   camposAnalisisTmp.map((metaCampo, i) => (
-                     <Fade key={ metaCampo.nombre } duration={ 2000 } top>
+                     <Fade key={ metaCampo.nombre } top duration={ durationFadeTop } delay={ delayFadeTop * (i + 1) }>
 
                         <ListItem>
                            <ListItemButton>

@@ -1,6 +1,8 @@
-import { useImperativeHandle, forwardRef, useRef } from 'react'
+import { useImperativeHandle, forwardRef, useRef, useMemo } from 'react'
 
 import ExportExcel from 'react-export-excel'
+
+import { getPropertiesOfArrayObjects } from 'helpers'
 
 const ExcelFile = ExportExcel.ExcelFile
 const ExcelSheet = ExportExcel.ExcelSheet
@@ -12,10 +14,10 @@ export type ExportToExcelRefProps = {
 
 type Props = {
    data: Array<any>
-   fields: Array<any>
+   fields?: Array<any>
 }
 
-export const ExportToExcel = forwardRef<ExportToExcelRefProps, Props>(({ data, fields }, ref) => {
+export const ExportToExcel = forwardRef<ExportToExcelRefProps, Props>(({ data, fields = [] }, ref) => {
    /* ► HOOK'S  */
    const exportToExcel = useRef({} as HTMLButtonElement)
 
@@ -26,6 +28,10 @@ export const ExportToExcel = forwardRef<ExportToExcelRefProps, Props>(({ data, f
 
    /* ► DEP'S  */
    const fileName: string = `${data.length} registros`
+   const customFields = useMemo(() => fields.length > 0
+      ? fields
+      : getPropertiesOfArrayObjects(data)
+   , [data])
 
    return (
       <ExcelFile
@@ -33,9 +39,11 @@ export const ExportToExcel = forwardRef<ExportToExcelRefProps, Props>(({ data, f
          element={<button ref={ exportToExcel } hidden>Descargar</button>}
       >
          <ExcelSheet data={ data } name={ fileName }>
-            {fields.map(field => (
-               <ExcelColumn key={ field } label={ field } value={ field } />
-            ))}
+            {
+               customFields.map(field => (
+                  <ExcelColumn key={ field } label={ field } value={ field } />
+               ))
+            }
          </ExcelSheet>
       </ExcelFile>
    )

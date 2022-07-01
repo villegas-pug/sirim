@@ -161,13 +161,13 @@ export const alterTablaDinamica = (tablaDinamicaDto: Partial<TablaDinamicaDto>) 
    }
 }
 
-export const findMetaTablaDinamicaExtraccion = (tablaDinamicaDto: Partial<TablaDinamicaDto>) => async (dispatch: Dispatch<ExtraccionAction>, getState: () => any): Promise<void> => {
+export const findMetaTablaDinamica = (tablaDinamicaDto: Partial<TablaDinamicaDto>) => async (dispatch: Dispatch<ExtraccionAction>, getState: () => any): Promise<void> => {
    dispatch({ type: '[Extracción] Find metadatos extracción loading' })
    try {
       const { usuario: { token } } = getState()
       const { data: { levelLog, data, message } } = await api.request<Response<MetaCampoTablaDinamica[]>>({
          method: 'POST',
-         url: '/microservicio-rimextraccion/findMetaTablaDinamicaExtraccion',
+         url: '/microservicio-rimextraccion/findMetaTablaDinamica',
          data: tablaDinamicaDto,
          headers: {
             [AUTHORIZATION]: token
@@ -375,6 +375,8 @@ export const dynamicJoinStatement = (queryClauseDto: QueryClauseDto) => async (d
 
 export const removeAllExtraccionDownload = () => (dispatch: Dispatch<ExtraccionAction>) => { dispatch({ type: '[Extracción] Remove-All Extracción Download' }) }
 
+export const removeAllDepuracion = () => (dispatch: Dispatch<ExtraccionAction>) => { dispatch({ type: '[Extracción] Remove-All Depuración' }) }
+
 export const deleteQueryStringById = (idQStr: number) => async (dispatch: Dispatch<ExtraccionAction>, getState: any): Promise<void> => {
    dispatch({ type: '[Extracción] Delete queryString loading' })
    try {
@@ -458,6 +460,35 @@ export const findDnvByParams = (params: RequestParamsDnv) => async (dispatch: Di
       }
    } catch (err: any) {
       dispatch({ type: '[Extracción] Find all dnv by params error', payload: err?.message })
+      dispatch({ type: '[http-status] Response status', payload: err?.response?.status })
+   }
+}
+
+export const findTablaDinamicaBySuffixOfField = (nombreTabla: String, suffix: String) => async (dispatch: Dispatch<ExtraccionAction>, getState: any): Promise<void> => {
+   dispatch({ type: '[Extracción] Find tabla dinámica by suffix loading' })
+   try {
+      const { usuario: { token } } = getState()
+      const { data: { levelLog, data, message } } = await api.request<Response<Array<Object>>>({
+         method: 'POST',
+         url: '/microservicio-rimextraccion/findTablaDinamicaBySuffixOfField',
+         params: { nombreTabla, suffix },
+         headers: {
+            [AUTHORIZATION]: token
+         }
+      })
+
+      switch (levelLog) {
+      case 'SUCCESS':
+         dispatch({ type: '[Extracción] Find tabla dinámica by suffix success', payload: data })
+         break
+      case 'WARNING':
+      case 'ERROR':
+         dispatch({ type: '[Extracción] Find tabla dinámica by suffix error', payload: message })
+         noty('error', message)
+         break
+      }
+   } catch (err: any) {
+      dispatch({ type: '[Extracción] Find tabla dinámica by suffix error', payload: err?.message })
       dispatch({ type: '[http-status] Response status', payload: err?.response?.status })
    }
 }

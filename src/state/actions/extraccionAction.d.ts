@@ -159,6 +159,8 @@ interface RemoveAllExtraccionDownload {
    type: '[Extracción] Remove-All Extracción Download'
 }
 
+interface RemoveAllDepuracion { type: '[Extracción] Remove-All Depuración' }
+
 interface DeleteQueryStringByIdLoading {
    type: '[Extracción] Delete queryString loading'
 }
@@ -201,6 +203,20 @@ interface FindDnvParamsError {
    payload: string | null
 }
 
+interface FindTablaDinamicaBySuffixOfFieldLoading {
+   type: '[Extracción] Find tabla dinámica by suffix loading'
+}
+
+interface FindTablaDinamicaBySuffixOfFieldSuccess {
+   type: '[Extracción] Find tabla dinámica by suffix success'
+   payload: Array<Object>
+}
+
+interface FindTablaDinamicaBySuffixOfFieldError {
+   type: '[Extracción] Find tabla dinámica by suffix error'
+   payload: string | null
+}
+
 export type ExtraccionAction =
    | ResponseHttpStatusType
    | CreateTablaExtracciónLoading
@@ -237,6 +253,7 @@ export type ExtraccionAction =
    | DynamicJoinStatementSuccess
    | DynamicJoinStatementError
    | RemoveAllExtraccionDownload
+   | RemoveAllDepuracion
    | DeleteQueryStringByIdLoading
    | DeleteQueryStringByIdSuccess
    | DeleteQueryStringByIdError
@@ -246,3 +263,6 @@ export type ExtraccionAction =
    | FindDnvParamsLoading
    | FindDnvParamsSuccess
    | FindDnvParamsError
+   | FindTablaDinamicaBySuffixOfFieldLoading
+   | FindTablaDinamicaBySuffixOfFieldSuccess
+   | FindTablaDinamicaBySuffixOfFieldError

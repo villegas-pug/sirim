@@ -21,7 +21,12 @@ type ExtraccionState = {
       data: Array<BaseDatos>
       error: string | null
    },
-   downloadExtraccion: {
+   extraccion: {
+      loading: boolean
+      data: Array<Object>
+      error: string | null
+   },
+   depuracion: {
       loading: boolean
       data: Array<Object>
       error: string | null
@@ -53,7 +58,12 @@ const initialState: ExtraccionState = {
       data: [],
       error: null
    },
-   downloadExtraccion: {
+   extraccion: {
+      loading: false,
+      data: [],
+      error: null
+   },
+   depuracion: {
       loading: false,
       data: [],
       error: null
@@ -119,13 +129,13 @@ export const extraccionReducer = (state: ExtraccionState = initialState, action:
    case '[Extracción] Delete queryString error':
       return { ...state, basesDatos: { loading: false, data: [], error: action.payload } }
    case '[Extracción] Dynamic-Join-Statement loading':
-      return { ...state, downloadExtraccion: { loading: true, data: [], error: null } }
+      return { ...state, extraccion: { loading: true, data: [], error: null } }
    case '[Extracción] Dynamic-Join-Statement success':
-      return { ...state, downloadExtraccion: { loading: false, data: action.payload, error: null } }
+      return { ...state, extraccion: { loading: false, data: action.payload, error: null } }
    case '[Extracción] Dynamic-Join-Statement error':
-      return { ...state, downloadExtraccion: { loading: false, data: [], error: action.payload } }
+      return { ...state, extraccion: { loading: false, data: [], error: action.payload } }
    case '[Extracción] Remove-All Extracción Download':
-      return { ...state, downloadExtraccion: { loading: false, data: [], error: null } }
+      return { ...state, extraccion: { loading: false, data: [], error: null } }
    case '[Extracción] Update queryString loading':
       return { ...state, basesDatos: { ...state.basesDatos, loading: true, error: null } }
    case '[Extracción] Update queryString success':
@@ -138,6 +148,14 @@ export const extraccionReducer = (state: ExtraccionState = initialState, action:
       return { ...state, dnv: { loading: false, data: action.payload, error: null } }
    case '[Extracción] Find all dnv by params error':
       return { ...state, dnv: { loading: false, data: [], error: action.payload } }
+   case '[Extracción] Find tabla dinámica by suffix loading':
+      return { ...state, depuracion: { loading: true, data: [], error: null } }
+   case '[Extracción] Find tabla dinámica by suffix success':
+      return { ...state, depuracion: { loading: false, data: action.payload, error: null } }
+   case '[Extracción] Find tabla dinámica by suffix error':
+      return { ...state, depuracion: { loading: false, data: [], error: action.payload } }
+   case '[Extracción] Remove-All Depuración':
+      return { ...state, depuracion: { loading: false, data: [], error: null } }
    default:
       return state
    }

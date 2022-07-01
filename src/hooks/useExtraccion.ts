@@ -56,9 +56,13 @@ export const useExtraccion = () => {
          loading: loadingBasesDatosDb,
          data: basesDatosDb
       },
-      downloadExtraccion: {
-         loading: loadingDownloadExtraccion,
-         data: downloadExtraccionDb
+      extraccion: {
+         loading: loadingExtraccion,
+         data: extraccion
+      },
+      depuracion: {
+         loading: loadingDepuracion,
+         data: depuracion
       },
       dnv: {
          data: dnvDb,
@@ -72,19 +76,21 @@ export const useExtraccion = () => {
       deleteTablaExtraccion,
       alterTablaDinamica,
       findAllBandejaEvaluacion,
-      findMetaTablaDinamicaExtraccion,
+      findMetaTablaDinamica,
       uploadExtraccion,
       saveGrupoCamposAnalisis,
       findAllBasesDatos,
       saveQueryString,
       dynamicJoinStatement,
       removeAllExtraccionDownload,
+      removeAllDepuracion,
       deleteQueryStringById,
       updateQueryString,
-      findDnvByParams
+      findDnvByParams,
+      findTablaDinamicaBySuffixOfField
    } = useAppActions()
 
-   /* » HANDLER'S:  */
+   /* ► HANDLER'S:  */
    const handleAlterFieldOfTablaDinamica = useCallback((tablaDinamicaDto: Partial<TablaDinamicaDto>, metaCampo: MetaCampoTablaDinamica, type: AlterTableType) => {
       const metaFieldDecorated = decorateMetaFieldByAlterType(metaCampo, type)
       tablaDinamicaDto.alterTableType = type
@@ -124,7 +130,7 @@ export const useExtraccion = () => {
       alterTablaDinamica(tablaDinamicaDto)
    }, [])
 
-   /* » DEP'S  */
+   /* ► DEP'S  */
    const camposExtraccionDb = useMemo(() => camposTablaDinamicaDb.filter(({ nombre }) => nombre.endsWith('_e')), [camposTablaDinamicaDb])
 
    const camposDnvDb = useMemo(() => {
@@ -141,8 +147,10 @@ export const useExtraccion = () => {
       loadingTablaDinamica,
       loadingBasesDatosDb,
       basesDatosDb,
-      downloadExtraccionDb,
-      loadingDownloadExtraccion,
+      loadingExtraccion,
+      extraccion,
+      loadingDepuracion,
+      depuracion,
       dnvDb,
       loadingDnvDb,
       camposDnvDb,
@@ -155,16 +163,18 @@ export const useExtraccion = () => {
       updateNameTablaDinamica,
       deleteTablaExtraccion,
       findAllBandejaEvaluacion,
-      findMetaTablaDinamicaExtraccion,
+      findMetaTablaDinamica,
       uploadExtraccion,
       saveGrupoCamposAnalisis,
       findAllBasesDatos,
       saveQueryString,
       handleDynamicJoinStatement,
       removeAllExtraccionDownload,
+      removeAllDepuracion,
       deleteQueryStringById,
       updateQueryString,
       findDnvByParams,
+      findTablaDinamicaBySuffixOfField,
 
       /* » Off-Hook method's ... */
       decorateMetaFieldByAlterType,

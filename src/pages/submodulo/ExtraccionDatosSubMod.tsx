@@ -35,6 +35,7 @@ import {
 import { styled } from '@mui/styles'
 import { Formik, Form } from 'formik'
 import * as Yup from 'yup'
+import Fade from 'react-reveal/Fade'
 import { motion } from 'framer-motion'
 
 import { Scrollbar } from 'components/layout'
@@ -50,11 +51,13 @@ import { useExtraccion, usePais } from 'hooks'
 
 import { Pais, QueryString, WhereClauseControlMigraMod } from 'interfaces'
 import { convertJSON, noty } from 'helpers'
-import { variantsParent, variantsChild } from 'constants/'
 
 const MyPaper = styled(Paper)({
    height: '100%'
 })
+
+const delayFadeTop: number = 270
+const durationFadeTop: number = 500
 
 const ExtraccionDatosSubMod: FC = () => {
    /* ► CONTEXT  */
@@ -99,56 +102,57 @@ const ExtraccionDatosSubMod: FC = () => {
 
    return (
       <>
-         <Paper variant='outlined'>
-            <Grid container p={0.5} sx={{ height: 'calc(100vh - 115px)' }} flexWrap='nowrap' gap={ 0.5 }>
+         <Fade>
+            <Paper variant='outlined'>
+               <Grid container p={0.5} sx={{ height: 'calc(100vh - 115px)' }} flexWrap='nowrap' gap={ 0.5 }>
 
-               <Grid item xs={ 3 }>
-                  <MyPaper>
-                     <Scrollbar height={ 75 }>
-                        <ListaBasesDatos />
-                     </Scrollbar>
-                  </MyPaper>
-               </Grid>
-
-               <Grid item xs={ 3 } container gap={ 0.5 }>
-
-                  <Grid item xs={ 12 }>
+                  <Grid item xs={ 3 }>
                      <MyPaper>
-                        <Scrollbar height={ 35 }>
-                           <ListaModulos />
+                        <Scrollbar height={ 75 }>
+                           <ListaBasesDatos />
                         </Scrollbar>
                      </MyPaper>
                   </Grid>
 
-                  <Grid item xs={ 12 }>
+                  <Grid item xs={ 3 } container gap={ 0.5 }>
+
+                     <Grid item xs={ 12 }>
+                        <MyPaper>
+                           <Scrollbar height={ 35 }>
+                              <ListaModulos />
+                           </Scrollbar>
+                        </MyPaper>
+                     </Grid>
+
+                     <Grid item xs={ 12 }>
+                        <MyPaper>
+                           <Scrollbar height={ 35 }>
+                              <ListaModelosDetos />
+                           </Scrollbar>
+                        </MyPaper>
+                     </Grid>
+
+                  </Grid>
+
+                  <Grid item xs={ 3 }>
                      <MyPaper>
-                        <Scrollbar height={ 35 }>
-                           <ListaModelosDetos />
+                        <Scrollbar height={ 75 }>
+                           <ListaTablas />
+                        </Scrollbar>
+                     </MyPaper>
+                  </Grid>
+
+                  <Grid item xs={ 3 }>
+                     <MyPaper>
+                        <Scrollbar height={ 75 }>
+                           <ListaCampos />
                         </Scrollbar>
                      </MyPaper>
                   </Grid>
 
                </Grid>
-
-               <Grid item xs={ 3 }>
-                  <MyPaper>
-                     <Scrollbar height={ 75 }>
-                        <ListaTablas />
-                     </Scrollbar>
-                  </MyPaper>
-               </Grid>
-
-               <Grid item xs={ 3 }>
-                  <MyPaper>
-                     <Scrollbar height={ 75 }>
-                        <ListaCampos />
-                     </Scrollbar>
-                  </MyPaper>
-               </Grid>
-
-            </Grid>
-         </Paper>
-
+            </Paper>
+         </Fade>
          {/* ► MODAL: Crear módulo ... */}
          <SimpleModal ref={ modalCrearMod }>
             <Formik
@@ -206,18 +210,20 @@ const ListaBasesDatos: FC = () => {
       <List subheader={ <ListSubheader sx={{ fontWeight: '1000' }}>Bases de Datos</ListSubheader> }>
          {
             basesDatosDb.map((bd, i) => (
-               <ListItem key={ bd.nombre }>
-                  <ListItemButton
-                     selected={ selected === i }
-                     onClick={ () => {
-                        setSelected(i)
-                        handleSaveBaseDatosTmp(bd)
-                     } }
-                  >
-                     <ListItemIcon><StorageRounded fontSize='small' /></ListItemIcon>
-                     <ListItemText primary={ <Typography variant='h6'>{ bd.nombre }</Typography> } />
-                  </ListItemButton>
-               </ListItem>
+               <Fade key={ bd.nombre } top duration={ durationFadeTop } delay={ delayFadeTop * (i + 1) }>
+                  <ListItem>
+                     <ListItemButton
+                        selected={ selected === i }
+                        onClick={ () => {
+                           setSelected(i)
+                           handleSaveBaseDatosTmp(bd)
+                        } }
+                     >
+                        <ListItemIcon><StorageRounded fontSize='small' /></ListItemIcon>
+                        <ListItemText primary={ <Typography variant='h6'>{ bd.nombre }</Typography> } />
+                     </ListItemButton>
+                  </ListItem>
+               </Fade>
             ))
          }
       </List>
@@ -233,32 +239,27 @@ const ListaModulos: FC = () => {
    /* ► CUSTOM - HOOK'S  */
 
    return (
-      <motion.div
-         variants={ variantsParent }
-         initial='hidden'
-         animate='visible'
-      >
-         <List subheader={ <ListSubheader sx={{ fontWeight: '1000' }}>Módulos</ListSubheader> }>
-            {
-               baseDatosTmp.modulos?.map((mod, i) => (
-                  <motion.div key={ mod.nombre } variants={ variantsChild }>
-                     <ListItem>
-                        <ListItemButton
-                           selected={ selected === i }
-                           onClick={ () => {
-                              setSelected(i)
-                              handleSaveModuloTmp(mod)
-                           } }
-                        >
-                           <ListItemIcon><WorkspacesRounded fontSize='small' /></ListItemIcon>
-                           <ListItemText primary={ <Typography variant='h6'>{ mod.nombre }</Typography> } />
-                        </ListItemButton>
-                     </ListItem>
-                  </motion.div>
-               ))
-            }
-         </List>
-      </motion.div>
+      <List subheader={ <ListSubheader sx={{ fontWeight: '1000' }}>Módulos</ListSubheader> }>
+         {
+            baseDatosTmp.modulos?.map((mod, i) => (
+               <Fade key={ mod.nombre } top duration={ durationFadeTop } delay={ delayFadeTop * (i + 1) }>
+                  <ListItem>
+                     <ListItemButton
+                        selected={ selected === i }
+                        onClick={ () => {
+                           setSelected(i)
+                           handleSaveModuloTmp(mod)
+                        } }
+                     >
+                        <ListItemIcon><WorkspacesRounded fontSize='small' /></ListItemIcon>
+                        <ListItemText primary={ <Typography variant='h6'>{ mod.nombre }</Typography> } />
+                     </ListItemButton>
+                  </ListItem>
+               </Fade>
+            ))
+         }
+      </List>
+
    )
 }
 
@@ -288,55 +289,49 @@ const ListaModelosDetos: FC = () => {
 
    return (
       <>
-         <motion.div
-            initial='hidden'
-            animate='visible'
-            variants={ variantsParent }
-         >
-            <List subheader={ <ListSubheader sx={{ fontWeight: '1000' }}>Modelos de Datos</ListSubheader> }>
-               {
-                  moduloTmp.queryStrings?.map((model, i) => (
-                     <motion.div key={ model.nombre } variants={ variantsChild }>
-                        <ListItem>
-                           <ListItemButton
-                              selected={ selected === i }
-                              onClick={ () => {
-                                 setSelected(i)
-                                 handleUpdateCamposSeleccionadosTmp({ camposCsv: model.queryString }, 'Add-All')
-                              } }
-                           >
-                              <ListItemIcon><BusinessRounded fontSize='small' /></ListItemIcon>
-                              <ListItemText primary={ <Typography variant='h6'>{ model.nombre }</Typography> } />
-                              <ListItemSecondaryAction>
+         <List subheader={ <ListSubheader sx={{ fontWeight: '1000' }}>Modelos de Datos</ListSubheader> }>
+            {
+               moduloTmp.queryStrings?.map((model, i) => (
+                  <Fade key={ model.nombre } top duration={ durationFadeTop } delay={ delayFadeTop * (i + 1) }>
+                     <ListItem>
+                        <ListItemButton
+                           selected={ selected === i }
+                           onClick={ () => {
+                              setSelected(i)
+                              handleUpdateCamposSeleccionadosTmp({ camposCsv: model.queryString }, 'Add-All')
+                           } }
+                        >
+                           <ListItemIcon><BusinessRounded fontSize='small' /></ListItemIcon>
+                           <ListItemText primary={ <Typography variant='h6'>{ model.nombre }</Typography> } />
+                           <ListItemSecondaryAction>
 
-                                 <IconButton
-                                    size='small'
-                                    onClick={ () => {
-                                       tmpQueryString.current = model
-                                       modalUpdateQueryString.current.setOpen(true)
-                                    }}
-                                 >
-                                    <EditRounded fontSize='small' />
-                                 </IconButton>
+                              <IconButton
+                                 size='small'
+                                 onClick={ () => {
+                                    tmpQueryString.current = model
+                                    modalUpdateQueryString.current.setOpen(true)
+                                 }}
+                              >
+                                 <EditRounded fontSize='small' />
+                              </IconButton>
 
-                                 <IconButton
-                                    size='small'
-                                    onClick={ () => {
-                                       tmpQueryString.current = model
-                                       confirmDeleteDataModel.current.setIsOpen(true)
-                                    }}
-                                 >
-                                    <DeleteForeverOutlined fontSize='small' />
-                                 </IconButton>
+                              <IconButton
+                                 size='small'
+                                 onClick={ () => {
+                                    tmpQueryString.current = model
+                                    confirmDeleteDataModel.current.setIsOpen(true)
+                                 }}
+                              >
+                                 <DeleteForeverOutlined fontSize='small' />
+                              </IconButton>
 
-                              </ListItemSecondaryAction>
-                           </ListItemButton>
-                        </ListItem>
-                     </motion.div>
-                  ))
-               }
-            </List>
-         </motion.div>
+                           </ListItemSecondaryAction>
+                        </ListItemButton>
+                     </ListItem>
+                  </Fade>
+               ))
+            }
+         </List>
 
          {/* ► CONFIRM: Delete Data Model ... */}
          <ConfirmDialogModal
@@ -385,29 +380,24 @@ const ListaTablas: FC = () => {
 
    return (
       <List subheader={ <ListSubheader sx={{ fontWeight: '1000' }}>Tablas</ListSubheader> }>
-         <motion.div
-            initial='hidden'
-            animate='visible'
-            variants={ variantsParent }
-         >
-            {
-               moduloTmp.tablas?.map((tabla, i) => (
-                  <motion.li key={ tabla.idTabla } variants={ variantsChild }>
-                     <ListItem>
-                        <ListItemButton
-                           selected={ selected === i }
-                           onClick={ () => {
-                              setSelected(i)
-                              handleSaveTablaTmp(tabla)
-                           } }
-                        >
-                           <ListItemIcon><TableViewRounded fontSize='small' /></ListItemIcon>
-                           <ListItemText primary={ <Typography variant='h6'>{ tabla.nombre }</Typography> } />
-                        </ListItemButton>
-                     </ListItem>
-                  </motion.li>
-               ))}
-         </motion.div>
+         {
+            moduloTmp.tablas?.map((tabla, i) => (
+               <Fade key={ tabla.idTabla } top duration={ 200 } delay={ 100 * (i + 1) }>
+                  <ListItem>
+                     <ListItemButton
+                        selected={ selected === i }
+                        onClick={ () => {
+                           setSelected(i)
+                           handleSaveTablaTmp(tabla)
+                        } }
+                     >
+                        <ListItemIcon><TableViewRounded fontSize='small' /></ListItemIcon>
+                        <ListItemText primary={ <Typography variant='h6'>{ tabla.nombre }</Typography> } />
+                     </ListItemButton>
+                  </ListItem>
+               </Fade>
+            ))
+         }
       </List>
    )
 }
@@ -447,40 +437,35 @@ const ListaCampos: FC = () => {
 
    return (
       <List subheader={ <ListSubheader sx={{ fontWeight: '1000' }}>Campos</ListSubheader> }>
-         <motion.div
-            initial='hidden'
-            animate='visible'
-            variants={ variantsParent }
-         >
-            {
-               camposTmp.map((campo, i) => (
-                  <motion.div key={ i } variants={ variantsChild }>
-                     <ListItem>
-                        <ListItemButton
-                           selected={ selected === i }
-                           onClick={ () => {
-                              setSelected(i)
-                              handleClickItem(campo)
-                           } }
-                        >
-                           <ListItemIcon>
-                              <Checkbox
-                                 size='small'
-                                 checked={ isSelected(campo) }
-                              />
-                           </ListItemIcon>
-                           <ListItemText primary={ <Typography variant='h5'>{ campo }</Typography> } />
-                        </ListItemButton>
-                     </ListItem>
-                  </motion.div>
-               ))
-            }
-         </motion.div>
+         {
+            camposTmp.map((campo, i) => (
+               <Fade key={ campo } top duration={ 200 } delay={ 100 * (i + 1) }>
+                  <ListItem>
+                     <ListItemButton
+                        selected={ selected === i }
+                        onClick={ () => {
+                           setSelected(i)
+                           handleClickItem(campo)
+                        } }
+                     >
+                        <ListItemIcon>
+                           <Checkbox
+                              size='small'
+                              checked={ isSelected(campo) }
+                           />
+                        </ListItemIcon>
+                        <ListItemText primary={ <Typography variant='h5'>{ campo }</Typography> } />
+                     </ListItemButton>
+                  </ListItem>
+               </Fade>
+            ))
+         }
       </List>
    )
 }
 
 const optTipoControl: ItemType[] = [
+   { value: '%', label: '--Todos--' },
    { value: 'E', label: 'Entrada' },
    { value: 'S', label: 'Salida' }
 ]
@@ -497,8 +482,8 @@ const FrmExtraerDatos: FC = () => {
    /* ► CUSTOM-HOOK'S  */
    const { paisDb, findAllPais } = usePais()
    const {
-      loadingDownloadExtraccion,
-      downloadExtraccionDb,
+      loadingExtraccion,
+      extraccion,
       handleDynamicJoinStatement
    } = useExtraccion()
 
@@ -506,9 +491,9 @@ const FrmExtraerDatos: FC = () => {
    useEffect(() => { findAllPais() }, [])
 
    useEffect(() => { /* ► Si hay registros, renderiza modal de descargas ...  */
-      if (downloadExtraccionDb.length === 0) return
+      if (extraccion.length === 0) return
       modalDownloadChunks.current.setOpen(true)
-   }, [downloadExtraccionDb])
+   }, [extraccion])
 
    /* ► HANDLER'S  */
    const handleInputChange = ({ target: { value } }: ChangeEvent<HTMLInputElement>) => { input.current = parseInt(value) }
@@ -538,13 +523,15 @@ const FrmExtraerDatos: FC = () => {
                tipo: Yup.string().required('¡Campo requerido!'),
                paisNac: Yup.object().nullable().required('¡Campo requerido!')
             })}
-            onSubmit={ async (values: WhereClauseControlMigraMod, meta): Promise<void> => {
+            onSubmit={ (values: WhereClauseControlMigraMod, meta): void => {
                const { fechaIni, fechaFin, tipo, paisNac } = values
-               await handleDynamicJoinStatement(
+               handleDynamicJoinStatement(
                   moduloTmp.nombre,
                   camposSeleccionadosTmp,
-                  `AND SimMovMigra.dFechaControl BETWEEN '${fechaIni} 00:00:00' AND '${fechaFin} 23:59:59' 
-               AND SimMovMigra.sTipo = '${tipo}' AND SimMovMigra.sIdPaisNacionalidad = '${paisNac.idPais}'`
+                  `AND SimMovMigra.dFechaControl BETWEEN '${fechaIni} 00:00:00.000' 
+                   AND '${fechaFin} 23:59:59.999' 
+                   AND SimMovMigra.sTipo LIKE '${tipo}' 
+                   AND SimMovMigra.sIdPaisNacionalidad LIKE '${paisNac?.idPais ?? '%'.replaceAll("'", '')}'`
                )
             } }
          >
@@ -558,9 +545,9 @@ const FrmExtraerDatos: FC = () => {
                      <Button
                         type='submit'
                         variant='outlined'
-                        disabled={ loadingDownloadExtraccion }
+                        disabled={ loadingExtraccion }
                      >
-                        { loadingDownloadExtraccion
+                        { loadingExtraccion
                            ? <CircularProgress size={ 22 } sx={{ color: '#999' }} />
                            : <SearchOutlined />
                         }
@@ -581,7 +568,7 @@ const FrmExtraerDatos: FC = () => {
                >
                   <Stack direction='row' spacing={ 2 } alignItems='center'>
                      <Typography variant='h5'>Registros encontrados:</Typography>
-                     <Typography variant='h4'>{ downloadExtraccionDb.length.toLocaleString() }</Typography>
+                     <Typography variant='h4'>{ extraccion.length.toLocaleString() }</Typography>
                   </Stack>
                   <Stack direction='row' spacing={ 3 }>
                      <TextField
@@ -621,12 +608,12 @@ const FrmExtraerDatos: FC = () => {
                   }
                }}
             >
-               <ExportMultipleExcelFiles data={ downloadExtraccionDb } numberPartitions={ downloadChunks } />
+               <ExportMultipleExcelFiles data={ extraccion } numberPartitions={ downloadChunks } />
             </motion.div>
          )}
 
          {/* ► MODAL: Loading ...  */}
-         { loadingDownloadExtraccion && <ModalLoader /> }
+         { loadingExtraccion && <ModalLoader /> }
 
       </>
    )

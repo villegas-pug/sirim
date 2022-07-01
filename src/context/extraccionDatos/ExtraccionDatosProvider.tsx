@@ -54,7 +54,7 @@ export const ExtraccionDatosProvider: FC<Props> = ({ children }) => {
       })
    }, [basesDatosDb])
 
-   useEffect(() => { /* ► ... */
+   useEffect(() => { /* ► Update: Estado `CamposTmp` ... */
       if (Object.keys(state.tablaTmp).length === 0) return
       dispatch({ type: 'saveCamposTmp', payload: convertCsvToArrayStr(state.tablaTmp.camposCsv) })
    }, [state.tablaTmp])

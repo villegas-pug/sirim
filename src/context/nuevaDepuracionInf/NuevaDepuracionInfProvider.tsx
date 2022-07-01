@@ -24,19 +24,6 @@ type ProviderProps = {
    children: ReactElement | ReactElement[]
 }
 
-const findGruposAnalisisByIdTabla = (idTabla: number, tablaDinamicaDb: Array<TablaDinamica>) => {
-   return tablaDinamicaDb.find(({ idTabla: id }) => id === idTabla)?.lstGrupoCamposAnalisis || []
-}
-
-const convertCsvToMetaCampoTablaDinamica = (grupoAnalisis: GrupoCamposAnalisis): MetaCampoTablaDinamica[] => {
-   return grupoAnalisis.metaFieldsCsv?.split(',')
-      .map(mf => mf.trim())
-      .map(mf => {
-         const meta = mf.split(' ')
-         return { nombre: meta[0], tipo: meta[1] as CampoType }
-      }) || []
-}
-
 export const NuevaDepuracionInfProvider: FC<ProviderProps> = ({ children }) => {
    /* » HOOK - STATE ... */
    const [state, dispatch] = useReducer(nuevaDepuracionInfReducer, INITIAL_STATE)
@@ -63,7 +50,7 @@ export const NuevaDepuracionInfProvider: FC<ProviderProps> = ({ children }) => {
       })
    }, [extraccionDb])
 
-   useEffect(() => {
+   useEffect(() => { /* ► Clean-up ...  */
       dispatch({ type: 'saveCamposAnalisisTmp', payload: [] })
    }, [state.tablaDinamicaDto])
 
@@ -100,4 +87,18 @@ export const NuevaDepuracionInfProvider: FC<ProviderProps> = ({ children }) => {
          { children }
       </NuevaDepuracionInfContext.Provider>
    )
+}
+
+/* ► Method's ...  */
+const findGruposAnalisisByIdTabla = (idTabla: number, tablaDinamicaDb: Array<TablaDinamica>) => {
+   return tablaDinamicaDb.find(({ idTabla: id }) => id === idTabla)?.lstGrupoCamposAnalisis || []
+}
+
+const convertCsvToMetaCampoTablaDinamica = (grupoAnalisis: GrupoCamposAnalisis): MetaCampoTablaDinamica[] => {
+   return grupoAnalisis.metaFieldsCsv?.split(',')
+      .map(mf => mf.trim())
+      .map(mf => {
+         const meta = mf.split(' ')
+         return { nombre: meta[0], tipo: meta[1] as CampoType }
+      }) || []
 }

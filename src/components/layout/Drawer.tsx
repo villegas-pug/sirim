@@ -31,18 +31,17 @@ import {
    Work
 } from '@mui/icons-material'
 import Fade from 'react-reveal/Fade'
-/* import Scrollbars from 'react-custom-scrollbars-2' */
-
 import { styled, useTheme } from '@mui/material/styles'
 import { useNavigate } from 'react-router-dom'
+
+import { DrawerTitle, ModalLoader } from 'components'
 
 import { useAuth } from 'hooks'
 
 import { elementIcons, layout } from 'constants/'
-import { DrawerTitle, ModalLoader } from '../styled'
 import { Modulo } from 'types'
 
-const drawerWidth = 190
+const drawerWidth = 150
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{ open?: boolean }>(({ theme, open }) => ({
    flexGrow: 1,
@@ -99,7 +98,7 @@ type Props = {
 
 export const Drawer: FC<Props> = ({ children }) => {
    const theme = useTheme()
-   const [open, setOpen] = useState(false)
+   const [open, setOpen] = useState(true)
 
    const [selectedItemDrawer, setSelectedItemDrawer] = useState(0)
    const [anchorEl, setAnchorEl] = useState(null)
@@ -131,7 +130,7 @@ export const Drawer: FC<Props> = ({ children }) => {
    const handleRootLogout = () => (handleCloseMenu(), logout())
 
    return (
-      <Fade duration={1500} delay={250} top>
+      <Fade duration={ 1500 } delay={ 250 } top>
          <Box sx={{ display: 'flex' }}>
             <CssBaseline />
             <AppBar position="fixed" open={open}>
@@ -153,10 +152,10 @@ export const Drawer: FC<Props> = ({ children }) => {
                            .filter(({ disposicion }) => disposicion === layout.APP_BAR)
                            .map(({ idProcedimiento, nombre, icono, rutaPrincipal }) => (
                               <Tab
-                                 key={idProcedimiento}
-                                 value={nombre}
+                                 key={ idProcedimiento }
+                                 value={ nombre }
                                  icon={ elementIcons[icono] }
-                                 onClick={() => handleTabs(rutaPrincipal, nombre as Modulo)}
+                                 onClick={ () => handleTabs(rutaPrincipal, nombre as Modulo) }
                               />
                            ))
                      }
@@ -165,10 +164,10 @@ export const Drawer: FC<Props> = ({ children }) => {
                   <Box display='flex' width='65%' marginLeft='auto' justifyContent='space-between' alignItems='center'>
 
                      <Grid container style={{ width: '12rem' }}>
-                        <Grid item xs={2} alignItems='stretch'>
+                        <Grid item xs={ 2 } alignItems='stretch'>
                            <Business fontSize='small' style={{ marginTop: 5 }} />
                         </Grid>
-                        <Grid item xs={10}>
+                        <Grid item xs={ 10 }>
                            <Typography variant='h4'>
                            UNIDAD ORGÁNICA <Typography variant='h5'>{ userCredentials?.area || '' }</Typography>
                            </Typography>
@@ -257,12 +256,12 @@ export const Drawer: FC<Props> = ({ children }) => {
                               <Divider />
                               <ListItem
                                  button
-                                 selected={selectedItemDrawer === idProcedimiento}
-                                 key={idProcedimiento}
-                                 onClick={() => { handleOnClickOptSidebar(rutaPrincipal, idProcedimiento) }}
+                                 selected={ selectedItemDrawer === idProcedimiento }
+                                 key={ idProcedimiento }
+                                 onClick={ () => { handleOnClickOptSidebar(rutaPrincipal, idProcedimiento) } }
                               >
-                                 <ListItemIcon>{ elementIcons[icono] }</ListItemIcon>
-                                 <ListItemText><DrawerTitle title={nombre} size={0.9} /></ListItemText>
+                                 <ListItemIcon sx={{ minWidth: 0 }}>{ elementIcons[icono] }</ListItemIcon>
+                                 <ListItemText><DrawerTitle title={ nombre } size={0.75} /></ListItemText>
                               </ListItem>
                            </>
                         ))

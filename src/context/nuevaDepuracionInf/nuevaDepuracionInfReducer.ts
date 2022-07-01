@@ -2,13 +2,13 @@ import { NuevaDepuracionInfState } from 'context/nuevaDepuracionInf'
 
 import { GrupoCamposAnalisis, MetaCampoTablaDinamica, TablaDinamicaDto } from 'interfaces'
 
-type nuevaDepuracionInfAction =
-| { type: 'saveTablaDinamicaDto', payload: Partial<TablaDinamicaDto> }
-| { type: 'saveGruposAnalisisDto', payload: GrupoCamposAnalisis[] }
-| { type: 'saveCamposAnalisisTmp', payload: Array<MetaCampoTablaDinamica> }
-| { type: 'saveGrupoAnalisisTmp', payload: GrupoCamposAnalisis }
+type NuevaDepuracionInfAction =
+   | { type: 'saveTablaDinamicaDto', payload: Partial<TablaDinamicaDto> }
+   | { type: 'saveGruposAnalisisDto', payload: GrupoCamposAnalisis[] }
+   | { type: 'saveCamposAnalisisTmp', payload: Array<MetaCampoTablaDinamica> }
+   | { type: 'saveGrupoAnalisisTmp', payload: GrupoCamposAnalisis }
 
-export const nuevaDepuracionInfReducer = (state: NuevaDepuracionInfState, action: nuevaDepuracionInfAction): NuevaDepuracionInfState => {
+export const nuevaDepuracionInfReducer = (state: NuevaDepuracionInfState, action: NuevaDepuracionInfAction): NuevaDepuracionInfState => {
    switch (action.type) {
    case 'saveTablaDinamicaDto':
       return { ...state, tablaDinamicaDto: action.payload }
