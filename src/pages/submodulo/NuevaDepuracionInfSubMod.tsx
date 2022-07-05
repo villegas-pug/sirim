@@ -64,6 +64,7 @@ const NuevaDepuracionInfSubMod: FC = () => {
       loadingExtraccionDb,
       loadingcamposTablaDinamicaDb,
       loadingTablaDinamica,
+      loadingDepuracion,
       findAllExtraccion,
       createTablaExtraccion
    } = useExtraccion()
@@ -89,7 +90,7 @@ const NuevaDepuracionInfSubMod: FC = () => {
             <Paper sx={{ padding: 0.5 }}>
                <Grid container height='calc(100vh - 7.5rem)' spacing={0.5}>
 
-                  <Grid item xs={5}>
+                  <Grid item xs={ 5 }>
                      <MyItemPaper>
                         <Typography variant='h5' >NUEVA TABLA</Typography>
                         <Divider />
@@ -136,7 +137,7 @@ const NuevaDepuracionInfSubMod: FC = () => {
                      </MyItemPaper>
                   </Grid>
 
-                  <Grid item xs={3}>
+                  <Grid item xs={ 4 }>
                      <MyItemPaper>
                         <Typography variant='h5' >CAMPOS DE EXTRACCIÓN</Typography>
                         <Divider />
@@ -144,7 +145,7 @@ const NuevaDepuracionInfSubMod: FC = () => {
                      </MyItemPaper>
                   </Grid>
 
-                  <Grid item xs={ 4 } container spacing={ 0.5 }>
+                  <Grid item xs={ 3 } container spacing={ 0.5 }>
 
                      <Grid item xs={ 12 }>
                         <MyItemPaper>
@@ -175,6 +176,7 @@ const NuevaDepuracionInfSubMod: FC = () => {
          { loadingExtraccionDb && <ModalLoader /> }
          { loadingcamposTablaDinamicaDb && <ModalLoader /> }
          { loadingTablaDinamica && <ModalLoader /> }
+         { loadingDepuracion && <ModalLoader /> }
 
       </>
    )

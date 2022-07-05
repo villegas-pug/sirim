@@ -4,6 +4,7 @@ export interface QueryClauseDto {
    mod: string
    fields: string
    where: string
+   nameTable?: string
 }
 
 export interface WhereClauseControlMigraMod {
@@ -11,4 +12,5 @@ export interface WhereClauseControlMigraMod {
    fechaFin: string
    tipo: string
    paisNac: Pais
+   nombreTabla?: string
 }

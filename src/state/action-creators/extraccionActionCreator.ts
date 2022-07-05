@@ -7,7 +7,17 @@ import { api } from 'config'
 import { noty } from 'helpers'
 import { localStorage, httpStatus } from 'constants/'
 
-import { Response, TablaDinamica, TablaDinamicaDto, MetaCampoTablaDinamica, BaseDatos, ModuloDto, QueryClauseDto, QueryString, RequestParamsDnv } from 'interfaces'
+import {
+   Response,
+   TablaDinamica,
+   TablaDinamicaDto,
+   MetaCampoTablaDinamica,
+   BaseDatos,
+   ModuloDto,
+   QueryClauseDto,
+   QueryString,
+   RequestParamsDnv
+} from 'interfaces'
 
 const { AUTHORIZATION } = localStorage
 
@@ -347,11 +357,16 @@ export const dynamicJoinStatementTest = (queryClauseDto: QueryClauseDto) => asyn
 export const dynamicJoinStatement = (queryClauseDto: QueryClauseDto) => async (dispatch: Dispatch<ExtraccionAction>, getState: any): Promise<void> => {
    dispatch({ type: '[Extracción] Dynamic-Join-Statement loading' })
    try {
-      const { usuario: { token } } = getState()
+      const { usuario: { token, userCredentials } } = getState()
+      const tablaDinamicaDto: Partial<TablaDinamicaDto> = {
+         nombre: queryClauseDto.nameTable,
+         usrCreador: userCredentials
+      }
+
       const { data: { levelLog, data, message } } = await api.request<Response<Object[]>>({
          method: 'POST',
          url: '/microservicio-rimextraccion/dynamicJoinStatement',
-         data: queryClauseDto,
+         data: { queryClauseDto, tablaDinamicaDto },
          headers: {
             [AUTHORIZATION]: token
          }
@@ -360,6 +375,7 @@ export const dynamicJoinStatement = (queryClauseDto: QueryClauseDto) => async (d
       switch (levelLog) {
       case 'SUCCESS':
          dispatch({ type: '[Extracción] Dynamic-Join-Statement success', payload: data })
+         noty('success', message)
          break
       case 'WARNING':
       case 'ERROR':
@@ -373,9 +389,13 @@ export const dynamicJoinStatement = (queryClauseDto: QueryClauseDto) => async (d
    }
 }
 
-export const removeAllExtraccionDownload = () => (dispatch: Dispatch<ExtraccionAction>) => { dispatch({ type: '[Extracción] Remove-All Extracción Download' }) }
+export const removeAllExtraccion = () => async (dispatch: Dispatch<ExtraccionAction>): Promise<void> => {
+   dispatch({ type: '[Extracción] Remove-All Extracción Download' })
+}
 
-export const removeAllDepuracion = () => (dispatch: Dispatch<ExtraccionAction>) => { dispatch({ type: '[Extracción] Remove-All Depuración' }) }
+export const removeAllDepuracion = () => async (dispatch: Dispatch<ExtraccionAction>): Promise<void> => {
+   dispatch({ type: '[Extracción] Remove-All Depuración' })
+}
 
 export const deleteQueryStringById = (idQStr: number) => async (dispatch: Dispatch<ExtraccionAction>, getState: any): Promise<void> => {
    dispatch({ type: '[Extracción] Delete queryString loading' })

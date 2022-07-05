@@ -129,11 +129,11 @@ export const extraccionReducer = (state: ExtraccionState = initialState, action:
    case '[Extracción] Delete queryString error':
       return { ...state, basesDatos: { loading: false, data: [], error: action.payload } }
    case '[Extracción] Dynamic-Join-Statement loading':
-      return { ...state, extraccion: { loading: true, data: [], error: null } }
+      return { ...state, extraccion: { ...state.extraccion, loading: true, error: null } }
    case '[Extracción] Dynamic-Join-Statement success':
       return { ...state, extraccion: { loading: false, data: action.payload, error: null } }
    case '[Extracción] Dynamic-Join-Statement error':
-      return { ...state, extraccion: { loading: false, data: [], error: action.payload } }
+      return { ...state, extraccion: { ...state.extraccion, loading: false, error: action.payload } }
    case '[Extracción] Remove-All Extracción Download':
       return { ...state, extraccion: { loading: false, data: [], error: null } }
    case '[Extracción] Update queryString loading':

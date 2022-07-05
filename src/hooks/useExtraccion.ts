@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from 'react'
 
-import { AlterTableType, MetaCampoTablaDinamica, QueryClauseDto, TablaDinamicaDto } from 'interfaces'
+import { AlterTableType, MetaCampoTablaDinamica, TablaDinamicaDto } from 'interfaces'
 
 import { useAppActions, useAppSelector } from 'hooks'
 
@@ -23,14 +23,14 @@ const undecorateNameField = (nombre: MetaCampoTablaDinamica['nombre']): string =
    return nombre?.slice(1).slice(0, -2) || ''
 }
 
-const convertObjectToFieldsClause = (fields: Object): string => {
+const convertObjectToFieldsSqlClause = (fields: Object): string => {
    const fieldsClause = Object.entries(fields)
       .filter(([_, value]) => (<string> value).length > 0)
       .map(entry => {
          const [key, value] = entry
          return (<string> value).split(',').map(f => {
             const ff = `${key.trim()}.${f.trim()}`
-            if (f.startsWith('d')) return `CAST(${ff} AS DATE) [${ff}]`
+            if (f.startsWith('d')) return `CAST(${ff} AS VARCHAR) [${ff}]`
             return `${ff} [${ff}]`
          })
       })
@@ -43,7 +43,7 @@ const convertObjectToFieldsClause = (fields: Object): string => {
 export const useExtraccion = () => {
    /* » CUSTOM - HOOK'S  */
    const {
-      loading: loadingExtraccionDb,
+      loading: loadingExtraccionDb, /* ► Reservado, estado raiz ... */
       data: extraccionDb,
       camposTablaDinamica: {
          loading: loadingcamposTablaDinamicaDb,
@@ -82,7 +82,7 @@ export const useExtraccion = () => {
       findAllBasesDatos,
       saveQueryString,
       dynamicJoinStatement,
-      removeAllExtraccionDownload,
+      removeAllExtraccion,
       removeAllDepuracion,
       deleteQueryStringById,
       updateQueryString,
@@ -114,16 +114,6 @@ export const useExtraccion = () => {
          break
       }
    }, [])
-
-   const handleDynamicJoinStatement = (mod: string, fields: Object, where: string) => {
-      const QueryClause: QueryClauseDto = {
-         mod,
-         fields: convertObjectToFieldsClause(fields),
-         where
-      }
-
-      dynamicJoinStatement(QueryClause)
-   }
 
    const handleDropFieldOfTablaDinamica = useCallback((tablaDinamicaDto: Partial<TablaDinamicaDto>, metaCampo: MetaCampoTablaDinamica, type: AlterTableType) => {
       tablaDinamicaDto = { ...tablaDinamicaDto, camposCsv: `${metaCampo.nombre} ${metaCampo.tipo}`, alterTableType: type }
@@ -168,8 +158,8 @@ export const useExtraccion = () => {
       saveGrupoCamposAnalisis,
       findAllBasesDatos,
       saveQueryString,
-      handleDynamicJoinStatement,
-      removeAllExtraccionDownload,
+      dynamicJoinStatement,
+      removeAllExtraccion,
       removeAllDepuracion,
       deleteQueryStringById,
       updateQueryString,
@@ -178,6 +168,7 @@ export const useExtraccion = () => {
 
       /* » Off-Hook method's ... */
       decorateMetaFieldByAlterType,
-      undecorateNameField
+      undecorateNameField,
+      convertObjectToFieldsSqlClause
    }
 }

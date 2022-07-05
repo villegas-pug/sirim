@@ -4,7 +4,6 @@ import {
    Box,
    Button,
    Checkbox,
-   CircularProgress,
    Divider,
    Grid,
    IconButton,
@@ -27,6 +26,7 @@ import {
    EditRounded,
    ManageSearchOutlined,
    SaveAsRounded,
+   SaveRounded,
    SearchOutlined,
    StorageRounded,
    TableViewRounded,
@@ -50,7 +50,7 @@ import { ExtraccionDatosContext, ExtraccionDatosProvider } from 'context/extracc
 import { useExtraccion, usePais } from 'hooks'
 
 import { Pais, QueryString, WhereClauseControlMigraMod } from 'interfaces'
-import { convertJSON, noty } from 'helpers'
+import { convertJSON, noty, validateSqlSchemaName } from 'helpers'
 
 const MyPaper = styled(Paper)({
    height: '100%'
@@ -72,7 +72,7 @@ const ExtraccionDatosSubMod: FC = () => {
       loadingBasesDatosDb,
       findAllBasesDatos,
       saveQueryString,
-      removeAllExtraccionDownload
+      removeAllExtraccion
    } = useExtraccion()
 
    /* ► EFFECT'S  */
@@ -95,7 +95,7 @@ const ExtraccionDatosSubMod: FC = () => {
          handleClick: () => {
             if (!hasSelectedFieldsTmp) { noty('error', '¡Seleccione los campos a extraer!'); return }
             modalExtraerDatos.current.setOpen(true)
-            removeAllExtraccionDownload()
+            removeAllExtraccion()
          }
       }
    ]
@@ -484,7 +484,8 @@ const FrmExtraerDatos: FC = () => {
    const {
       loadingExtraccion,
       extraccion,
-      handleDynamicJoinStatement
+      dynamicJoinStatement,
+      convertObjectToFieldsSqlClause
    } = useExtraccion()
 
    /* ► EFFECT'S ... */
@@ -506,6 +507,9 @@ const FrmExtraerDatos: FC = () => {
       modalDownloadChunks.current.setOpen(false)/* ► Close modal ... */
    }
 
+   /* ► DEP'S ... */
+   const hasExtraccion = Boolean(extraccion.length)
+
    return (
       <>
          <Formik
@@ -513,7 +517,8 @@ const FrmExtraerDatos: FC = () => {
                fechaFin: '',
                fechaIni: '',
                tipo: '',
-               paisNac: {} as Pais
+               paisNac: {} as Pais,
+               nombreTabla: ''
             }}
             validationSchema={Yup.object({
                fechaIni: Yup.date().required('¡Campo requerido!')
@@ -521,18 +526,22 @@ const FrmExtraerDatos: FC = () => {
                fechaFin: Yup.date().required('¡Campo requerido!')
                   .min(Yup.ref('fechaIni'), '¡Fecha debe ser posterior a la Fecha Inicial!'),
                tipo: Yup.string().required('¡Campo requerido!'),
-               paisNac: Yup.object().nullable().required('¡Campo requerido!')
+               paisNac: Yup.object().nullable().required('¡Campo requerido!'),
+               nombreTabla: hasExtraccion ? Yup.string().required('¡Nombre de basea extraer requerida!') : Yup.string()
             })}
-            onSubmit={ (values: WhereClauseControlMigraMod, meta): void => {
-               const { fechaIni, fechaFin, tipo, paisNac } = values
-               handleDynamicJoinStatement(
-                  moduloTmp.nombre,
-                  camposSeleccionadosTmp,
-                  `AND SimMovMigra.dFechaControl BETWEEN '${fechaIni} 00:00:00.000' 
-                   AND '${fechaFin} 23:59:59.999' 
-                   AND SimMovMigra.sTipo LIKE '${tipo}' 
-                   AND SimMovMigra.sIdPaisNacionalidad LIKE '${paisNac?.idPais ?? '%'.replaceAll("'", '')}'`
-               )
+            onSubmit={ async (values: WhereClauseControlMigraMod, meta): Promise<void> => {
+               setDownloadChunks(0)/* ► Cleanup ... */
+
+               const { fechaIni, fechaFin, tipo, paisNac, nombreTabla } = values
+               await dynamicJoinStatement({
+                  mod: moduloTmp.nombre,
+                  fields: convertObjectToFieldsSqlClause(camposSeleccionadosTmp),
+                  where: `AND SimMovMigra.dFechaControl BETWEEN '${fechaIni} 00:00:00.000' 
+                           AND '${fechaFin} 23:59:59.999' 
+                           AND SimMovMigra.sTipo LIKE '${tipo}' 
+                           AND SimMovMigra.sIdPaisNacionalidad LIKE '${paisNac?.idPais ?? '%'.replaceAll("'", '')}'`,
+                  nameTable: nombreTabla && validateSqlSchemaName(nombreTabla)
+               })
             } }
          >
             {(props) => (
@@ -547,17 +556,39 @@ const FrmExtraerDatos: FC = () => {
                         variant='outlined'
                         disabled={ loadingExtraccion }
                      >
-                        { loadingExtraccion
-                           ? <CircularProgress size={ 22 } sx={{ color: '#999' }} />
-                           : <SearchOutlined />
-                        }
+                        <SearchOutlined />
                      </Button>
                   </Box>
+
+                  {/* ►  */}
+                  {
+                     hasExtraccion &&
+                     (
+                        <>
+                           <Divider sx={{ my: 2 }} />
+                           <Stack
+                              direction='row'
+                              divider={ <Divider orientation='vertical' flexItem /> }
+                              spacing={ 1 }
+                              alignItems='center'
+                           >
+                              <MyTextField type='text' name='nombreTabla' label='Nombre de base a extraer' width={ 30 } focused />
+                              <Button
+                                 type='submit'
+                                 variant='outlined'
+                                 disabled={ loadingExtraccion }
+                              >
+                                 <SaveRounded />
+                              </Button>
+                           </Stack>
+                        </>
+                     )
+                  }
                </Form>
             )}
          </Formik>
 
-         {/* ► MODAL: Download Chunk's  */}
+         {/* ► MODAL: Download file chunk's  */}
          <SimpleModal ref={ modalDownloadChunks }>
             <>
                <Stack
@@ -568,7 +599,9 @@ const FrmExtraerDatos: FC = () => {
                >
                   <Stack direction='row' spacing={ 2 } alignItems='center'>
                      <Typography variant='h5'>Registros encontrados:</Typography>
-                     <Typography variant='h4'>{ extraccion.length.toLocaleString() }</Typography>
+                     <Typography variant='h4'>
+                        { new Intl.NumberFormat().format(extraccion.length) }
+                     </Typography>
                   </Stack>
                   <Stack direction='row' spacing={ 3 }>
                      <TextField
@@ -590,7 +623,7 @@ const FrmExtraerDatos: FC = () => {
             </>
          </SimpleModal>
 
-         {/* ► DOWNLOAD-COMPONENT:  */}
+         {/* ► COMPONENT: Download file chunk's  */}
          { downloadChunks > 0 && (
             <motion.div
                style={{ marginTop: 15, display: 'flex', flexWrap: 'wrap', gap: 10 }}
