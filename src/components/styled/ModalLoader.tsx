@@ -1,35 +1,36 @@
 import { FC } from 'react'
+import ReactDOM from 'react-dom'
 
-import { makeStyles } from '@mui/styles'
+/* import Fade from 'react-reveal/Fade' */
+import styled from 'styled-components'
 import { PropagateLoader } from 'react-spinners'
-import Fade from 'react-reveal/Fade'
 
-const useStyle = makeStyles({
-   box: {
-      position: 'fixed',
-      top: 0,
-      right: 0,
-      bottom: 0,
-      left: 0,
-      display: 'flex',
-      justifyContent: 'center',
-      alignItems: 'center',
-      backgroundColor: 'rgba(0, 0, 0, .2)',
-      zIndex: 100
+const Modal = styled.body`
+   position: fixed;
+   inset: 0;
+   display: flex;
+   justify-content: center;
+   align-items: center;
+   background-color: rgba(0, 0, 0, .2);
+   opacity: 0;
+   z-index: 9999;
+
+   animation: show 1s ease forwards;
+
+   @keyframes show {
+      to{ opacity: 1; }
    }
-})
+   
+`
 
 export const ModalLoader: FC = () => {
-   /* » HOOK'S  */
-   const clasess = useStyle()
+   /* ► ...  */
+   const portal = document.getElementById('loader')
 
-   return (
-      <>
-         <Fade big>
-            <body className={clasess.box}>
-               <PropagateLoader color='#004795' size={25} />
-            </body>
-         </Fade>
-      </>
+   return ReactDOM.createPortal(
+      <Modal>
+         <PropagateLoader color='#004795' size={ 25 } />
+      </Modal>,
+      portal!
    )
 }

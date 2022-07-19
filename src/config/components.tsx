@@ -14,13 +14,12 @@ const PerfilMod = lazy(() => import('pages/modulo/PerfilMod'))
 const GestionTramitesMod = lazy(() => import('pages/modulo/GestionTramitesMod'))
 
 /* » SUBMOD'S  */
-const NuevaDepuracionInfSubMod = lazy(() => import('pages/submodulo/NuevaDepuracionInfSubMod'))
-const NuevoAnalisisInfSubMod = lazy(() => import('pages/submodulo/NuevoAnalisisInfSubMod'))
-const AsignarExtraccionSubMod = lazy(() => import('pages/submodulo/AsignarExtraccionSubMod'))
 const NuevoExpedienteSFMSubMod = lazy(() => import('pages/submodulo/NuevoExpedienteSFMSubMod'))
 const RecepcionAsignacionSFMSubMod = lazy(() => import('pages/submodulo/RecepcionAsignacionSFMSubMod'))
 const EvaluacionExpedientesSFMSubMod = lazy(() => import('pages/submodulo/EvaluacionExpedientesSFMSubMod'))
 const ExtraccionDatosSubMod = lazy(() => import('pages/submodulo/ExtraccionDatosSubMod'))
+const NuevaDepuracionInfSubMod = lazy(() => import('pages/submodulo/NuevaDepuracionInfSubMod'))
+const AsignarExtraccionSubMod = lazy(() => import('pages/submodulo/AsignarExtraccionSubMod'))
 const BuscarDnvSubMod = lazy(() => import('pages/submodulo/BuscarDnvSubMod'))
 
 /* » ITEM'S */
@@ -45,9 +44,6 @@ const modulo: Array<ModuloType> = [
 
 const subModulo: Array<SubModuloType> = [
    {
-      name: 'ANALISIS DE INFORMACIÓN',
-      component: <NuevoAnalisisInfSubMod />
-   }, {
       name: 'DEPURACIÓN DE DATOS',
       component: <NuevaDepuracionInfSubMod />
    }, {

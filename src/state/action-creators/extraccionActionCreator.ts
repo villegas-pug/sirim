@@ -1,7 +1,7 @@
 import { Dispatch } from 'redux'
 import fileDownload from 'js-file-download'
 
-import { ExtraccionAction } from 'state/actions'
+import { AsignarExtraccionAction, ExtraccionAction } from 'state/actions'
 
 import { api } from 'config'
 import { noty } from 'helpers'
@@ -53,13 +53,14 @@ export const createTablaExtraccion = (values: Partial<TablaDinamicaDto>) => asyn
    }
 }
 
-export const findAllExtraccion = () => async (dispatch: Dispatch<ExtraccionAction>, getState: any): Promise<void> => {
-   dispatch({ type: '[Extracción] Find all loading' })
+export const findAllTablaDinamica = () => async (dispatch: Dispatch<ExtraccionAction | AsignarExtraccionAction>, getState: any): Promise<void> => {
+   dispatch({ type: '[Extracción] Find all tabla dinámica loading' })
+   dispatch({ type: '[Asignar-Extracción] Find all tabla dinámica loading' })
    try {
       const { usuario: { token } } = getState()
       const { data: { levelLog, data, message } } = await api.request<Response<TablaDinamica[]>>({
          method: 'GET',
-         url: '/microservicio-rimextraccion/findAll',
+         url: '/microservicio-rimextraccion/findAllTablaDinamica',
          headers: {
             [AUTHORIZATION]: token
          }
@@ -67,16 +68,20 @@ export const findAllExtraccion = () => async (dispatch: Dispatch<ExtraccionActio
 
       switch (levelLog) {
       case 'SUCCESS':
-         dispatch({ type: '[Extracción] Find all success', payload: data })
+         dispatch({ type: '[Extracción] Find all tabla dinámica success', payload: data })
+         dispatch({ type: '[Asignar-Extracción] Find all tabla dinámica success', payload: data })
          break
       case 'WARNING':
       case 'ERROR':
-         dispatch({ type: '[Extracción] Find all error', payload: message })
+         dispatch({ type: '[Extracción] Find all tabla dinamica error', payload: message })
+         dispatch({ type: '[Asignar-Extracción] Find all tabla dinamica error', payload: message })
          noty('error', message)
          break
       }
    } catch (err: any) {
-      dispatch({ type: '[http-status] Response status', payload: err?.response?.status })
+      dispatch({ type: '[Extracción] Find all tabla dinamica error', payload: err.response?.status })
+      dispatch({ type: '[Asignar-Extracción] Find all tabla dinamica error', payload: err.response?.status })
+      dispatch({ type: '[http-status] Response status', payload: err.response?.status })
    }
 }
 
@@ -509,6 +514,35 @@ export const findTablaDinamicaBySuffixOfField = (nombreTabla: String, suffix: St
       }
    } catch (err: any) {
       dispatch({ type: '[Extracción] Find tabla dinámica by suffix error', payload: err?.message })
+      dispatch({ type: '[http-status] Response status', payload: err?.response?.status })
+   }
+}
+
+export const countTablaDinamicaByNombre = (nombreTabla: string) => async (dispatch: Dispatch<ExtraccionAction>, getState: any): Promise<void> => {
+   dispatch({ type: '[Extracción] Count tabla by nombre loading' })
+   try {
+      const { usuario: { token } } = getState()
+      const { data: { levelLog, data, message } } = await api.request<Response<number>>({
+         method: 'GET',
+         url: '/microservicio-rimextraccion/countTablaByNombre',
+         params: { nombreTabla },
+         headers: {
+            [AUTHORIZATION]: token
+         }
+      })
+
+      switch (levelLog) {
+      case 'SUCCESS':
+         dispatch({ type: '[Extracción] Count tabla by nombre success', payload: data })
+         break
+      case 'WARNING':
+      case 'ERROR':
+         dispatch({ type: '[Extracción] Count tabla by nombre error', payload: message })
+         noty('error', message)
+         break
+      }
+   } catch (err: any) {
+      dispatch({ type: '[Extracción] Count tabla by nombre error', payload: err?.message })
       dispatch({ type: '[http-status] Response status', payload: err?.response?.status })
    }
 }

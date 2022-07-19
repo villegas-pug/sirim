@@ -15,17 +15,17 @@ interface CreateTablaExtracciónError {
    payload: string
 }
 
-interface FindAllTablaExtracciónLoading {
-   type: '[Extracción] Find all loading'
+interface FindAllTablaDinamicaLoading {
+   type: '[Extracción] Find all tabla dinámica loading'
 }
 
-interface FindAllTablaExtracciónSuccess {
-   type: '[Extracción] Find all success',
+interface FindAllTablaDinamicaSuccess {
+   type: '[Extracción] Find all tabla dinámica success',
    payload: TablaDinamica[]
 }
 
-interface FindAllTablaExtracciónError {
-   type: '[Extracción] Find all error',
+interface FindAllTablaDinamicaError {
+   type: '[Extracción] Find all tabla dinamica error',
    payload: string | null
 }
 
@@ -217,14 +217,28 @@ interface FindTablaDinamicaBySuffixOfFieldError {
    payload: string | null
 }
 
+interface CountTablaByNombreLoading {
+   type: '[Extracción] Count tabla by nombre loading'
+}
+
+interface CountTablaByNombreSuccess {
+   type: '[Extracción] Count tabla by nombre success'
+   payload: number
+}
+
+interface CountTablaByNombreError {
+   type: '[Extracción] Count tabla by nombre error'
+   payload: string | null
+}
+
 export type ExtraccionAction =
    | ResponseHttpStatusType
    | CreateTablaExtracciónLoading
    | CreateTablaExtracciónSuccess
    | CreateTablaExtracciónError
-   | FindAllTablaExtracciónLoading
-   | FindAllTablaExtracciónSuccess
-   | FindAllTablaExtracciónError
+   | FindAllTablaDinamicaLoading
+   | FindAllTablaDinamicaSuccess
+   | FindAllTablaDinamicaError
    | UpdateNameTablaExtracciónLoading
    | UpdateNameTablaExtracciónSuccess
    | UpdateNameTablaExtracciónError
@@ -266,3 +280,6 @@ export type ExtraccionAction =
    | FindTablaDinamicaBySuffixOfFieldLoading
    | FindTablaDinamicaBySuffixOfFieldSuccess
    | FindTablaDinamicaBySuffixOfFieldError
+   | CountTablaByNombreLoading
+   | CountTablaByNombreSuccess
+   | CountTablaByNombreError

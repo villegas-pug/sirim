@@ -23,6 +23,7 @@ type ExtraccionState = {
    },
    extraccion: {
       loading: boolean
+      totalRegistros?: number
       data: Array<Object>
       error: string | null
    },
@@ -60,6 +61,7 @@ const initialState: ExtraccionState = {
    },
    extraccion: {
       loading: false,
+      totalRegistros: 0,
       data: [],
       error: null
    },
@@ -78,15 +80,15 @@ const initialState: ExtraccionState = {
 export const extraccionReducer = (state: ExtraccionState = initialState, action: ExtraccionAction): ExtraccionState => {
    switch (action.type) {
    case '[Extracción] Create new table loading':
-   case '[Extracción] Find all loading':
+   case '[Extracción] Find all tabla dinámica loading':
    case '[Extracción] Save grupo analisis loading':
       return { ...state, loading: true, data: [], error: null }
    case '[Extracción] Create new table success':
-   case '[Extracción] Find all success':
+   case '[Extracción] Find all tabla dinámica success':
    case '[Extracción] Save grupo analisis success':
       return { ...state, loading: false, data: action.payload, error: null }
    case '[Extracción] Create new table error':
-   case '[Extracción] Find all error':
+   case '[Extracción] Find all tabla dinamica error':
    case '[Extracción] Save grupo analisis error':
       return { ...state, loading: false, data: [], error: action.payload }
    case '[Extracción] Update name tabla loading':
@@ -131,11 +133,11 @@ export const extraccionReducer = (state: ExtraccionState = initialState, action:
    case '[Extracción] Dynamic-Join-Statement loading':
       return { ...state, extraccion: { ...state.extraccion, loading: true, error: null } }
    case '[Extracción] Dynamic-Join-Statement success':
-      return { ...state, extraccion: { loading: false, data: action.payload, error: null } }
+      return { ...state, extraccion: { ...state.extraccion, loading: false, data: action.payload, error: null } }
    case '[Extracción] Dynamic-Join-Statement error':
       return { ...state, extraccion: { ...state.extraccion, loading: false, error: action.payload } }
    case '[Extracción] Remove-All Extracción Download':
-      return { ...state, extraccion: { loading: false, data: [], error: null } }
+      return { ...state, extraccion: { ...state.extraccion, loading: false, data: [], error: null } }
    case '[Extracción] Update queryString loading':
       return { ...state, basesDatos: { ...state.basesDatos, loading: true, error: null } }
    case '[Extracción] Update queryString success':
@@ -156,6 +158,12 @@ export const extraccionReducer = (state: ExtraccionState = initialState, action:
       return { ...state, depuracion: { loading: false, data: [], error: action.payload } }
    case '[Extracción] Remove-All Depuración':
       return { ...state, depuracion: { loading: false, data: [], error: null } }
+   case '[Extracción] Count tabla by nombre loading':
+      return { ...state, extraccion: { ...state.extraccion, loading: true, error: null } }
+   case '[Extracción] Count tabla by nombre success':
+      return { ...state, extraccion: { ...state.extraccion, totalRegistros: action.payload, loading: false, error: null } }
+   case '[Extracción] Count tabla by nombre error':
+      return { ...state, extraccion: { ...state.extraccion, loading: false, error: action.payload } }
    default:
       return state
    }

@@ -8,7 +8,9 @@ import {
    distritoReducer,
    paisReducer,
    etapaReducer,
-   dependenciaReducer
+   dependenciaReducer,
+   asignarExtraccionReducer,
+   interpolReducer
 } from 'state/reducers'
 
 export const rootReducer = combineReducers({
@@ -19,5 +21,7 @@ export const rootReducer = combineReducers({
    distrito: distritoReducer,
    pais: paisReducer,
    etapa: etapaReducer,
-   dependencia: dependenciaReducer
+   dependencia: dependenciaReducer,
+   asignarExtraccion: asignarExtraccionReducer,
+   interpol: interpolReducer
 })

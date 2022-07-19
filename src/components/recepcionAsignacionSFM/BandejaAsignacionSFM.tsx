@@ -34,7 +34,7 @@ import { RecepcionAsignacionSFMContext } from 'context/recepcionAsignacionSFM'
 import { SimpleDataGrid } from 'components/table'
 import { MyAutocomplete } from 'components/formik'
 import { SpeedDialActionProps, SpeedDialBackdrop } from 'components/speedDial'
-import { ConfirmDialogModal, ConfirmDialogRefType, SimpleModal, SimpleModalRefProps } from 'components/modal'
+import { ConfirmDialogModal, ConfirmDialogRefProps, SimpleModal, SimpleModalRefProps } from 'components/modal'
 
 import { EvaluarSolicitudSFM, SolicitudSFM, Usuario } from 'interfaces'
 
@@ -61,7 +61,7 @@ export const BandejaAsignacionSFM: FC = () => {
    const [tmpSolicitudSFM, setTmpSolicitudSFM] = useState<SolicitudSFM>()
    const modalAsignarRef = useRef({} as SimpleModalRefProps)
    const modalDetalleRef = useRef({} as SimpleModalRefProps)
-   const dialogEliminarRef = useRef({} as ConfirmDialogRefType)
+   const dialogEliminarRef = useRef({} as ConfirmDialogRefProps)
 
    /* » CUSTOM-HOOK'S  */
    const {

@@ -143,7 +143,7 @@ const BuscarDnvSubMod: FC = () => {
                         : currentScreen === 'desktopLarge'
                            ? 8
                            : currentScreen === 'desktopWide'
-                              ? 12
+                              ? 11
                               : 5 }
                   />
                </Zoom>

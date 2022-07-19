@@ -41,7 +41,7 @@ import { motion } from 'framer-motion'
 import { Scrollbar } from 'components/layout'
 import { ModalLoader } from 'components/styled'
 import { ExportMultipleExcelFiles } from 'components/data-export'
-import { ConfirmDialogModal, ConfirmDialogRefType, SimpleModal, SimpleModalRefProps } from 'components/modal'
+import { ConfirmDialogModal, ConfirmDialogRefProps, SimpleModal, SimpleModalRefProps } from 'components/modal'
 import { SpeedDialActionProps, SpeedDialBackdrop } from 'components/speedDial'
 import { ItemType, MyAutocomplete, MySelect, MyTextField } from 'components/formik'
 
@@ -268,7 +268,7 @@ const ListaModelosDetos: FC = () => {
    const { moduloTmp, handleUpdateCamposSeleccionadosTmp } = useContext(ExtraccionDatosContext)
 
    /* ► HOOK'S  */
-   const confirmDeleteDataModel = useRef({} as ConfirmDialogRefType)
+   const confirmDeleteDataModel = useRef({} as ConfirmDialogRefProps)
    const modalUpdateQueryString = useRef({} as SimpleModalRefProps)
    const tmpQueryString = useRef({} as QueryString)
    const [acceptDeleteDataModel, setAcceptDeleteDataModel] = useState(false)
@@ -527,7 +527,7 @@ const FrmExtraerDatos: FC = () => {
                   .min(Yup.ref('fechaIni'), '¡Fecha debe ser posterior a la Fecha Inicial!'),
                tipo: Yup.string().required('¡Campo requerido!'),
                paisNac: Yup.object().nullable().required('¡Campo requerido!'),
-               nombreTabla: hasExtraccion ? Yup.string().required('¡Nombre de basea extraer requerida!') : Yup.string()
+               nombreTabla: hasExtraccion ? Yup.string().required('¡Nombre de base a extraer requerida!') : Yup.string()
             })}
             onSubmit={ async (values: WhereClauseControlMigraMod, meta): Promise<void> => {
                setDownloadChunks(0)/* ► Cleanup ... */
@@ -570,7 +570,7 @@ const FrmExtraerDatos: FC = () => {
                               direction='row'
                               divider={ <Divider orientation='vertical' flexItem /> }
                               spacing={ 1 }
-                              alignItems='center'
+                              alignItems='flex-start'
                            >
                               <MyTextField type='text' name='nombreTabla' label='Nombre de base a extraer' width={ 30 } focused />
                               <Button

@@ -1,8 +1,17 @@
 import { Usuario } from 'interfaces'
 
+export interface AsigGrupoCamposAnalisis {
+   idAsigGrupo: number
+   produccionAnalisis: Array<any>
+   usrAnalista: Usuario
+   regAnalisisIni: number
+   regAnalisisFin: number
+   fechaAsignacion: string
+}
+
 export interface GrupoCamposAnalisis {
    idGrupo: number
-   asigGrupoCamposAnalisis: any[]
+   asigGrupoCamposAnalisis: AsigGrupoCamposAnalisis[]
    nombre: string
    metaFieldsCsv: null | string
    fechaCreacion: Date
@@ -31,4 +40,8 @@ export type CampoType = 'int' | 'VARCHAR(MAX)'
 export interface MetaCampoTablaDinamica {
    nombre: string
    tipo: CampoType
+}
+
+export interface AsigGrupoCamposAnalisisDto extends AsigGrupoCamposAnalisis {
+   grupo: Partial<GrupoCamposAnalisis>
 }

@@ -43,7 +43,8 @@ import {
    MarkEmailReadOutlined,
    PendingActionsOutlined,
    TaskOutlined,
-   ContentPasteSearchOutlined
+   ContentPasteSearchOutlined,
+   CleaningServicesRounded
 } from '@mui/icons-material'
 
 const classes = {
@@ -78,9 +79,10 @@ export const elementIcons = {
    TrendingUp: <TrendingUp color='action' style={classes.subModIcon} />,
    SupportAgent: <SupportAgent color='action' style={classes.subModIcon} />,
    FactCheck: <FactCheck color='action' style={classes.subModIcon} />,
-   storageRounded: <StorageRounded color='action' style={classes.subModIcon} />,
+   StorageRounded: <StorageRounded color='action' style={classes.subModIcon} />,
    GroupsRounded: <GroupsRounded color='action' style={classes.subModIcon} />,
    ContentPasteSearchOutlined: <ContentPasteSearchOutlined color='action' style={classes.subModIcon} />,
+   CleaningServicesRounded: <CleaningServicesRounded color='action' style={ classes.subModIcon } />,
 
    Test: <Build />,
    Cloud: <Cloud />,

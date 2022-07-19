@@ -45,7 +45,7 @@ import { MyAutocomplete, ItemType, MySelect, MyTextField, SimpleAutocomplete } f
 import { DiligenciaSFM, Etapa, EvaluarSolicitudSFM, SolicitudSFM } from 'interfaces'
 
 import { useEtapa, useFiscalizacionPosterior } from 'hooks'
-import { ConfirmDialogModal, ConfirmDialogRefType, SimpleModal, SimpleModalRefProps } from 'components/modal'
+import { ConfirmDialogModal, ConfirmDialogRefProps, SimpleModal, SimpleModalRefProps } from 'components/modal'
 
 import { Form, Formik, FormikConfig } from 'formik'
 import { EvaluacionExpedientesSFMContext, EvaluacionExpedientesSFMContextProvider } from 'context/evaluacionExpedientesSFM'
@@ -71,7 +71,7 @@ const EvaluacionExpedientesSFMSubMod: FC = () => {
 
    /* » HOOK'S  */
    const [isAcceptLeerSolicitud, setIsAcceptLeerSolicitud] = useState(false)
-   const dialogLeerSolicitudRef = useRef({} as ConfirmDialogRefType)
+   const dialogLeerSolicitudRef = useRef({} as ConfirmDialogRefProps)
    const modalDiligenciaRef = useRef({} as SimpleModalRefProps)
    const modalEtapaRef = useRef({} as SimpleModalRefProps)
    const modalOpinionRef = useRef({} as SimpleModalRefProps)
@@ -348,7 +348,7 @@ const DiligenciaFrm: FC<DiligenciaFrmProps> = ({ diligencia }) => {
    const { evaluarSolicitudSFMTmp: { idVerifExp } } = useContext(EvaluacionExpedientesSFMContext)
 
    const [isAcceptEliminarDiligencia, setIsAcceptEliminarDiligencia] = useState(false)
-   const dialogEliminarDiligenciaRef = useRef({} as ConfirmDialogRefType)
+   const dialogEliminarDiligenciaRef = useRef({} as ConfirmDialogRefProps)
    const [file, setFile] = useState<File | null>()
    const inputFileRef = useRef({} as HTMLInputElement)
 

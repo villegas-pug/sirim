@@ -70,12 +70,11 @@ export const useExtraccion = () => {
       }
    } = useAppSelector(store => store.extraccion)
    const {
+      findAllTablaDinamica,
       createTablaExtraccion,
-      findAllExtraccion,
       updateNameTablaDinamica,
       deleteTablaExtraccion,
       alterTablaDinamica,
-      findAllBandejaEvaluacion,
       findMetaTablaDinamica,
       uploadExtraccion,
       saveGrupoCamposAnalisis,
@@ -148,11 +147,10 @@ export const useExtraccion = () => {
       handleAlterFieldOfTablaDinamica,
       handleDropFieldOfTablaDinamica,
 
-      findAllExtraccion,
+      findAllTablaDinamica,
       createTablaExtraccion,
       updateNameTablaDinamica,
       deleteTablaExtraccion,
-      findAllBandejaEvaluacion,
       findMetaTablaDinamica,
       uploadExtraccion,
       saveGrupoCamposAnalisis,

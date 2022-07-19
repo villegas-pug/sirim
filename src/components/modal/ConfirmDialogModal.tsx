@@ -7,17 +7,17 @@ import {
    Typography
 } from '@mui/material'
 
-export type ConfirmDialogRefType = {
+export type ConfirmDialogRefProps = {
    isOpen: boolean
    setIsOpen: (isOpen: boolean) => void
 }
 
-type PropTypes = {
+type Props = {
    title: string
    setIsAccept: (isAccept: boolean) => void
 }
 
-export const ConfirmDialogModal = forwardRef<ConfirmDialogRefType, PropTypes>(({ title, setIsAccept }, ref) => {
+export const ConfirmDialogModal = forwardRef<ConfirmDialogRefProps, Props>(({ title, setIsAccept }, ref) => {
    /* » HOOK'S  */
    const [isOpen, setIsOpen] = useState(false)
 
