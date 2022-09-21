@@ -1,0 +1,6 @@
+export * from './extraccionDatos'
+export * from './nuevaDepuracionInf'
+export * from './asignarExtraccion'
+export * from './analizarExtraccion'
+export * from './controlCalidad'
+export * from './crearTipoLogico'
