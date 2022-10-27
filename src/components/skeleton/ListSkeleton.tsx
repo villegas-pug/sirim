@@ -25,7 +25,7 @@ export const ListSkeleton: FC<ListItemSkeletonProps> = ({ children, loading, ske
       >
          {
             [...Array(skeletons)].map((_, i) => (
-               <Skeleton key={ i } animation='wave' />
+               <Skeleton key={ i } animation='pulse' />
             ))
          }
 

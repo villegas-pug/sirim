@@ -3,7 +3,7 @@ import { FC, ReactElement, useEffect, useReducer } from 'react'
 import { AnalizarExtraccionContext } from './AnalizarExtraccionContext'
 import { analizarExtraccionReducer } from './analizarExtraccionReducer'
 
-import { RegistroTablaDinamica, AsigGrupoCamposAnalisisDto } from 'interfaces'
+import { RegistroTablaDinamicaDto, AsigGrupoCamposAnalisisDto } from 'interfaces'
 import { useAnalizarExtraccion } from 'hooks'
 
 export type AnalizarExtraccionBandeja = 'ENTRADA' | 'ANALISIS'
@@ -11,30 +11,27 @@ export type AnalizarExtraccionBandeja = 'ENTRADA' | 'ANALISIS'
 export interface AnalizarExtraccionState {
    bandeja: AnalizarExtraccionBandeja,
    asigGrupoCamposAnalisisTmp: AsigGrupoCamposAnalisisDto
-   tablaAsignadaTmp: RegistroTablaDinamica[]
-   registroDinamicoAsignadoTmp: RegistroTablaDinamica
+   tablaAsignadaTmp: RegistroTablaDinamicaDto[]
+   registroDinamicoAsignadoTmp: RegistroTablaDinamicaDto
 }
 
 const INITIAL_STATE: AnalizarExtraccionState = {
    bandeja: 'ENTRADA',
    asigGrupoCamposAnalisisTmp: {} as AsigGrupoCamposAnalisisDto,
-   registroDinamicoAsignadoTmp: {} as RegistroTablaDinamica,
+   registroDinamicoAsignadoTmp: {} as RegistroTablaDinamicaDto,
    tablaAsignadaTmp: []
 }
 
-type ProviderProps = {
-   children: ReactElement | ReactElement[]
-}
-
-export const AnalizarExtraccionProvider: FC<ProviderProps> = ({ children }) => {
-   /* ► HOOK - STATE ... */
+export const AnalizarExtraccionProvider: FC<{ children: ReactElement | ReactElement[] }> = ({ children }) => {
+   // ► Hook's ...
    const [state, dispatch] = useReducer(analizarExtraccionReducer, INITIAL_STATE)
 
-   /* ► CUSTOM - HOOK'S  */
+   // ► CUSTOM - HOOK'S ...
    const { tablaAsignadaDb, asigGrupoCamposAnalisisDb, findAsigAnalisisByUsr } = useAnalizarExtraccion()
 
-   /* » EFFECT'S ...  */
-   useEffect(() => { // ► Update `store`: Si store `tablaAsignadaDb` cambia, llama a `findAsigAnalisisByUsr()` ...
+   // » EFFECT'S ...
+   // ► Update `store`: Si store `tablaAsignadaDb` cambia, llama a `findAsigAnalisisByUsr()` ...
+   useEffect(() => {
       if (tablaAsignadaDb.length === 0) return
       findAsigAnalisisByUsr()
    }, [tablaAsignadaDb])
@@ -64,7 +61,7 @@ export const AnalizarExtraccionProvider: FC<ProviderProps> = ({ children }) => {
       dispatch({ type: '[asigGrupoCamposAnalisisTmp] Save grupo asignado de Campos de analisis', payload: asigGrupoCamposAnalisis })
    }
 
-   const handleSaveRegistroDinamicoAsignadoTmp = (registroDinamicoAsignadoTmp: RegistroTablaDinamica) => {
+   const handleSaveRegistroDinamicoAsignadoTmp = (registroDinamicoAsignadoTmp: RegistroTablaDinamicaDto) => {
       dispatch({ type: '[registroDinamicoAsignadoTmp] Save registro dinámico asignado', payload: registroDinamicoAsignadoTmp })
    }
 
@@ -81,8 +78,8 @@ export const AnalizarExtraccionProvider: FC<ProviderProps> = ({ children }) => {
 }
 
 /* ► Private - Method's ... */
-type SomeFieldsFromProduccionAnalisis = { [key: number]: Pick<RegistroTablaDinamica, 'fechaAnalisis' | 'analizado'> }
-const assignPropsToTablaAsignada = (asigGrupoCamposAnalisis: AsigGrupoCamposAnalisisDto, tablaAsignada: RegistroTablaDinamica[]): RegistroTablaDinamica[] => {
+type SomeFieldsFromProduccionAnalisis = { [key: number]: Pick<RegistroTablaDinamicaDto, 'fechaAnalisis' | 'analizado'> }
+const assignPropsToTablaAsignada = (asigGrupoCamposAnalisis: AsigGrupoCamposAnalisisDto, tablaAsignada: RegistroTablaDinamicaDto[]): RegistroTablaDinamicaDto[] => {
    // ► Dep's: ...
    if (Object.entries(asigGrupoCamposAnalisis).length === 0) return []
    const someFieldsFromProduccionAnalisis: SomeFieldsFromProduccionAnalisis =

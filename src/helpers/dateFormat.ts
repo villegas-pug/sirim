@@ -24,9 +24,22 @@ export const parseJsonTimestampToStrDate = (value: string): string => {
    const valueArr = value.split(/-/g)
    const year = valueArr[0]
    const month = valueArr[1]
-   const day = valueArr[2].trim().split(/\s/g)[0].trim()
+   const day = valueArr[2].trim().split(/[\sT]/g)[0].trim()
 
    return `${year}-${month}-${day}`
+}
+
+export const parseJsonTimestampToDate = (value: string): Date => {
+   // ► Validación: ...
+   if (!value) return new Date()
+
+   // ► Dep's: `2022-01-01 00:00:00` ...
+   const valueArr = value.split(/-/g)
+   const year = parseInt(valueArr[0])
+   const month = parseInt(valueArr[1]) - 1
+   const day = parseInt(valueArr[2].trim().split(/[\sT]/g)[0].trim())
+
+   return new Date(year, month, day)
 }
 
 export const removeFlagTFromDateTimeStr = (dateTime: string): string => {

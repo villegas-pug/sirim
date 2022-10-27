@@ -2,18 +2,27 @@ import { FC, ReactElement, useEffect, useReducer } from 'react'
 
 import { format } from 'date-fns'
 
-import { ControlCalidadContext } from './ControlCalidadContext'
-import { controlCalidadReducer } from './controlCalidadReducer'
+import { ControlCalidadContext, controlCalidadReducer } from 'context'
 
-import { useExtraccion } from 'hooks'
-import { AsigGrupoCamposAnalisis, AsigGrupoCamposAnalisisDto, CtrlCalCamposAnalisis, TablaDinamicaDto, Usuario } from 'interfaces'
+import { useControlCalidad, useExtraccion } from 'hooks'
+import {
+   AsigGrupoCamposAnalisis,
+   AsigGrupoCamposAnalisisDto,
+   CtrlCalCamposAnalisis,
+   RegistroTablaDinamicaDto,
+   TablaDinamicaDto,
+   Usuario
+} from 'interfaces'
 
 export interface ControlCalidadProviderState {
    asigsGrupoCamposAnalisisTmp: AsigGrupoCamposAnalisisDto[]
    asigGrupoCamposAnalisisTmp: AsigGrupoCamposAnalisisDto
    filteredAsigsGrupoCamposAnalisisTmp: AsigGrupoCamposAnalisisDto[]
    filterListAsigsTmp: Pick<AsigGrupoCamposAnalisis, 'fechaAsignacion' | 'ctrlCalConforme'>
-   ctrlsCalCamposAnalisis: CtrlCalCamposAnalisis[]
+   ctrlsCalCamposAnalisisTmp: CtrlCalCamposAnalisis[]
+   ctrlCalCamposAnalisisTmp: CtrlCalCamposAnalisis
+   tablaCtrlCalidadTmp: RegistroTablaDinamicaDto[]
+   registroCtrlCalidadTmp: RegistroTablaDinamicaDto
 }
 
 const INITIAL_STATE: ControlCalidadProviderState = {
@@ -21,22 +30,25 @@ const INITIAL_STATE: ControlCalidadProviderState = {
    asigGrupoCamposAnalisisTmp: {} as AsigGrupoCamposAnalisisDto,
    filteredAsigsGrupoCamposAnalisisTmp: [],
    filterListAsigsTmp: { fechaAsignacion: format(new Date(), 'yyyy-MM-dd'), ctrlCalConforme: false } as Pick<AsigGrupoCamposAnalisis, 'fechaAsignacion' | 'ctrlCalConforme'>,
-   ctrlsCalCamposAnalisis: []
+   ctrlsCalCamposAnalisisTmp: [],
+   ctrlCalCamposAnalisisTmp: {} as CtrlCalCamposAnalisis,
+   tablaCtrlCalidadTmp: [],
+   registroCtrlCalidadTmp: {} as RegistroTablaDinamicaDto
 }
 
 export type Action = 'SAVE' | 'RESET'
 
 export const ControlCalidadProvider: FC<{ children: ReactElement | ReactElement[] }> = ({ children }) => {
-   /* ► STATE - HOOK'S ... */
+   // ► STATE - HOOK'S ...
    const [state, dispatch] = useReducer(controlCalidadReducer, INITIAL_STATE)
 
-   /* ► CUSTOM - HOOK'S ...  */
+   // ► CUSTOM - HOOK'S ...
    const { extraccionDb: tablaDinamicaDb } = useExtraccion()
+   const { tablaCtrlCalDb } = useControlCalidad()
 
-   /* ► EFFECT'S ... */
+   // ► EFFECT'S ...
    useEffect(() => { // ► Update `tmp`: When `tablaDinamicaDb` change, `asigsGrupoCamposAnalisisTmp` is Updated ...
-      if (tablaDinamicaDb.length === 0) return
-      if (state.asigsGrupoCamposAnalisisTmp.length === 0) return
+      if (tablaDinamicaDb.length === 0 || state.asigsGrupoCamposAnalisisTmp.length === 0) return
 
       dispatch({
          type: '[asigsGrupoCamposAnalisisTmp] Save',
@@ -51,7 +63,7 @@ export const ControlCalidadProvider: FC<{ children: ReactElement | ReactElement[
       })
    }, [state.asigsGrupoCamposAnalisisTmp])
 
-   useEffect(() => {
+   useEffect(() => { // ► ...
       if (state.filteredAsigsGrupoCamposAnalisisTmp.length === 0) {
          handleActionAsigGrupoCamposAnalisisTmp('RESET')
          return
@@ -64,27 +76,34 @@ export const ControlCalidadProvider: FC<{ children: ReactElement | ReactElement[
       })
    }, [state.filteredAsigsGrupoCamposAnalisisTmp])
 
+   useEffect(() => { // ► ...
+      if (tablaCtrlCalDb.length === 0 || Object.entries(state.asigGrupoCamposAnalisisTmp).length === 0) return
+      dispatch({
+         type: '[tablaCtrlCalidadTmp] Save',
+         payload: assignPropsToTablaCtrlCalTmp(state.asigGrupoCamposAnalisisTmp, tablaCtrlCalDb)
+      })
+   }, [tablaCtrlCalDb, state.asigGrupoCamposAnalisisTmp])
+
+   useEffect(() => { // ► ...
+      if (state.tablaCtrlCalidadTmp.length === 0 || Object.entries(state.registroCtrlCalidadTmp).length === 0) return
+      dispatch({
+         type: '[registroCtrlCalidadTmp] Save',
+         payload: state.tablaCtrlCalidadTmp.find(({ nId }) => nId === state.registroCtrlCalidadTmp.nId) || {} as RegistroTablaDinamicaDto
+      })
+   }, [state.tablaCtrlCalidadTmp])
+
    useEffect(() => { // ► Clean-up: When ...
-      handleActionCtrlsCalCamposAnalisis('RESET')
+      handleActionCtrlsCalCamposAnalisisTmp('RESET')
    }, [state.asigsGrupoCamposAnalisisTmp])
 
    useEffect(() => () => { // ► Clean-up: Cuando el hook es desmontado ...
       handleActionFilterListAsigsTmp('RESET')
-   }, [])
-
-   useEffect(() => () => { // ► Clean-up: Cuando el hook es desmontado ...
       handleActionFilteredAsigsGrupoCamposAnalisisTmp('RESET')
-   }, [])
-
-   useEffect(() => () => { // ► Clean-up: Cuando el hook es desmontado ...
-      handleActionCtrlsCalCamposAnalisis('RESET')
-   }, [])
-
-   useEffect(() => () => { // ► Clean-up: Cuando el hook es desmontado ...
+      handleActionCtrlsCalCamposAnalisisTmp('RESET')
       handleActionAsigsGrupoCamposAnalisisTmp('RESET')
    }, [])
 
-   /* ► HANDLER'S ... */
+   // ► HANDLER'S ...
    const handleActionAsigsGrupoCamposAnalisisTmp = (action: Action, usrAnalista?: Usuario) => {
       switch (action) {
       case 'SAVE':
@@ -128,17 +147,47 @@ export const ControlCalidadProvider: FC<{ children: ReactElement | ReactElement[
       }
    }
 
-   const handleActionCtrlsCalCamposAnalisis = (action: Action, ctrlsCal?: CtrlCalCamposAnalisis[]): void => {
+   const handleActionCtrlsCalCamposAnalisisTmp = (action: Action, ctrlsCal?: CtrlCalCamposAnalisis[]): void => {
       switch (action) {
       case 'SAVE':
          dispatch({
-            type: '[ctrlsCalCamposAnalisis] Save',
+            type: '[ctrlsCalCamposAnalisisTmp] Save',
             payload: ctrlsCal!
          })
          break
       case 'RESET':
-         dispatch({ type: '[ctrlsCalCamposAnalisis] Save', payload: [] })
+         dispatch({ type: '[ctrlsCalCamposAnalisisTmp] Save', payload: [] })
          break
+      }
+   }
+
+   const handleActionCtrlCalCamposAnalisisTmp = (action: Action, ctrlCal?: CtrlCalCamposAnalisis): void => {
+      switch (action) {
+      case 'SAVE':
+         dispatch({
+            type: '[ctrlCalCamposAnalisisTmp] Save',
+            payload: ctrlCal!
+         })
+         break
+      case 'RESET':
+         dispatch({ type: '[ctrlCalCamposAnalisisTmp] Save', payload: {} as CtrlCalCamposAnalisis })
+         break
+      }
+   }
+
+   const handleActionRegistroCtrlCalidadTmp = (action: Action, registroCtrlCalidad?: RegistroTablaDinamicaDto) => {
+      switch (action) {
+      case 'SAVE':
+         dispatch({
+            type: '[registroCtrlCalidadTmp] Save',
+            payload: registroCtrlCalidad!
+         })
+         break
+      case 'RESET':
+         dispatch({
+            type: '[registroCtrlCalidadTmp] Save',
+            payload: {} as RegistroTablaDinamicaDto
+         })
       }
    }
 
@@ -149,7 +198,9 @@ export const ControlCalidadProvider: FC<{ children: ReactElement | ReactElement[
          handleActionAsigGrupoCamposAnalisisTmp,
          handleActionFilteredAsigsGrupoCamposAnalisisTmp,
          handleActionFilterListAsigsTmp,
-         handleActionCtrlsCalCamposAnalisis
+         handleActionCtrlsCalCamposAnalisisTmp,
+         handleActionCtrlCalCamposAnalisisTmp,
+         handleActionRegistroCtrlCalidadTmp
       }}>
          { children }
       </ControlCalidadContext.Provider>
@@ -159,9 +210,23 @@ export const ControlCalidadProvider: FC<{ children: ReactElement | ReactElement[
 /* ► Private method's ...  */
 const findAsigsGrupoCamposAnalisisByUsr = (tablaDinamica: TablaDinamicaDto[], usr: Usuario): AsigGrupoCamposAnalisisDto[] => {
    const asigsGrupoCamposAnalisis = tablaDinamica
-      .map(td => td.lstGrupoCamposAnalisis)
+      .map(t => {
+         t.lstGrupoCamposAnalisis.forEach(g => {
+            const { lstGrupoCamposAnalisis, usrCreador, ...restTabla } = t
+            g.tablaDinamica = restTabla as TablaDinamicaDto
+         })
+
+         return t.lstGrupoCamposAnalisis
+      })
       .flat()
-      .map(g => g.asigGrupoCamposAnalisis)
+      .map(g => {
+         g.asigGrupoCamposAnalisis.forEach(a => {
+            const { asigGrupoCamposAnalisis, ...restGrupo } = g
+            a.grupo = restGrupo
+         })
+
+         return g.asigGrupoCamposAnalisis
+      })
       .flat()
       .filter(({ usrAnalista: { idUsuario } }) => idUsuario === usr.idUsuario) || []
 
@@ -194,4 +259,24 @@ const getUsrFromAsigsGrupoCamposAnalisisTmp = (asigs: AsigGrupoCamposAnalisisDto
       .find((_, i) => i === 0)
       ?.usrAnalista || {} as Usuario
    return usr
+}
+
+/* ► Private - Method's ... */
+type SomeFieldsFromProduccionAnalisis = { [key: number]: Pick<RegistroTablaDinamicaDto, 'revisado' | 'observacionesCtrlCal' | 'metaFieldIdErrorCsv'> }
+const assignPropsToTablaCtrlCalTmp = (asigGrupoCamposAnalisis: AsigGrupoCamposAnalisisDto, tablaCtrlCalidad: RegistroTablaDinamicaDto[]): RegistroTablaDinamicaDto[] => {
+   // ► Dep's: ...
+   if (Object.entries(asigGrupoCamposAnalisis).length === 0) return []
+
+   const someFieldsFromProduccionAnalisis: SomeFieldsFromProduccionAnalisis =
+   asigGrupoCamposAnalisis?.produccionAnalisis.reduce((map, prod) => {
+      map[prod.idRegistroAnalisis] = {
+         revisado: prod.revisado,
+         metaFieldIdErrorCsv: prod.metaFieldIdErrorCsv,
+         observacionesCtrlCal: prod.observacionesCtrlCal
+      }
+      return map
+   }, {} as SomeFieldsFromProduccionAnalisis)
+
+   // ► ...
+   return tablaCtrlCalidad.map((record, i) => ({ ...record, ...someFieldsFromProduccionAnalisis[record.nId], nro: i + 1 }))
 }

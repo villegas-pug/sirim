@@ -16,7 +16,7 @@ export const findAllTipoLogico = () => async (dispatch: Dispatch<TipoLogicoActio
       const { usuario: { token } } = getState()
       const { data: { levelLog, data, message } } = await api.request<Response<TipoLogico[]>>({
          method: 'GET',
-         url: '/microservicio-rimextraccion/findAllTipoLogico',
+         url: '/microservicio-rimmantenimiento/findAllTipoLogico',
          headers: {
             [AUTHORIZATION]: token
          }
@@ -44,7 +44,7 @@ export const saveTipoLogico = (tipoLogico: Partial<TipoLogico>) => async (dispat
       const { usuario: { token } } = getState()
       const { data: { levelLog, data, message } } = await api.request<Response<TipoLogico[]>>({
          method: 'POST',
-         url: '/microservicio-rimextraccion/saveTipoLogico',
+         url: '/microservicio-rimmantenimiento/saveTipoLogico',
          data: { ...tipoLogico },
          headers: {
             [AUTHORIZATION]: token
@@ -74,7 +74,7 @@ export const deleteTipoLogicoById = (idTipo: number) => async (dispatch: Dispatc
       const { usuario: { token } } = getState()
       const { data: { levelLog, data, message } } = await api.request<Response<TipoLogico[]>>({
          method: 'DELETE',
-         url: `/microservicio-rimextraccion/deleteTipoLogicoById/${idTipo}`,
+         url: `/microservicio-rimmantenimiento/deleteTipoLogicoById/${idTipo}`,
          headers: {
             [AUTHORIZATION]: token
          }

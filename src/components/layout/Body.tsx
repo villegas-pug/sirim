@@ -1,21 +1,22 @@
 import { FC, ReactElement } from 'react'
 
-import { Paper } from '@mui/material'
+import { Paper, SxProps } from '@mui/material'
 import { styled } from '@mui/styles'
 
 const CustomPaper = styled(Paper)({
    height: '82vh',
-   padding: 20,
+   padding: 10,
    overflow: 'auto'
 })
 
-type PropsType = {
+type BodyProps = {
    children: ReactElement | Array<ReactElement>
+   sx?: SxProps
 }
 
-export const Body: FC<PropsType> = ({ children }) => {
+export const Body: FC<BodyProps> = ({ children, sx }) => {
    return (
-      <CustomPaper variant='outlined'>
+      <CustomPaper variant='outlined' sx={ sx }>
          { children }
       </CustomPaper>
    )

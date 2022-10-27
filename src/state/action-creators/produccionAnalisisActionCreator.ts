@@ -15,7 +15,7 @@ export const getRptTiempoPromedioAnalisisByParms = (fecIni: string, fecFin: stri
       const { usuario: { token } } = getState()
       const { data: { levelLog, data, message } } = await api.request<Response<RptTiempoPromedioAnalisisDto[]>>({
          method: 'GET',
-         url: '/microservicio-rimextraccion/getRptTiempoPromedioAnalisisByParms',
+         url: '/microservicio-rimanalisis/getRptTiempoPromedioAnalisisByParms',
          params: { fecIni, fecFin },
          headers: {
             [AUTHORIZATION]: token
@@ -44,7 +44,7 @@ export const getRptProduccionHorasLaboralesPorAnalista = (fechaAnalisis: string,
       const { usuario: { token } } = getState()
       const { data: { levelLog, data, message } } = await api.request<Response<RptProduccionHoraLaboralDto[]>>({
          method: 'GET',
-         url: '/microservicio-rimextraccion/getRptProduccionHorasLaboralesPorAnalista',
+         url: '/microservicio-rimanalisis/getRptProduccionHorasLaboralesPorAnalista',
          params: { fechaAnalisis, grupo },
          headers: {
             [AUTHORIZATION]: token

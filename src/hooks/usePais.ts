@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
-import { useAppActions } from './useAppActions'
-import { useAppSelector } from './useAppSelector'
+
+import { useAppActions, useAppSelector } from 'hooks'
 
 export const usePais = () => {
    /* » HOOK'S - STORE  */
@@ -8,9 +8,13 @@ export const usePais = () => {
    const { findAllPais } = useAppActions()
 
    /* » HANDLER'S  */
-
    /* » DEP'S  */
-   const nacionalidadDb = useMemo(() => paisDb.map(({ nacionalidad }) => nacionalidad), [paisDb])
+
+   const nacionalidadDb = useMemo(() => {
+      return paisDb
+         .map(({ nacionalidad }) => nacionalidad)
+         .filter(nac => nac.trim())
+   }, [paisDb])
 
    return {
       paisDb,

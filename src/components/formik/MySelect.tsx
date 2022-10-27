@@ -33,10 +33,10 @@ export const MySelect: FC<Props> = ({ label, width, opt, muiProps, ...rest }) =>
          <Select
             labelId={ idSelect }
             { ...fieldProps }
-            { ...muiProps }
             label={ label }
             size='small'
             sx={{ width: `${width}rem` }}
+            { ...muiProps }
          >
             {
                opt?.map(({ label, value }) => (

@@ -17,11 +17,11 @@ const Body = styled.div`
    transform: translateY(-50%) translateX(-50%);
    padding: .5rem;
    background-color: #fff;
-   cursor: grab;
+   /* cursor: grab;
 
    :active {
       cursor: grabbing;
-   }
+   } */
 `
 
 export type SimpleModalRefProps = {
@@ -66,10 +66,7 @@ export const SimpleModal = forwardRef<SimpleModalRefProps, Props>(({ children, s
          BackdropProps={{ timeout: 1000 }}
          closeAfterTransition={ true }
       >
-         <motion.div
-            drag
-            dragElastic={ 1 }
-         >
+         <motion.div>
             <Body style={ style }>
                <Box display='flex'>
 

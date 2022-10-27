@@ -14,4 +14,4 @@ interface NuevaDepuracionInfContextProps extends NuevaDepuracionInfState {
 
 export const NuevaDepuracionInfContext = createContext({} as NuevaDepuracionInfContextProps)
 
-export const useDepuracionContext = () => useContext(NuevaDepuracionInfContext)
+export const useDepurarExtraccionContext = () => useContext(NuevaDepuracionInfContext)

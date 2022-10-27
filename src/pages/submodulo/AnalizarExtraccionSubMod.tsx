@@ -13,15 +13,18 @@ import {
    Typography
 } from '@mui/material'
 import {
+   ArrowBackIosNewRounded,
    CachedRounded,
+   CheckCircleRounded,
    CheckRounded,
    ClearRounded,
+   DownloadOutlined,
    DownloadRounded,
-   ExitToAppRounded,
-   FastRewindRounded,
    FileDownloadRounded,
    QueryStatsRounded,
-   SaveAsRounded
+   RemoveRedEyeRounded,
+   SaveAsRounded,
+   UnpublishedRounded
 } from '@mui/icons-material'
 import { GridColDef } from '@mui/x-data-grid'
 import Fade from 'react-reveal/Fade'
@@ -43,13 +46,14 @@ import {
 } from 'components'
 
 import { AnalizarExtraccionProvider, useAnalizarExtraccionContext } from 'context'
-import { useAnalizarExtraccion, useBreakpoints } from 'hooks'
+import { useAnalizarExtraccion, useBreakpoints, useLocalStorage } from 'hooks'
 
 import { applyCommaThousands, parseJsonDateToDate, parseJsonTimestampToStrDate, undecorateMetaFieldName } from 'helpers'
-import { AnalizadosDto, AsigGrupoCamposAnalisisDto, PrefixMetaFieldName, RegistroTablaDinamica } from 'interfaces'
+import { RecordsBetweenDatesDto, AsigGrupoCamposAnalisisDto, PrefixMetaFieldName, RegistroTablaDinamicaDto } from 'interfaces'
 import { optSelectItemMonthName } from 'constants/calendar'
 import { format } from 'date-fns'
 import { useTipoLogico } from 'hooks/useTipoLogico'
+import { messages, regex } from 'constants/'
 
 export const AnalizarExtraccionSubMod: FC = () => {
    /* ► CONTEXT ... */
@@ -68,6 +72,10 @@ export const AnalizarExtraccionSubMod: FC = () => {
       findTablaDinamicaByRangoFromIds
    } = useAnalizarExtraccion()
 
+   const [, setBandejaAnalisisNroPagina] = useLocalStorage('ANALIZAR_EXTRACCION_BANDEJA_ANALISIS_NRO_PAGINA')
+
+   useEffect(() => { setBandejaAnalisisNroPagina(0) }, [])
+
    /* ► DEP'S ... */
    const optSpeedDial = useMemo<SpeedDialActionProps[]>(() => ([
       {
@@ -76,7 +84,7 @@ export const AnalizarExtraccionSubMod: FC = () => {
          handleClick: async () => {
             await findAsigAnalisisByUsr()
             findTablaDinamicaByRangoFromIds({
-               nombreTabla: asigGrupoCamposAnalisisTmp.grupo.tablaDinamica?.nombre,
+               asigGrupo: { idAsigGrupo: asigGrupoCamposAnalisisTmp.idAsigGrupo },
                regAnalisisIni: asigGrupoCamposAnalisisTmp.regAnalisisIni,
                regAnalisisFin: asigGrupoCamposAnalisisTmp.regAnalisisFin
             })
@@ -177,6 +185,7 @@ const BandejaEntrada: FC = () => {
       findTablaDinamicaByRangoFromIds,
       downloadAnalisadosByDates
    } = useAnalizarExtraccion()
+
    const { currentScreen } = useBreakpoints()
 
    /* ► EFFECT'S ...  */
@@ -193,14 +202,14 @@ const BandejaEntrada: FC = () => {
                onClick={ async () => {
                   handleSaveAsigGrupoCamposAnalisisTmp(row)
                   await findTablaDinamicaByRangoFromIds({
-                     nombreTabla: row.grupo.tablaDinamica?.nombre,
+                     asigGrupo: { idAsigGrupo: row.idAsigGrupo },
                      regAnalisisIni: row.regAnalisisIni,
                      regAnalisisFin: row.regAnalisisFin
                   })
                   handleChangePage('ANALISIS')
                } }
             >
-               <ExitToAppRounded />
+               <RemoveRedEyeRounded />
             </IconButton>
          </Tooltip>
       }, {
@@ -218,12 +227,33 @@ const BandejaEntrada: FC = () => {
             </IconButton>
          </Tooltip>
       }, {
+         field: '>>>',
+         width: 50,
+         ...commonGridColDef,
+         renderCell: ({ row }) => <Tooltip title='Descargar plantilla' placement='top-start' arrow>
+            <IconButton
+               onClick={ () => {
+                  downloadAnalisadosByDates({
+                     idAsigGrupo: row.idAsigGrupo,
+                     isAssignedTemplate: true
+                  })
+               } }
+            >
+               <DownloadOutlined />
+            </IconButton>
+         </Tooltip>
+      }, {
          field: 'fechaAsignacion',
          headerName: 'Fecha Asignación',
-         width: 150,
+         width: 110,
          type: 'date',
          valueGetter: (params) => parseJsonDateToDate(params.value),
          ...commonGridColDef
+      }, {
+         field: 'Estado',
+         width: 80,
+         ...commonGridColDef,
+         renderCell: ({ row }) => row.totalAsignados === row.totalAnalizados ? <CheckCircleRounded color='success' /> : <UnpublishedRounded color='disabled' />
       }, {
          field: 'Base',
          minWidth: 250,
@@ -232,7 +262,7 @@ const BandejaEntrada: FC = () => {
          ...commonGridColDef
       }, {
          field: 'Grupo',
-         minWidth: 250,
+         minWidth: 200,
          flex: 1,
          renderCell: ({ row }) => row.grupo.nombre,
          ...commonGridColDef
@@ -302,7 +332,7 @@ const BandejaEntrada: FC = () => {
                   fecIni: Yup.date().required('¡Fecha requerida!').max(Yup.ref('fecFin'), '¡Fecha debe ser menor a la final!'),
                   fecFin: Yup.date().required('¡Fecha requerida!').min(Yup.ref('fecIni'), '¡Fecha debe ser mayor a la inicial!')
                })}
-               onSubmit={ async (values: Omit<AnalizadosDto, 'idAsigGrupo'>, meta): Promise<void> => {
+               onSubmit={ async (values: Pick<RecordsBetweenDatesDto, 'fecIni' | 'fecFin'>, meta): Promise<void> => {
                   downloadAnalisadosByDates({
                      idAsigGrupo: asigGrupoCamposAnalisisTmp.idAsigGrupo!,
                      ...values
@@ -388,7 +418,7 @@ const BandejaAnalisis: FC = () => {
    /* ► EFFECT'S ... */
 
    /* » DEP'S ... */
-   const dgColumns = useMemo<Array<GridColDef<RegistroTablaDinamica>>>(() => ([
+   const dgColumns = useMemo<Array<GridColDef<RegistroTablaDinamicaDto>>>(() => ([
       {
          field: '>',
          width: 50,
@@ -422,7 +452,7 @@ const BandejaAnalisis: FC = () => {
          width: 150,
          type: 'boolean',
          ...commonGridColDef,
-         renderCell: ({ row }) => row.analizado ? <CheckRounded fontSize='small' /> : <ClearRounded fontSize='small' />
+         renderCell: ({ row }) => row.analizado ? <CheckRounded color='success' /> : <ClearRounded color='error' />
       }, {
          field: 'fechaAnalisis',
          headerName: 'Fecha Analisis',
@@ -441,11 +471,14 @@ const BandejaAnalisis: FC = () => {
          {/* ► NAVIGATE  */}
          <Fade left big>
             <Button
-               variant='contained'
-               startIcon={ <FastRewindRounded fontSize='small' /> }
+               startIcon={ <ArrowBackIosNewRounded fontSize='small' /> }
                size='small'
-               onClick={ () => { handleChangePage('ENTRADA') } }
-            />
+               onClick={ () => {
+                  handleChangePage('ENTRADA')
+               } }
+            >
+               <Typography variant='h5'>Ir a Bandeja Entrada</Typography>
+            </Button>
          </Fade>
 
          {/* ► BODY ... */}
@@ -460,8 +493,8 @@ const BandejaAnalisis: FC = () => {
                         ? 10
                         : 4
                }
-               localStoragePageKey='ANALIZAR_EXTRACCION_BANDEJA_ANALISIS_NRO_PAGINA'
                getRowId={ row => row.nId }
+               localStoragePageKey='ANALIZAR_EXTRACCION_BANDEJA_ANALISIS_NRO_PAGINA'
             />
          </Zoom>
 
@@ -474,27 +507,27 @@ const BandejaAnalisis: FC = () => {
 }
 
 const HeaderBandejaAnalisis: FC = () => {
-   /* ► CONTEXT ... */
+   // ► CONTEXT ...
    const {
       asigGrupoCamposAnalisisTmp,
       tablaAsignadaTmp
    } = useAnalizarExtraccionContext()
 
-   /* ► HOOK'S ...  */
+   // ► HOOK'S ...
 
-   /* ► CUSTOM - HOOK'S ... */
+   // ► CUSTOM - HOOK'S ...
    const { loadingAsigGrupoCamposAnalisisDb } = useAnalizarExtraccion()
    const { currentScreen } = useBreakpoints()
 
-   /* ► EFFECT'S ...  */
+   // ► EFFECT'S ...
 
-   /* » DEP'S ... */
+   // ► DEP'S ...
    const countRecordsAnalizadosToday = useMemo(() => tablaAsignadaTmp.filter(({ fechaAnalisis }) => {
       return parseJsonTimestampToStrDate(fechaAnalisis) === format(new Date(), 'yyyy-MM-dd')
    }).length
    , [tablaAsignadaTmp])
 
-   /* ► RENDER CONDITIONAL ...  */
+   // ► RENDER CONDITIONAL ...
    if (currentScreen === 'mobileLandscape') return <></>
 
    return (
@@ -528,15 +561,14 @@ const AnalizarExtraccion: FC = () => {
    const [showDatosExtraccion, setShowDatosExtraccion] = useState(true)
 
    /* ► CUSTOM - HOOK'S ... */
-   /* const { currentScreen } = useBreakpoints() */
-   const { loadingAsigGrupoCamposAnalisisDb, saveRecordAssigned } = useAnalizarExtraccion()
+   const { loadingAsigGrupoCamposAnalisisDb, saveRecordAssigned, findAsigAnalisisByUsr } = useAnalizarExtraccion()
 
    /* ► HANDLER'S ... */
    const handleShowCamposExtraccion = ({ target: { checked } }: ChangeEvent<HTMLInputElement>) => {
       setShowDatosExtraccion(checked)
    }
 
-   /* ► DEP'S ... */
+   // ► DEP'S ...
    const metaFieldsNameAssigned = useMemo(() => (asigGrupoCamposAnalisisTmp.grupo.metaFieldsCsv?.split(',')
       .map(i => i.trim())
       .map(i => i.split('|')[0].trim())
@@ -600,13 +632,15 @@ const AnalizarExtraccion: FC = () => {
                validationSchema={ Yup.object({ ...getValidationSchemaFromCsv(metaFieldsNameAssigned!, asigGrupoCamposAnalisisTmp.grupo.obligatorio!) }) }
                onSubmit={ async (values: any, meta): Promise<void> => {
                   await saveRecordAssigned({
-                     nombreTable: asigGrupoCamposAnalisisTmp.grupo.tablaDinamica?.nombre,
+                     nombreTabla: asigGrupoCamposAnalisisTmp.grupo.tablaDinamica?.nombre,
                      id: registroDinamicoAsignadoTmp.nId,
                      values: JSON.stringify(values),
                      regAnalisisIni: asigGrupoCamposAnalisisTmp.regAnalisisIni,
                      regAnalisisFin: asigGrupoCamposAnalisisTmp.regAnalisisFin,
                      asigGrupo: { idAsigGrupo: asigGrupoCamposAnalisisTmp.idAsigGrupo }
                   })
+
+                  findAsigAnalisisByUsr()
                } }>
                {(formikprops) => (
                   <Form>
@@ -697,8 +731,8 @@ export default function Default () {
    </AnalizarExtraccionProvider>
 }
 
-/* ► Private Method's ... */
-const getGridColDefByTablaDinamicaAsignada = (tablaDinamicaAsignada: RegistroTablaDinamica[], fieldSuffix: '_a' | '_e'): Array<GridColDef> => {
+// ► Private Method's ...
+const getGridColDefByTablaDinamicaAsignada = (tablaDinamicaAsignada: RegistroTablaDinamicaDto[], fieldSuffix: '_a' | '_e'): Array<GridColDef> => {
    return Object.keys(tablaDinamicaAsignada.find((_, i) => i === 0) || {}).filter(field => field.endsWith(fieldSuffix)).map(field => ({
       field,
       headerName: undecorateMetaFieldName(field, 'prefix | underscore | suffix'),
@@ -714,7 +748,7 @@ const getInitialValuesFromCsv = (metaFieldsNameCsv: string, registroDinamicoAsig
    metaFieldsNameCsv
       .split(',')
       .map(k => k.trim())
-      .forEach(k => {
+      .forEach((k) => {
          initialValues[k] = registroDinamicoAsignado[k] || ''
       })
 
@@ -731,7 +765,7 @@ const getValidationSchemaFromCsv = (metaFieldsNameCsv: string, obligatorio: bool
       .map(k => k.trim())
       .forEach(k => {
          if (k.startsWith('s') || k.startsWith('b')) {
-            schemaValues[k] = Yup.string().matches(/^[^:,|]*$/g, 'Caracteres no permitidos: (,), (:) y (|).')
+            schemaValues[k] = Yup.string().matches(regex.INPUT_FIELD_TEXT_REGEX, messages.INPUT_FIELD_TEXT_REGEX_VALIDATION)
          }
 
          if (k.startsWith('n')) {

@@ -28,7 +28,7 @@ import { Form, Formik } from 'formik'
 import * as Yup from 'yup'
 import Fade from 'react-reveal/Fade'
 
-import { Body, ListItemFade, ModalLoader, MyTextField, SimpleModal, SimpleModalRefProps } from 'components'
+import { Body, ListItemFade, ModalLoader, MyTextField, Scrollbar, SimpleModal, SimpleModalRefProps } from 'components'
 
 import { CrearTipoLogicoProvider, useCrearTipoLogicoContext } from 'context'
 import { messages, regex } from 'constants/'
@@ -101,67 +101,68 @@ const ListTipoLogicos: FC = () => {
       <>
          {/* ► ...  */}
          <ListTipoLogicoPaper variant='outlined' sx={{ width: 400 }}>
-            <List
-               subheader={ <ListSubheader>Tipos Lógicos</ListSubheader> }
-            >
-               {
-                  tipoLogicoDbCurrentGrupoAuth.map((tipoLogico, i) => (
-                     <ListItemFade key={ tipoLogico.idTipo } i={ i } direction={ 'top' }>
-                        <ListItemButton
-                           key={ tipoLogico.idTipo }
-                           selected={ selected === i }
-                        >
-                           <ListItemIcon><AbcRounded /></ListItemIcon>
-                           <ListItemText
-                              primary={ <Typography variant='h5'>{ tipoLogico.nombre }</Typography> }
-                              onClick={ () => {
-                                 setSelected(i)
-                                 handleActionTipoLogicoTmp('SAVE', tipoLogico)
-                              } }
-                           />
-
-                           {/* ► Actions ...  */}
-                           <ListItemSecondaryAction>
-                              {/* ► Add valor lógico ... */}
-                              <IconButton
+            <Scrollbar>
+               <List
+                  subheader={ <ListSubheader>Tipos Lógicos</ListSubheader> }
+               >
+                  {
+                     tipoLogicoDbCurrentGrupoAuth.map((tipoLogico, i) => (
+                        <ListItemFade key={ tipoLogico.idTipo } i={ i } direction={ 'top' }>
+                           <ListItemButton
+                              key={ tipoLogico.idTipo }
+                              selected={ selected === i }
+                           >
+                              <ListItemIcon><AbcRounded /></ListItemIcon>
+                              <ListItemText
+                                 primary={ <Typography variant='h5'>{ tipoLogico.nombre }</Typography> }
                                  onClick={ () => {
                                     setSelected(i)
                                     handleActionTipoLogicoTmp('SAVE', tipoLogico)
-                                    modalAddSubTipoLogico.current.setOpen(true)
                                  } }
-                              >
-                                 <AddCircleRounded />
-                              </IconButton>
+                              />
 
-                              {/* ► Update nombre tipo lógico ... */}
-                              <IconButton
-                                 onClick={ () => {
-                                    refNombreTipoLogico.current = tipoLogico.nombre
-                                    setSelected(i)
-                                    handleActionTipoLogicoTmp('SAVE', tipoLogico)
-                                    modalUpdateTipoLogico.current.setOpen(true)
-                                 } }
-                              >
-                                 <ModeEditRounded />
-                              </IconButton>
+                              {/* ► Actions ...  */}
+                              <ListItemSecondaryAction>
+                                 {/* ► Add valor lógico ... */}
+                                 <IconButton
+                                    onClick={ () => {
+                                       setSelected(i)
+                                       handleActionTipoLogicoTmp('SAVE', tipoLogico)
+                                       modalAddSubTipoLogico.current.setOpen(true)
+                                    } }
+                                 >
+                                    <AddCircleRounded />
+                                 </IconButton>
 
-                              {/* ► Delete tipo lógico ... */}
-                              <IconButton
-                                 onClick={ () => {
-                                    setSelected(i)
-                                    deleteTipoLogicoById(tipoLogico.idTipo)
-                                 } }
-                              >
-                                 <DeleteForeverRounded />
-                              </IconButton>
-                           </ListItemSecondaryAction>
+                                 {/* ► Update nombre tipo lógico ... */}
+                                 <IconButton
+                                    onClick={ () => {
+                                       refNombreTipoLogico.current = tipoLogico.nombre
+                                       setSelected(i)
+                                       handleActionTipoLogicoTmp('SAVE', tipoLogico)
+                                       modalUpdateTipoLogico.current.setOpen(true)
+                                    } }
+                                 >
+                                    <ModeEditRounded />
+                                 </IconButton>
 
-                        </ListItemButton>
-                     </ListItemFade>
-                  ))
-               }
-            </List>
+                                 {/* ► Delete tipo lógico ... */}
+                                 <IconButton
+                                    onClick={ () => {
+                                       setSelected(i)
+                                       deleteTipoLogicoById(tipoLogico.idTipo)
+                                    } }
+                                 >
+                                    <DeleteForeverRounded />
+                                 </IconButton>
+                              </ListItemSecondaryAction>
 
+                           </ListItemButton>
+                        </ListItemFade>
+                     ))
+                  }
+               </List>
+            </Scrollbar>
          </ListTipoLogicoPaper>
 
          {/* ► MODAL: Crear valor lógico ...  */}
@@ -216,13 +217,13 @@ const ListValoresTipoLogico: FC = () => {
       <>
          {/* ► ...  */}
          <ListTipoLogicoPaper variant='outlined' sx={{ width: '52vw' }}>
-            <List
-               subheader={ <ListSubheader>Valores Lógicos</ListSubheader> }
-            >
-               {
-                  values.map((value, i) => (
-                     <ListItemFade key={ value } i={ i } direction={ 'top' }>
-                        <ListItemButton key={ value }>
+            <Scrollbar>
+               <List
+                  subheader={ <ListSubheader>Valores Lógicos</ListSubheader> }
+               >
+                  {
+                     values.map((value, i) => (
+                        <ListItemButton key={ `${i}-${value}` }>
                            <ListItemText
                               primary={ <Typography variant='h5'>{ `${i + 1}► ${value}` }</Typography> }
                               onClick={ () => { } }
@@ -253,10 +254,10 @@ const ListValoresTipoLogico: FC = () => {
                            </ListItemSecondaryAction>
 
                         </ListItemButton>
-                     </ListItemFade>
-                  ))
-               }
-            </List>
+                     ))
+                  }
+               </List>
+            </Scrollbar>
 
          </ListTipoLogicoPaper>
 
@@ -293,7 +294,7 @@ const FrmSaveTipoLogico: FC<FrmSaveValorTipoLogicoProps> = ({ handleSubmit, valo
          validationSchema={ Yup.object({
             valor: Yup.string()
                .required('¡Valor de tipo requerido!')
-               .matches(regex.INPUT_CREATE_VALOR_TIPO_LOGICO_REGEX, messages.INPUT_CREATE_VALOR_TIPO_LOGICO_VALIDATION)
+               .matches(regex.INPUT_VALUE_LOGICO_REGEX, messages.INPUT_VALOR_TIPO_LOGICO_VALIDATION)
          })}
          onSubmit={ async ({ valor }: { valor: string }, meta): Promise<void> => {
             await handleSubmit(valor)

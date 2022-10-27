@@ -30,10 +30,10 @@ export const useAuth = () => {
       findUserByLogin,
       login,
       logout,
-      updatePasswordByLogin
+      updateAccount
    } = useAppActions()
 
-   /* » HOOK'S... */
+   // » HOOK'S...
    const [componentsAuth, setComponentsAuth] = useState<Procedimiento[]>([])
    const [redirectComponentsAuth, setRedirectComponentsAuth] = useState<Procedimiento[]>([])
    const [modAuthenticated, setModAuthenticated] = useState<Procedimiento[]>([])
@@ -41,7 +41,7 @@ export const useAuth = () => {
    const [pathAuthenticated, setPathAuthenticated] = useState({})
    const { status } = useHttpStatus()
 
-   /* » EFFECT'S */
+   // » EFFECT'S ...
    useEffect(() => { status === httpStatus.FORBIDDEN && logout() }, [status])
 
    useEffect(() => {
@@ -87,16 +87,15 @@ export const useAuth = () => {
       setSubmodAuthenticated(submod)
    }, [modAuthenticated])
 
-   /* » HANDLER'S ... */
+   // » HANDLER'S ...
 
-   /* » DEP'S ... */
+   // » DEP'S ...
    const usersAnalisisDb = useMemo(() => usersDb.filter(({ grupo }) => grupo === 'ANALISIS'), [usersDb])
    const usersDepuracionDb = useMemo(() => usersDb.filter(({ grupo }) => grupo === 'DEPURACION'), [usersDb])
    const userscurrentGroupDb = useMemo(() => {
       // ► Validación: ...
       if (usersAnalisisDb.length === 0 && usersDepuracionDb.length === 0) return []
 
-      // ► ...
       return userCredentials.grupo === 'ANALISIS' ? usersAnalisisDb : usersDepuracionDb
    }, [usersAnalisisDb, usersDepuracionDb])
 
@@ -108,7 +107,7 @@ export const useAuth = () => {
       userCredentials,
 
       componentsAuth,
-      redirectComponentsAuth, /* » Components that rendered other components as MOD and SUB_MOD ... */
+      redirectComponentsAuth, // » Components that rendered other components as MOD and SUB_MOD ...
       modAuthenticated,
       submodAuthenticated,
       pathAuthenticated,
@@ -118,7 +117,7 @@ export const useAuth = () => {
 
       findAllUser,
       findUserByLogin,
-      updatePasswordByLogin,
+      updateAccount,
       login,
       logout
    }

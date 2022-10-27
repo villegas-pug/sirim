@@ -53,21 +53,20 @@ import {
    SpeedDialActionProps,
    SpeedDialBackdrop,
    BandejaProcesos,
-   MyCheckBox
+   MyCheckBox,
+   ListPuffLoader
 } from 'components'
 
-import { NuevaDepuracionInfContext, NuevaDepuracionInfProvider, useDepuracionContext } from 'context'
+import { NuevaDepuracionInfContext, NuevaDepuracionInfProvider, useDepurarExtraccionContext } from 'context'
 
-import { useExtraccion } from 'hooks'
+import { useExtraccion, useTipoLogico } from 'hooks'
 import { MetaFieldSqlType, GrupoCamposAnalisis, MetaCampoTablaDinamica, TablaDinamica, TablaDinamicaDto } from 'interfaces'
 import { convertMetaTypeToSqlType, undecorateMetaFieldName } from 'helpers'
 import { messages, regex } from 'constants/'
-import { ListSkeleton } from 'components/skeleton'
-import { useTipoLogico } from 'hooks/useTipoLogico'
 
 const MainPaper = styled(Paper)({
    height: '100%',
-   padding: 3
+   padding: '3px 3px 0 3px'
 })
 
 const DepurarExtraccionSubMod: FC = () => {
@@ -104,6 +103,7 @@ const DepurarExtraccionSubMod: FC = () => {
    return (
       <>
          <BandejaProcesos>
+            {/* ► Bases de extracción ... */}
             <Grid item xs={ 5 }>
                <MainPaper>
                   <Typography variant='h5' >NUEVA TABLA</Typography>
@@ -122,7 +122,7 @@ const DepurarExtraccionSubMod: FC = () => {
                      <Formik
                         initialValues={{ nombre: '' }}
                         validationSchema={Yup.object({
-                           nombre: Yup.string().required('¡Campo requerido!').matches(regex.INPUT_CREATE_TABLE_REGEX, messages.CREATE_TABLE_VALREGEX)
+                           nombre: Yup.string().required('¡Campo requerido!').matches(regex.INPUT_TABLE_REGEX, messages.INPUT_TABLE_VALIDATION)
                         })}
                         onSubmit={ async (values: Partial<TablaDinamicaDto>, meta): Promise<any> => {
                            await createTablaExtraccion(values)
@@ -144,14 +144,17 @@ const DepurarExtraccionSubMod: FC = () => {
                         }
                      </Formik>
 
-                     {/* » BODY: Tablas para extracción  */}
-                     <ListaTablasExtraccion />
+                     {/* ► ... */}
+                     <Box height='58vh'>
+                        <ListaTablasExtraccion />
+                     </Box>
 
                   </Box>
 
                </MainPaper>
             </Grid>
 
+            {/* ► CAMPOS DE EXTRACCIÓN ...  */}
             <Grid item xs={ 3 }>
                <MainPaper>
                   <Typography variant='h5' >CAMPOS DE EXTRACCIÓN</Typography>
@@ -160,6 +163,7 @@ const DepurarExtraccionSubMod: FC = () => {
                </MainPaper>
             </Grid>
 
+            {/* ► Grupo de Analisis y Campos de Analisis ... */}
             <Grid item xs={ 4 } container spacing={ 0.5 }>
 
                <Grid item xs={ 12 }>
@@ -230,10 +234,12 @@ const ListaTablasExtraccion: FC = () => {
    } = useExtraccion()
 
    /* ► EFFECT'S ...  */
-   useEffect(() => { /* ► Remove: Tabla extracción ... */
+   useEffect(() => { // ► Remove: Tabla extracción ...
       if (!isAcceptEliminarTabla) return
-      deleteTablaExtraccion(tablaDinamicaDto)
-      /* » Clean-up `tablaDinamicaDto` ... */
+
+      deleteTablaExtraccion({ idTabla: tablaDinamicaDto.idTabla, nombre: tablaDinamicaDto.nombre })
+
+      // » Clean-up `tablaDinamicaDto` ...
       handleSaveTablaDinamicaDto({} as TablaDinamica)
       setIsAcceptEliminarTabla(false)
    }, [isAcceptEliminarTabla])
@@ -259,12 +265,10 @@ const ListaTablasExtraccion: FC = () => {
 
    return (
       <>
-         <List
-            subheader={
-               <ListSubheader component='div'>Tabla de extracción</ListSubheader>
-            }
-         >
-            <Scrollbar height={ 47 }>
+         <Scrollbar>
+            <List
+               subheader={ <ListSubheader component='div'>Tabla de extracción</ListSubheader> }
+            >
                {
                   extraccionDbFromCurrentUsr?.map((tablaDinamica, i) => (
                      <ListItemFade key={ tablaDinamica.idTabla } i={ i } direction='top' >
@@ -353,8 +357,8 @@ const ListaTablasExtraccion: FC = () => {
                      </ListItemFade>
                   ))
                }
-            </Scrollbar>
-         </List>
+            </List>
+         </Scrollbar>
 
          {/* » MODAL: Editar nombre tabla extracción ...  */}
          <SimpleModal ref={ modalEditNombreTabla }>
@@ -415,7 +419,7 @@ const ListaTablasExtraccion: FC = () => {
                }}
                validationSchema={Yup.object({
                   nombre: Yup.string().required('¡Campo requerido!')
-                     .matches(regex.SAVE_GRUPO_ANALISIS_REGEX, messages.SAVE_GRUPO_ANALISIS_VALIDATION)
+                     .matches(regex.INPUT_GRUPO_ANALISIS_REGEX, messages.INPUT_GRUPO_ANALISIS_VALIDATION)
                })}
                onSubmit={ async (grupoCamposAnalisis: Pick<GrupoCamposAnalisis, 'nombre' | 'obligatorio'>, meta): Promise<void> => {
                   await saveGrupoCamposAnalisis({ idTabla: tablaDinamicaDto.idTabla, grupoCamposAnalisis })
@@ -525,7 +529,7 @@ const PoolFrmCrearCampo: FC<{ metaCamposTablaDinamica: MetaCampoTablaDinamica[],
 
 const FrmCrearCampoExtraccion: FC<{ metaCampo?: MetaCampoTablaDinamica}> = ({ metaCampo }) => {
    /* ► CONTEXT ... */
-   const { tablaDinamicaDto } = useDepuracionContext()
+   const { tablaDinamicaDto } = useDepurarExtraccionContext()
 
    /* ► CUSTOM - HOOK'S ...  */
    const { handleAlterFieldTablaDinamica, findAllTablaDinamica } = useExtraccion()
@@ -537,8 +541,8 @@ const FrmCrearCampoExtraccion: FC<{ metaCampo?: MetaCampoTablaDinamica}> = ({ me
             info: metaCampo?.info || ''
          }}
          validationSchema={ Yup.object({
-            nombre: Yup.string().required('¡Campo requerido!').matches(regex.INPUT_CREATE_FIELD_REGEX, messages.CREATE_FIELD_VALREGEX),
-            info: Yup.string().required('¡Campo requerido!').matches(regex.INPUT_CREATE_FIELD_INFO_REGEX, messages.CREATE_FIELD_INFO_VALREGEX)
+            nombre: Yup.string().required('¡Campo requerido!').matches(regex.INPUT_FIELD_REGEX, messages.INPUT_FIELD_VALIDATION),
+            info: Yup.string().required('¡Campo requerido!').matches(regex.INPUT_INFO_REGEX, messages.INPUT_INFO_VALIDATION)
          })}
          onSubmit={ async (values: Partial<MetaCampoTablaDinamica>, meta): Promise<void> => {
             await handleAlterFieldTablaDinamica(tablaDinamicaDto, values, 'ADD_COLUMN_E')
@@ -577,7 +581,7 @@ const FrmCrearCampoExtraccion: FC<{ metaCampo?: MetaCampoTablaDinamica}> = ({ me
 
 const FrmCrearCampoAnalisis: FC<{ metaCampo?: MetaCampoTablaDinamica}> = ({ metaCampo }) => {
    /* ► CONTEXT ... */
-   const { tablaDinamicaDto, grupoAnalisisTmp } = useDepuracionContext()
+   const { tablaDinamicaDto, grupoAnalisisTmp } = useDepurarExtraccionContext()
 
    /* ► CUSTOM - HOOK'S ...  */
    const { handleAlterFieldTablaDinamica, loadingExtraccionDb } = useExtraccion()
@@ -591,9 +595,9 @@ const FrmCrearCampoAnalisis: FC<{ metaCampo?: MetaCampoTablaDinamica}> = ({ meta
             info: metaCampo?.info || ''
          }}
          validationSchema={Yup.object({
-            nombre: Yup.string().required('¡Campo requerido!').matches(regex.INPUT_CREATE_FIELD_REGEX, messages.CREATE_FIELD_VALREGEX),
+            nombre: Yup.string().required('¡Campo requerido!').matches(regex.INPUT_FIELD_REGEX, messages.INPUT_FIELD_VALIDATION),
             tipo: Yup.string().required('¡Campo requerido!'),
-            info: Yup.string().required('¡Campo requerido!').matches(regex.INPUT_CREATE_FIELD_INFO_REGEX, messages.CREATE_FIELD_INFO_VALREGEX)
+            info: Yup.string().required('¡Campo requerido!').matches(regex.INPUT_INFO_REGEX, messages.INPUT_INFO_VALIDATION)
          })}
          onSubmit={ async (values: MetaCampoTablaDinamica, meta): Promise<void> => {
             const tdDto = { ...tablaDinamicaDto, grupoCamposAnalisis: { ...grupoAnalisisTmp } }
@@ -639,10 +643,9 @@ const ListaCamposExtraccion: FC = () => {
 
    return (
       <>
-         <Scrollbar height={ 75 }>
-            <ListSkeleton
+         <Scrollbar>
+            <ListPuffLoader
                loading={ loadingExtraccionDb || loadingcamposTablaDinamicaDb }
-               skeletons={ 17 }
             >
                <List>
                   {
@@ -684,7 +687,7 @@ const ListaCamposExtraccion: FC = () => {
                      ))
                   }
                </List>
-            </ListSkeleton>
+            </ListPuffLoader>
          </Scrollbar>
 
          {/* » MODAL: Editar campo ...  */}
@@ -695,7 +698,7 @@ const ListaCamposExtraccion: FC = () => {
                   info: metaFieldInfoTablaDinamicaTmp[prevMetaField.nombre!]
                }}
                validationSchema={Yup.object({
-                  nombre: Yup.string().required('¡Campo requerido!').matches(regex.INPUT_CREATE_FIELD_REGEX, messages.CREATE_FIELD_VALREGEX),
+                  nombre: Yup.string().required('¡Campo requerido!').matches(regex.INPUT_FIELD_REGEX, messages.INPUT_FIELD_VALIDATION),
                   info: Yup.string().required('¡Campo requerido!')
                })}
                onSubmit={ async (values: Partial<MetaCampoTablaDinamica>, meta): Promise<void> => {
@@ -734,7 +737,7 @@ const ListaGrupoAnalisis:FC = () => {
       grupoAnalisisTmp,
       handleSaveCamposAnalisisTmp,
       handleSaveGrupoAnalisisTmp
-   } = useDepuracionContext()
+   } = useDepurarExtraccionContext()
 
    /* » HOOK'S ... */
    const modalEditarNombreGrupo = useRef({} as SimpleModalRefProps)
@@ -760,7 +763,7 @@ const ListaGrupoAnalisis:FC = () => {
 
    return (
       <>
-         <Scrollbar height={ 35 }>
+         <Scrollbar>
             <List>
                {
                   gruposAnalisisDto.map((grupo, i) => (
@@ -835,7 +838,7 @@ const ListaGrupoAnalisis:FC = () => {
                }}
                validationSchema={Yup.object({
                   nombre: Yup.string().required('¡Campo requerido!')
-                     .matches(regex.SAVE_GRUPO_ANALISIS_REGEX, messages.SAVE_GRUPO_ANALISIS_VALIDATION)
+                     .matches(regex.INPUT_GRUPO_ANALISIS_REGEX, messages.INPUT_GRUPO_ANALISIS_VALIDATION)
                })}
                onSubmit={ async (values: Pick<GrupoCamposAnalisis, 'nombre' | 'obligatorio'>, meta): Promise<void> => {
                   const tdDto: Partial<TablaDinamicaDto> = { ...tablaDinamicaDto, grupoCamposAnalisis: { ...grupoAnalisisTmp, ...values } }
@@ -886,7 +889,7 @@ const ListaCamposAnalisis: FC = () => {
       tablaDinamicaDto,
       grupoAnalisisTmp,
       camposAnalisisTmp
-   } = useContext(NuevaDepuracionInfContext)
+   } = useDepurarExtraccionContext()
 
    /* » HOOK'S  */
    const modalEliminarCampo = useRef({} as SimpleModalRefProps)
@@ -900,6 +903,7 @@ const ListaCamposAnalisis: FC = () => {
       loadingExtraccionDb,
       handleAlterFieldTablaDinamica
    } = useExtraccion()
+
    const { optTiposCurrentGrupoAuth } = useTipoLogico()
 
    /* ► EFFEC'S ... */
@@ -918,10 +922,10 @@ const ListaCamposAnalisis: FC = () => {
 
    return (
       <>
-         <Scrollbar height={ 37 }>
-            <ListSkeleton
+         <Scrollbar>
+            <ListPuffLoader
                loading={ loadingcamposTablaDinamicaDb || loadingExtraccionDb }
-               skeletons={ 6 }
+               size={ 40 }
             >
                <List>
                   {
@@ -965,7 +969,7 @@ const ListaCamposAnalisis: FC = () => {
                      ))
                   }
                </List>
-            </ListSkeleton>
+            </ListPuffLoader>
          </Scrollbar>
 
          {/* » MODAL: Editar campo ...  */}
@@ -977,9 +981,9 @@ const ListaCamposAnalisis: FC = () => {
                   info: prevMetaField.info
                }}
                validationSchema={Yup.object({
-                  nombre: Yup.string().required('¡Campo requerido!').matches(regex.INPUT_CREATE_FIELD_REGEX, messages.CREATE_FIELD_VALREGEX),
+                  nombre: Yup.string().required('¡Campo requerido!').matches(regex.INPUT_FIELD_REGEX, messages.INPUT_FIELD_VALIDATION),
                   tipo: Yup.string().required('¡Campo requerido!'),
-                  info: Yup.string().required('¡Campo requerido!')
+                  info: Yup.string().required('¡Campo requerido!').matches(regex.INPUT_INFO_REGEX, messages.INPUT_INFO_VALIDATION)
                })}
                onSubmit={ async (values: MetaCampoTablaDinamica, meta): Promise<void> => {
                   const tdDto: Partial<TablaDinamicaDto> = {

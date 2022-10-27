@@ -20,11 +20,11 @@ import {
    IconButton,
    ListItem,
    ListItemIcon,
-   ListItemText
+   ListItemText,
+   Avatar
 } from '@mui/material'
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar'
 import {
-   AccountCircle,
    Business,
    ExitToApp,
    LocationCity,
@@ -200,17 +200,23 @@ export const Drawer: FC<Props> = ({ children }) => {
                      <Box>
                         <Button
                            id='user-account'
-                           style={{ color: '#fff' }}
+                           sx={{ color: '#fff' }}
                            aria-controls='menu-account'
                            aria-haspopup={ true }
-                           onClick={handleOpenMenu}
-                           startIcon={ <AccountCircle fontSize='large' /> }
+                           onClick={ handleOpenMenu }
+                           startIcon={
+                              <Avatar
+                                 alt={ userCredentials.nombres }
+                                 src={ userCredentials.foto }
+                                 sx={{ width: 50, height: 50 }}
+                              />
+                           }
                         >
                            <Typography
                               variant='h4'
                               display={ currentScreen === 'mobileLandscape' ? 'none' : '' }
                            >
-                              {userCredentials?.nombres || ''}
+                              { userCredentials?.nombres || ''}
                            </Typography>
                         </Button>
 

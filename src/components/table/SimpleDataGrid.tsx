@@ -17,7 +17,7 @@ type SimpleDataGridProps = DataGridProps & {
 
 export const SimpleDataGrid: FC<SimpleDataGridProps> = ({ rows, columns, exportable, localStoragePageKey, ...rest }) => {
    // ► Custom hook's ...
-   const [page, setPage] = useLocalStorage(localStoragePageKey, 1)
+   const [page, setPage] = useLocalStorage(localStoragePageKey, 0)
 
    // ► Handler's ...
    const handleOnPageChange = (page: number, details: GridCallbackDetails) => {

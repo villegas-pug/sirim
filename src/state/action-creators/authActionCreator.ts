@@ -99,11 +99,14 @@ export const login = (cred: any) => async (dispatch: Dispatch<AuthActionType>) =
    }
 }
 
-export const updatePasswordByLogin = (cred: any) => async (dispatch: Dispatch<AuthActionType>, getStore: () => any) => {
+export const updateAccount = (cred: Partial<Usuario>) => async (dispatch: Dispatch<AuthActionType>, getStore: () => any): Promise<void> => {
    try {
-      dispatch({ type: '[usuario] Update password by login loading' })
-      const { usuario: { token } } = getStore()
-      const { data: { levelLog, message } } = await api.request<Response<Usuario>>({
+      dispatch({ type: '[usuario] updateAccount loading' })
+
+      const { usuario: { token, userCredentials: { login } } } = getStore()
+      cred.login = login
+
+      const { data: { levelLog, data, message } } = await api.request<Response<Usuario>>({
          method: 'PUT',
          url: '/microservicio-usuario/updateAccount',
          data: cred,
@@ -114,15 +117,12 @@ export const updatePasswordByLogin = (cred: any) => async (dispatch: Dispatch<Au
 
       switch (levelLog) {
       case SUCCESS:
-         dispatch({ type: '[usuario] Update password by login success' })
+         dispatch({ type: '[usuario] updateAccount success', payload: data })
          noty('success', message)
          break
       case WARNING:
-         dispatch({ type: '[usuario] Update password by login error', payload: message })
-         noty('error', message)
-         break
       case ERROR:
-         dispatch({ type: '[usuario] Update password by login error', payload: message })
+         dispatch({ type: '[usuario] updateAccount error', payload: message })
          noty('error', message)
          break
       }

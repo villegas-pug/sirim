@@ -10,10 +10,11 @@ export const messages = {
    ASSIGN_NOT_AVAILABLE: '¡Asignación masiva no disponible!',
 
    /* ► REGEX - VALIDATION ...  */
-   CREATE_FIELD_VALREGEX: '¡Caracter no válido: (coma), (punto), (espacio) o (símbolo)!',
-   CREATE_FIELD_INFO_VALREGEX: '¡Caracter no válido: (coma) o (símbolo)!',
-   CREATE_TABLE_VALREGEX: '¡Caracteres no permitidos: ((,)comas), ((.)puntos), (( )espacios) y (($%&)símbolos)!',
-   SAVE_GRUPO_ANALISIS_VALIDATION: '¡Caracteres no permitidos: ((,)comas), ((.)puntos) y (($%&)símbolos)!',
-   INPUT_CREATE_TIPO_LOGICO_VALIDATION: '¡Caracteres no permitidos: (Símbolos)!',
-   INPUT_CREATE_VALOR_TIPO_LOGICO_VALIDATION: '¡Caracteres no permitido: (|)!'
+   INPUT_TABLE_VALIDATION: '¡Caracteres no permitidos: (,), (.), (:), (espacio) o (símbolos)!',
+   INPUT_FIELD_VALIDATION: '¡Caracter no válido: (,), (.), (:), (|) (espacio) o (símbolos)!',
+   INPUT_INFO_VALIDATION: '¡Caracter no válido: (,) y (|)!',
+   INPUT_GRUPO_ANALISIS_VALIDATION: '¡Caracteres no permitidos: (símbolos)!',
+   INPUT_TIPO_LOGICO_VALIDATION: '¡Caracteres no permitidos: (Símbolos)!',
+   INPUT_VALOR_TIPO_LOGICO_VALIDATION: '¡Caracteres no permitido: (|)!',
+   INPUT_FIELD_TEXT_REGEX_VALIDATION: '¡Caracteres no permitidos: (,), (:), ({}), (=) y (|).!'
 }

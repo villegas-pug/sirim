@@ -1,4 +1,4 @@
-import { BaseDatos, MetaCampoTablaDinamica, TablaDinamicaDto } from 'interfaces'
+import { BaseDatos, MetaCampoTablaDinamica, RptControlMigratorioDto, TablaDinamicaDto } from 'interfaces'
 import { ResponseHttpStatusType } from 'state/actions'
 
 interface CreateTablaExtracciónLoading {
@@ -250,6 +250,20 @@ interface RemoveCamposTablaDinamica {
    payload: []
 }
 
+interface GetRptControlMigratorioLoading {
+   type: '[Extracción] getRptControlMigratorio loading'
+}
+
+interface GetRptControlMigratorioSuccess {
+   type: '[Extracción] getRptControlMigratorio success'
+   payload: Array<RptControlMigratorioDto>
+}
+
+interface GetRptControlMigratorioError {
+   type: '[Extracción] getRptControlMigratorio error'
+   payload: string | null
+}
+
 export type ExtraccionAction =
    | ResponseHttpStatusType
    | CreateTablaExtracciónLoading
@@ -306,3 +320,6 @@ export type ExtraccionAction =
    | DeleteGrupoCamposAnalisisbyIdLoading
    | DeleteGrupoCamposAnalisisbyIdSuccess
    | DeleteGrupoCamposAnalisisbyIdError
+   | GetRptControlMigratorioLoading
+   | GetRptControlMigratorioSuccess
+   | GetRptControlMigratorioError

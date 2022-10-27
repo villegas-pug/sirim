@@ -1,3 +1,3 @@
-export * from './NuevaDepuracionInfProvider'
-export * from './NuevaDepuracionInfContext'
-export * from './nuevaDepuracionInfReducer'
+export * from './DepurarExtraccionProvider'
+export * from './DepurarExtraccionContext'
+export * from './depurarExtraccionReducer'

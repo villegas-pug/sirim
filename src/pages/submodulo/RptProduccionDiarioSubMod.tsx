@@ -1,9 +1,8 @@
-import { FC, useEffect, useRef, useState } from 'react'
+import { FC, useRef, useState } from 'react'
 
 import {
    ArrowBackIosNewRounded,
    ArrowForwardIosRounded,
-   CachedRounded,
    QueryStatsRounded
 } from '@mui/icons-material'
 import { Box, Button, ButtonGroup, Divider, Grid, Stack } from '@mui/material'
@@ -16,13 +15,13 @@ import Zoom from 'react-reveal/Zoom'
 
 import {
    Body,
+   CustomTooltip,
+   CustomValueTooltip,
    InfoCard,
    LinearWithValueLabel,
    ModalLoader,
    MyTextField,
    SimpleDataGrid,
-   SpeedDialActionProps,
-   SpeedDialBackdrop,
    VerticalChart
 } from 'components'
 
@@ -36,52 +35,20 @@ import { RptTiempoPromedioAnalisisDto } from 'interfaces'
 
 export const RptProduccionDiarioSubMod: FC = () => {
    // ► HOOK'S ...
-   const refResetFrm = useRef({} as HTMLInputElement)
    const [asideRptProduccionDiaria, setAsideRptProduccionDiaria] = useState<'RptProduccionDiaria »Aside-01' | 'RptProduccionDiaria »Aside-02'>('RptProduccionDiaria »Aside-01')
 
    // ► CUSTOM - HOOK'S ...
-   const {
-      totalProduccionAnalisis,
-      totalProduccionDepuracion,
-      findProduccionDiariaByDateParams
-   } = useRptProduccionDiario()
-
-   const { loadingExtraccionDb, findAllTablaDinamica } = useExtraccion()
-
+   const { loadingReporteDb } = useRptProduccionDiario()
+   const { loadingExtraccionDb } = useExtraccion()
    const { loadingRptTiempoPromedioAnalisisDb } = useProduccionAnalisis()
 
-   // ► HANDLER'S ...
-
-   // ► DEP'S ...
-   const optSpeelDial: SpeedDialActionProps[] = [
-      {
-         name: 'Actualizar',
-         icon: <CachedRounded />,
-         handleClick: async () => {
-            await findAllTablaDinamica()
-            refResetFrm.current.click()
-            findProduccionDiariaByDateParams(format(new Date(), 'yyyy-MM-dd'), format(new Date(), 'yyyy-MM-dd'))
-         }
-      }
-   ]
+   // ► Dep's ...
 
    return (
       <>
          <Fade>
             <Body>
-               {/* ► Header: Card's ... */}
-               <Fade top delay={ 500 }>
-                  <Stack
-                     direction='row'
-                     justifyContent='space-around'
-                     divider={ <Divider orientation='vertical' flexItem /> }
-                  >
-                     <InfoCard iconName={'AccountTree'} title={'Total Analisis'} value={ totalProduccionAnalisis } />
-                     <InfoCard iconName={'AccountTree'} title={'Total Depuración'} value={ totalProduccionDepuracion } />
-                  </Stack>
-               </Fade>
-
-               {/* ► HEADER: Navigate's ... */}
+               {/* ► Header: Navigate's ... */}
                <ButtonGroup
                   variant='contained'
                   color='primary'
@@ -108,12 +75,27 @@ export const RptProduccionDiarioSubMod: FC = () => {
             </Body>
          </Fade>
 
-         <SpeedDialBackdrop actions={ optSpeelDial } />
-
          {/* ► MODAL: Loading  */}
          { loadingExtraccionDb && <ModalLoader /> }
          { loadingRptTiempoPromedioAnalisisDb && <ModalLoader /> }
+         { loadingReporteDb && <ModalLoader /> }
       </>
+   )
+}
+
+const InfoCardProduccionDiaria: FC<{ totalProduccionAnalisis: number, totalProduccionDepuracion: number }> = (props) => {
+   return (
+      <Fade top delay={ 700 }>
+         <Stack
+            mb={ 1.5 }
+            direction='row'
+            justifyContent='space-around'
+            divider={ <Divider orientation='vertical' flexItem /> }
+         >
+            <InfoCard iconName={'AssignmentComplete'} title={'Total Analisis'} value={ props.totalProduccionAnalisis } />
+            <InfoCard iconName={'AssignmentComplete'} title={'Total Depuración'} value={ props.totalProduccionDepuracion } />
+         </Stack>
+      </Fade>
    )
 }
 
@@ -125,80 +107,105 @@ const LeftAsideRptProduccionDiaria: FC = () => {
    const {
       produccionAnalisis,
       produccionDepuracion,
-      findProduccionDiariaByDateParams
+      totalProduccionAnalisis,
+      totalProduccionDepuracion,
+      getRptProduccionDiaria
    } = useRptProduccionDiario()
 
    const { currentScreen } = useBreakpoints()
 
    // ► EFFECT'S ...
-   useEffect(() => {
-      findProduccionDiariaByDateParams(format(new Date(), 'yyyy-MM-dd'), format(new Date(), 'yyyy-MM-dd'))
-   }, [])
 
    return (
+      <>
+         {/* ► Header: Info card ... */}
+         <InfoCardProduccionDiaria
+            totalProduccionAnalisis={ totalProduccionAnalisis }
+            totalProduccionDepuracion={ totalProduccionDepuracion }
+         />
 
-      <Grid container>
-         {/* ► Header: Filter ... */}
-         <Grid item xs={ 12 }>
-            <Formik
-               initialValues={{
-                  fecIni: format(new Date(), 'yyyy-MM-dd'),
-                  fecFin: format(new Date(), 'yyyy-MM-dd')
-               }}
-               validationSchema={ Yup.object({
-                  fecIni: Yup.date().required('¡Fecha requerida!').max(Yup.ref('fecFin'), '¡Debe ser menor a fecha final!'),
-                  fecFin: Yup.date().required('¡Fecha requerida!').min(Yup.ref('fecIni'), '¡Debe ser mayor o igual a fecha inicial!')
-               })}
-               onSubmit={ (values: { fecIni: string, fecFin: string }, meta): void => {
-                  findProduccionDiariaByDateParams(values.fecIni, values.fecFin)
-               }}>
-               {() => (
-                  <Form>
-                     <Box
-                        mb={ 1 }
-                        display='flex'
-                        alignItems='flex-start'
-                        gap={ 1 }
-                     >
-                        <MyTextField type='date' name='fecIni' label='Fecha inicio' width={ 15 } focused />
-                        <MyTextField type='date' name='fecFin' label='Fecha fin' width={ 15 } />
-                        <Button type='submit' variant='contained'><QueryStatsRounded /></Button>
-                        <input type='reset' ref={ refResetFrm } hidden />
-                     </Box>
-                  </Form>
-               )}
-            </Formik>
+         {/* ► Body: Filter & Reporte ... */}
+         <Grid container>
+            {/* ► Filter ... */}
+            <Grid item xs={ 12 }>
+               <Formik
+                  initialValues={{
+                     fecIni: format(new Date(), 'yyyy-MM-dd'),
+                     fecFin: format(new Date(), 'yyyy-MM-dd')
+                  }}
+                  validationSchema={ Yup.object({
+                     fecIni: Yup.date().required('¡Fecha requerida!').max(Yup.ref('fecFin'), '¡Debe ser menor a fecha final!'),
+                     fecFin: Yup.date().required('¡Fecha requerida!').min(Yup.ref('fecIni'), '¡Debe ser mayor o igual a fecha inicial!')
+                  })}
+                  onSubmit={ (values: { fecIni: string, fecFin: string }, meta): void => {
+                     getRptProduccionDiaria(values.fecIni, values.fecFin)
+                  }}>
+                  {() => (
+                     <Form>
+                        <Box
+                           mb={ 1 }
+                           display='flex'
+                           alignItems='flex-start'
+                           gap={ 1 }
+                        >
+                           <MyTextField type='date' name='fecIni' label='Fecha inicio' width={ 15 } focused />
+                           <MyTextField type='date' name='fecFin' label='Fecha fin' width={ 15 } />
+                           <Button type='submit' variant='contained'><QueryStatsRounded /></Button>
+                           <input type='reset' ref={ refResetFrm } hidden />
+                        </Box>
+                     </Form>
+                  )}
+               </Formik>
+            </Grid>
+
+            {/* ► Grupo: Analisis  */}
+            <Grid item container xs={ 6 } justifyContent='center'>
+               <VerticalChart
+                  w={ currentScreen === 'tabletLandscape' || currentScreen === 'desktop' ? 550 : 750 }
+                  h={ currentScreen === 'tabletLandscape' || currentScreen === 'desktop' ? 305 : 530 }
+                  data={ produccionAnalisis }
+                  titleYAxis='ANALISIS'
+                  borderColorBar={ '#900C3F' }
+                  yAxisDataKey='usrAnalista'
+                  barDataKey='totalAnalizados'
+                  customTooltip={(props) => {
+                     return <CustomTooltip { ...props }>
+                        {({ payload }) => (
+                           <>
+                              <CustomValueTooltip title='Analizados:' value={ payload.totalAnalizados } />
+                           </>
+                        )}
+                     </CustomTooltip>
+                  }}
+               />
+            </Grid>
+
+            {/* ► Grupo: Depuración  */}
+            <Grid item container xs={ 6 } justifyContent='center' alignItems='center'>
+               <VerticalChart
+                  w={ currentScreen === 'tabletLandscape' || currentScreen === 'desktop' ? 550 : 750 }
+                  h={ currentScreen === 'tabletLandscape' || currentScreen === 'desktop' ? 305 : 530 }
+                  data={ produccionDepuracion }
+                  titleYAxis='DEPURACIÓN'
+                  borderColorBar={ '#FF5733' }
+                  yAxisDataKey='usrAnalista'
+                  barDataKey='totalAnalizados'
+                  customTooltip={(props) => {
+                     return <CustomTooltip { ...props }>
+                        {({ payload }) => (
+                           <>
+                              <CustomValueTooltip title='Analizados:' value={ payload.totalAnalizados } />
+                           </>
+                        )}
+                     </CustomTooltip>
+                  }}
+               />
+
+            </Grid>
+
          </Grid>
 
-         {/* ► Body: ...   */}
-         {/* ► Grupo: Analisis  */}
-         <Grid item container xs={ 6 } justifyContent='center'>
-            <VerticalChart
-               w={ currentScreen === 'tabletLandscape' || currentScreen === 'desktop' ? 550 : 750 }
-               h={ currentScreen === 'tabletLandscape' || currentScreen === 'desktop' ? 305 : 530 }
-               data={produccionAnalisis}
-               titleYAxis='ANALISIS'
-               borderColorBar={ '#900C3F' }
-               yAxisDataKey='usrAnalista'
-               barDataKey='totalAnalizados'
-            />
-         </Grid>
-
-         {/* ► Grupo: Depuración  */}
-         <Grid item container xs={ 6 } justifyContent='center' alignItems='center'>
-            <VerticalChart
-               w={ currentScreen === 'tabletLandscape' || currentScreen === 'desktop' ? 550 : 750 }
-               h={ currentScreen === 'tabletLandscape' || currentScreen === 'desktop' ? 305 : 530 }
-               data={ produccionDepuracion }
-               titleYAxis='DEPURACIÓN'
-               borderColorBar={ '#FF5733' }
-               yAxisDataKey='usrAnalista'
-               barDataKey='totalAnalizados' />
-
-         </Grid>
-
-      </Grid>
-
+      </>
    )
 }
 
@@ -290,7 +297,8 @@ const RigthAsideRptProduccionDiariaAvg: FC = () => {
 
    return (
       <>
-         {/* ► HEADER ...  */}
+
+         {/* ► Header: Filter ... */}
          <Formik
             initialValues={{
                fecIni: format(new Date(), 'yyyy-MM-dd'),
@@ -319,7 +327,7 @@ const RigthAsideRptProduccionDiariaAvg: FC = () => {
             )}
          </Formik>
 
-         {/* ► BODY ...  */}
+         {/* ► Body: Reporte ...  */}
          <Zoom when={ !loadingRptTiempoPromedioAnalisisDb }>
             <SimpleDataGrid
                columns={ columns }

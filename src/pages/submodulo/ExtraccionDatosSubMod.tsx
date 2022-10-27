@@ -108,7 +108,7 @@ const ExtraccionDatosSubMod: FC = () => {
 
                   <Grid item xs={ 3 }>
                      <MyPaper>
-                        <Scrollbar height={ 75 }>
+                        <Scrollbar>
                            <ListaBasesDatos />
                         </Scrollbar>
                      </MyPaper>
@@ -118,7 +118,7 @@ const ExtraccionDatosSubMod: FC = () => {
 
                      <Grid item xs={ 12 }>
                         <MyPaper>
-                           <Scrollbar height={ 35 }>
+                           <Scrollbar>
                               <ListaModulos />
                            </Scrollbar>
                         </MyPaper>
@@ -126,7 +126,7 @@ const ExtraccionDatosSubMod: FC = () => {
 
                      <Grid item xs={ 12 }>
                         <MyPaper>
-                           <Scrollbar height={ 35 }>
+                           <Scrollbar>
                               <ListaModelosDetos />
                            </Scrollbar>
                         </MyPaper>
@@ -136,7 +136,7 @@ const ExtraccionDatosSubMod: FC = () => {
 
                   <Grid item xs={ 3 }>
                      <MyPaper>
-                        <Scrollbar height={ 75 }>
+                        <Scrollbar>
                            <ListaTablas />
                         </Scrollbar>
                      </MyPaper>
@@ -144,7 +144,7 @@ const ExtraccionDatosSubMod: FC = () => {
 
                   <Grid item xs={ 3 }>
                      <MyPaper>
-                        <Scrollbar height={ 75 }>
+                        <Scrollbar>
                            <ListaCampos />
                         </Scrollbar>
                      </MyPaper>

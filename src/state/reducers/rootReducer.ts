@@ -13,7 +13,8 @@ import {
    interpolReducer,
    paisReducer,
    produccionAnalisisReducer,
-   tipoLogicoReducer
+   tipoLogicoReducer,
+   reportesReducer
 } from 'state/reducers'
 
 export const rootReducer = combineReducers({
@@ -28,6 +29,7 @@ export const rootReducer = combineReducers({
    interpol: interpolReducer,
    pais: paisReducer,
    produccionAnalisis: produccionAnalisisReducer,
+   reportes: reportesReducer,
    tipoLogico: tipoLogicoReducer,
    usuario: authReducer
 })

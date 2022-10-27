@@ -17,9 +17,9 @@ interface LoginLoading { type: '[usuario] Login loading' }
 interface LoginSuccess { type: '[usuario] Login success' }
 interface LoginError { type: '[usuario] Login error', payload: string }
 
-interface UpdateUsuarioLoading { type: '[usuario] Update password by login loading' }
-interface UpdateUsuarioSuccess { type: '[usuario] Update password by login success' }
-interface UpdateUsuarioError { type: '[usuario] Update password by login error', payload: string }
+interface UpdateUsuarioLoading { type: '[usuario] updateAccount loading' }
+interface UpdateUsuarioSuccess { type: '[usuario] updateAccount success', payload: Usuario }
+interface UpdateUsuarioError { type: '[usuario] updateAccount error', payload: string }
 
 interface FindAllUserLoading { type: '[usuario] Find all user loading' }
 interface FindAllUserSuccess { type: '[usuario] Find all user success', payload: Usuario[] }

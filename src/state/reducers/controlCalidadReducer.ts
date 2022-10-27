@@ -1,14 +1,18 @@
 import { ControlCalidadAction } from 'state/actions'
 
+import { RegistroTablaDinamicaDto } from 'interfaces'
+
 type ControlCalidadReducerState = {
    loading: boolean
    data: [],
+   tabla: Array<RegistroTablaDinamicaDto>
    error: string | null
 }
 
 const INITIAL_STATE: ControlCalidadReducerState = {
    loading: false,
    data: [],
+   tabla: [],
    error: null
 }
 
@@ -20,6 +24,21 @@ export const controlCalidadReducer = (state: ControlCalidadReducerState = INITIA
       return { ...state, loading: false, data: [], error: null }
    case '[Control-Calidad] Generate records to Control Calidad error':
       return { ...state, loading: false, data: [], error: action.payload }
+   case '[Control-Calidad] findTablaDinamicaByIdCtrlCalAndIds loading':
+   case '[Control-Calidad] validateRecordAssigned loading':
+      return { ...state, loading: true, tabla: [], error: null }
+   case '[Control-Calidad] findTablaDinamicaByIdCtrlCalAndIds success':
+   case '[Control-Calidad] validateRecordAssigned success':
+      return { ...state, loading: false, tabla: action.payload, error: null }
+   case '[Control-Calidad] findTablaDinamicaByIdCtrlCalAndIds error':
+   case '[Control-Calidad] validateRecordAssigned error':
+      return { ...state, loading: false, tabla: [], error: action.payload }
+   case '[Control-Calidad] saveMetaFieldIdErrorCsv loading':
+      return { ...state, loading: true }
+   case '[Control-Calidad] saveMetaFieldIdErrorCsv success':
+      return { ...state, loading: false }
+   case '[Control-Calidad] saveMetaFieldIdErrorCsv error':
+      return { ...state, loading: false, error: action.payload }
    default:
       return state
    }

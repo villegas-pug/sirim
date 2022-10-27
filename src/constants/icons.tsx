@@ -55,7 +55,12 @@ import {
    EngineeringRounded,
    DataObjectRounded,
    EventNoteRounded,
-   QueryBuilderRounded
+   QueryBuilderRounded,
+   StackedLineChartRounded,
+   FlightLandRounded,
+   FlightTakeoffRounded,
+   BoyRounded,
+   GirlRounded
 } from '@mui/icons-material'
 
 const classes: { [key: string]: CSSProperties } = {
@@ -100,6 +105,7 @@ export const elementIcons = {
    DataObjectRounded: <DataObjectRounded color='action' style={ classes.subModIcon } />,
    EventNoteRounded: <EventNoteRounded color='action' style={ classes.subModIcon }/>,
    QueryBuilderRounded: <QueryBuilderRounded color='action' style={ classes.subModIcon }/>,
+   StackedLineChartRounded: <StackedLineChartRounded color='action' style={ classes.subModIcon }/>,
 
    Test: <Build />,
    Cloud: <Cloud />,
@@ -120,7 +126,11 @@ export const elementIcons = {
    Assignment: <AssignmentRounded fontSize='large' />,
    AssignmentComplete: <AssignmentTurnedInRounded fontSize='large' />,
    AssignmentPendent: <AssignmentLateRounded fontSize='large' />,
-   AssignmentCompleteToday: <HistoryToggleOffRounded fontSize='large' />
+   AssignmentCompleteToday: <HistoryToggleOffRounded fontSize='large' />,
+   PlaneEntry: <FlightLandRounded fontSize='large' />,
+   PlaneTakeOff: <FlightTakeoffRounded fontSize='large' />,
+   BoyRounded: <BoyRounded fontSize='large' />,
+   GirlRounded: <GirlRounded fontSize='large' />
 
 }
 

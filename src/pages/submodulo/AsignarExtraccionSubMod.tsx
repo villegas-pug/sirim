@@ -21,6 +21,7 @@ import {
    ArrowDownwardRounded,
    ArrowUpwardRounded,
    DeleteForeverRounded,
+   DoneRounded,
    GroupAddRounded,
    GroupWorkRounded,
    HighlightOffRounded,
@@ -44,6 +45,7 @@ import {
    ConfirmDialogRefProps,
    LinearWithValueLabel,
    ListItemFade,
+   ListItemZoom,
    ModalLoader,
    MyAutocomplete,
    MySelect,
@@ -63,12 +65,13 @@ import {
 } from 'context'
 
 import { AsigGrupoCamposAnalisis, AsigGrupoCamposAnalisisDto, Usuario } from 'interfaces'
-import { applyCommaThousands, noty } from 'helpers'
+import { applyCommaThousands, noty, parseJsonTimestampToDate } from 'helpers'
 import { messages } from 'constants/'
 import { format, parseISO } from 'date-fns'
 
 const MainPaper = styled(Paper)({
-   height: '100%'
+   height: '100%',
+   overflow: 'auto'
 })
 
 const delayFadeTop: number = 200
@@ -86,24 +89,22 @@ const AsignarExtraccionSubMod: FC = () => {
    return (
       <>
          <BandejaProcesos>
-            {/* ► Lista: Tablas Dinámicas ... */}
-            <Grid item xs={ 3 }>
-               <MainPaper variant='outlined'>
-                  <Scrollbar height={ 70 }>
+            {/* ► Listas: Tablas Dinámicas y Grupos ... */}
+            <Grid container item xs={ 3 } gap={ 0.5 }>
+               <Grid item xs={ 12 }>
+                  <MainPaper variant='outlined'>
                      <ListaTablasExtraccion />
-                  </Scrollbar>
-               </MainPaper>
-            </Grid>
+                  </MainPaper>
+               </Grid>
 
-            <Grid item xs={ 3 }>
-               <MainPaper variant='outlined'>
-                  <Scrollbar height={ 70 }>
+               <Grid item xs={ 12 }>
+                  <MainPaper variant='outlined'>
                      <ListaGruposCamposAnalisis />
-                  </Scrollbar>
-               </MainPaper>
+                  </MainPaper>
+               </Grid>
             </Grid>
 
-            <Grid item xs={ 6 }>
+            <Grid item xs={ 9 }>
                <MainPaper variant='outlined'>
                   <ListaAsignacionesGrupo />
                </MainPaper>
@@ -130,29 +131,34 @@ const ListaTablasExtraccion: FC = () => {
    const { tdDbFromCurrentUsr, countTablaDinamicaByNombre } = useAsignarExtraccion()
 
    return (
-      <List
-         subheader={ <ListSubheader>Bases disponibles</ListSubheader> }
-      >
-         {
-            tdDbFromCurrentUsr.map((tablaDinamica, i) => (
-               <ListItemFade key={ tablaDinamica.idTabla } i={ i } direction='top'>
-                  <ListItemButton
-                     selected={ selectedItem === i }
-                     onClick={ () => {
-                        countTablaDinamicaByNombre(tablaDinamica.nombre)
-                        handleAddTablaDinamicaTmp('ADD', tablaDinamica)
-                        setSelectedItem(i)
-                     } }
-                  >
-                     <ListItemIcon><TableViewRounded /></ListItemIcon>
-                     <ListItemText primary={
-                        <Typography variant='h5'>{ tablaDinamica.nombre }</Typography>
-                     } />
-                  </ListItemButton>
-               </ListItemFade>
-            ))
-         }
-      </List>
+      <Scrollbar>
+         <List
+            subheader={ <ListSubheader>Bases disponibles</ListSubheader> }
+         >
+            {
+               tdDbFromCurrentUsr.map((tablaDinamica, i) => (
+                  <ListItemFade key={ tablaDinamica.idTabla } i={ i } direction='left'>
+                     <ListItemButton
+                        selected={ selectedItem === i }
+                        onClick={ () => {
+                           countTablaDinamicaByNombre(tablaDinamica.nombre)
+                           handleAddTablaDinamicaTmp('ADD', tablaDinamica)
+                           setSelectedItem(i)
+                        } }
+                     >
+                        <ListItemIcon><TableViewRounded /></ListItemIcon>
+                        <ListItemText primary={
+                           <Box display='flex' justifyContent='space-between' gap={ 1 } flexWrap='wrap'>
+                              <Typography variant='h5'>{ tablaDinamica.nombre }</Typography>
+                              <Typography variant='h6'>{ format(parseJsonTimestampToDate(tablaDinamica.fechaCreacion), 'dd-MM-yyyy') }</Typography>
+                           </Box>
+                        } />
+                     </ListItemButton>
+                  </ListItemFade>
+               ))
+            }
+         </List>
+      </Scrollbar>
    )
 }
 
@@ -194,43 +200,45 @@ const ListaGruposCamposAnalisis: FC = () => {
    return (
       <>
          {/* ► ... */}
-         <List
-            subheader={ <ListSubheader>Grupos de analisis</ListSubheader> }
-         >
-            {
-               gruposCamposAnalisisTmp.map((grupo, i) => (
-                  <ListItemFade key={ grupo.idGrupo } i={ i } direction='top' >
-                     <ListItemButton
-                        selected={ i === selectedItem }
-                        onClick={ () => {
-                           setSelectedItem(i)
-                           handleAddGrupoCamposAnalisisTmp(grupo)
-                        } }
-                     >
+         <Scrollbar>
+            <List
+               subheader={ <ListSubheader>Grupos de analisis</ListSubheader> }
+            >
+               {
+                  gruposCamposAnalisisTmp.map((grupo, i) => (
+                     <ListItemFade key={ grupo.idGrupo } i={ i } direction='bottom' >
+                        <ListItemButton
+                           selected={ i === selectedItem }
+                           onClick={ () => {
+                              setSelectedItem(i)
+                              handleAddGrupoCamposAnalisisTmp(grupo)
+                           } }
+                        >
 
-                        <ListItemIcon><GroupWorkRounded fontSize='small' /></ListItemIcon>
+                           <ListItemIcon><GroupWorkRounded fontSize='small' /></ListItemIcon>
 
-                        <ListItemText
-                           onClick={ () => handleAddAsigsGrupoCamposAnalisisTmp('ADD', grupo.asigGrupoCamposAnalisis) }
-                           primary={
-                              <Typography variant='h5'>{ grupo.nombre }</Typography>
-                           }
-                        />
+                           <ListItemText
+                              onClick={ () => handleAddAsigsGrupoCamposAnalisisTmp('ADD', grupo.asigGrupoCamposAnalisis) }
+                              primary={
+                                 <Typography variant='h5'>{ grupo.nombre }</Typography>
+                              }
+                           />
 
-                        <ListItemSecondaryAction>
-                           <IconButton
-                              size='small'
-                              onClick={ () => { modalAssing.current.setOpen(true) } }
-                           >
-                              <GroupAddRounded fontSize='small' />
-                           </IconButton>
-                        </ListItemSecondaryAction>
+                           <ListItemSecondaryAction>
+                              <IconButton
+                                 size='small'
+                                 onClick={ () => { modalAssing.current.setOpen(true) } }
+                              >
+                                 <GroupAddRounded fontSize='small' />
+                              </IconButton>
+                           </ListItemSecondaryAction>
 
-                     </ListItemButton>
-                  </ListItemFade>
-               ))
-            }
-         </List>
+                        </ListItemButton>
+                     </ListItemFade>
+                  ))
+               }
+            </List>
+         </Scrollbar>
 
          {/* ► MODAL: Assign ... */}
          <SimpleModal ref={ modalAssing } onOpen={ handleModalAssingOnOpen }>
@@ -559,67 +567,83 @@ const ListaAsignacionesGrupo: FC = () => {
          <FrmFilterListaAsignaciones />
 
          {/* ► BODY: ... */}
-         <List subheader={ <ListSubheader>Rangos asignados</ListSubheader> }>
-            <Scrollbar height={ 50 }>
-               {
-                  filteredAsigsAnalisisTmp.map((asign, i) => (
-                     <ListItemFade key={asign.idAsigGrupo} i={i} direction='top'>
-                        <ListItemButton
-                           selected={ i === selectedItem }
-                           onClick={ () => setSelectedItem(i) }
-                        >
+         <Box height='76%'>
+            <Scrollbar>
+               <List subheader={ <ListSubheader>Rangos asignados</ListSubheader> }>
+                  {
+                     filteredAsigsAnalisisTmp.map((asign, i) => (
+                        <ListItemZoom key={asign.idAsigGrupo} i={i}>
+                           <ListItemButton
+                              selected={ i === selectedItem }
+                              onClick={ () => setSelectedItem(i) }
+                           >
 
-                           <ListItemIcon><PersonRounded fontSize='small' /></ListItemIcon>
+                              <ListItemIcon>
+                                 {
+                                    asign.totalAsignados === asign.totalAnalizados ? <DoneRounded color='success' /> : <PersonRounded color='disabled' />
+                                 }
 
-                           <ListItemText
-                              primary={
-                                 <Stack direction='row' spacing={ 2 }>
-                                    <Typography variant='h5'>{ format(parseISO(asign.fechaAsignacion), 'dd-MM-yyyy') }</Typography>
-                                    <Typography variant='h5'>{ asign.usrAnalista.nombres }</Typography>
-                                    <Typography variant='h5'>{ `A: ${applyCommaThousands(asign.totalAnalizados)}` }</Typography>
-                                    <Typography variant='h5'>{ `P: ${applyCommaThousands(asign.totalPendientes)}` }</Typography>
-                                    <LinearWithValueLabel progress={ (asign.totalAnalizados / asign.totalAsignados) * 100 } width={ 100 } />
-                                    <Typography variant='h5'>{ `R: ${asign.regAnalisisIni}-${asign.regAnalisisFin}` }</Typography>
-                                 </Stack>
-                              }
-                           />
+                              </ListItemIcon>
 
-                           <ListItemSecondaryAction>
+                              <ListItemText
+                                 primary={
+                                    <Stack
+                                       width={ '92%' }
+                                       direction='row'
+                                       justifyContent='space-between'
+                                       overflow='auto'
+                                       spacing={ 1 }
+                                       divider={ <Divider orientation='vertical' flexItem /> }
+                                    >
+                                       <Typography variant='h5'>{ format(parseISO(asign.fechaAsignacion), 'dd-MM-yyyy') }</Typography>
+                                       <Typography variant='h5'>{ asign.usrAnalista.nombres }</Typography>
+                                       <Typography variant='h5'>{ `Asignados: ${applyCommaThousands(asign.totalAsignados)}` }</Typography>
+                                       <Typography variant='h5'>{ `Analizados: ${applyCommaThousands(asign.totalAnalizados)}` }</Typography>
+                                       <Typography variant='h5'>{ `Pendientes: ${applyCommaThousands(asign.totalPendientes)}` }</Typography>
+                                       <LinearWithValueLabel progress={ (asign.totalAnalizados / asign.totalAsignados) * 100 } width={ 100 } />
+                                       <Typography variant='h5'>{ `R: ${asign.regAnalisisIni}-${asign.regAnalisisFin}` }</Typography>
+                                    </Stack>
+                                 }
+                              />
 
-                              <Tooltip title='Eliminar asignación' placement='top-start' arrow>
-                                 <IconButton
-                                    size='small'
-                                    disabled={ asign.totalAsignados === asign.totalAnalizados }
-                                    onClick={ () => {
-                                       setSelectedAsign(asign)
-                                       confirmEliminarAsign.current.setIsOpen(true)
-                                    } }
-                                 >
-                                    <HighlightOffRounded fontSize='small' />
-                                 </IconButton>
-                              </Tooltip>
+                              <ListItemSecondaryAction>
 
-                              <Tooltip title='Reasignar' placement='top-start' arrow>
-                                 <IconButton
-                                    size='small'
-                                    disabled={ asign.totalAsignados === asign.totalAnalizados }
-                                    onClick={ () => {
-                                       setSelectedAsign(asign)
-                                       modalReasignacion.current.setOpen(true)
-                                    } }
-                                 >
-                                    <PersonSearchRounded fontSize='small' />
-                                 </IconButton>
-                              </Tooltip>
+                                 <Tooltip title='Eliminar asignación' placement='top-start' arrow>
+                                    <IconButton
+                                       size='small'
+                                       disabled={ asign.totalAsignados === asign.totalAnalizados }
+                                       onClick={ () => {
+                                          setSelectedAsign(asign)
+                                          confirmEliminarAsign.current.setIsOpen(true)
+                                       } }
+                                    >
+                                       <HighlightOffRounded fontSize='small' />
+                                    </IconButton>
+                                 </Tooltip>
 
-                           </ListItemSecondaryAction>
+                                 <Tooltip title='Reasignar' placement='top-start' arrow>
+                                    <IconButton
+                                       size='small'
+                                       disabled={ asign.totalAsignados === asign.totalAnalizados }
+                                       onClick={ () => {
+                                          setSelectedAsign(asign)
+                                          modalReasignacion.current.setOpen(true)
+                                       } }
+                                    >
+                                       <PersonSearchRounded fontSize='small' />
+                                    </IconButton>
+                                 </Tooltip>
 
-                        </ListItemButton>
-                     </ListItemFade>
-                  ))
-               }
+                              </ListItemSecondaryAction>
+
+                           </ListItemButton>
+                        </ListItemZoom>
+                     ))
+                  }
+               </List>
             </Scrollbar>
-         </List>
+         </Box>
+
          {/* » MODAL: Confirm ...  */}
          <ConfirmDialogModal ref={ confirmEliminarAsign } title={'¿Seguro de continuar?'} setIsAccept={ setIsConfirmEliminarAsign } />
 

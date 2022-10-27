@@ -6,10 +6,12 @@ import {
    ComposedChart,
    YAxis,
    XAxis,
-   Line
+   Line,
+   Tooltip
 } from 'recharts'
+import { CustomTooltipProps } from 'components'
 
-const fontSizeAxis = 10
+const fontSizeAxis = 14
 const widthYAxis = 140
 const colorLabelAxis = '#444'
 
@@ -22,10 +24,12 @@ type VerticalChartProps<T> = {
    yAxisDataKey: keyof T
    barDataKey: keyof T
    layout?: 'vertical' | 'horizontal'
+   barWidth?: number
    xAxisDataKey?: keyof T
+   customTooltip?: (props: CustomTooltipProps<T>) => ReactElement | null
 }
 
-export const VerticalChart = <T extends unknown>({ w, h, layout = 'vertical', borderColorBar, data, titleYAxis, yAxisDataKey, xAxisDataKey, barDataKey }: VerticalChartProps<T>): ReactElement => {
+export const VerticalChart = <T extends unknown>({ w, h, data, titleYAxis, borderColorBar, yAxisDataKey, barDataKey, layout = 'vertical', barWidth, xAxisDataKey, customTooltip: CustomTooltip }: VerticalChartProps<T>): ReactElement => {
    return (
       <ComposedChart
          layout={ layout }
@@ -42,7 +46,7 @@ export const VerticalChart = <T extends unknown>({ w, h, layout = 'vertical', bo
             dataKey={ yAxisDataKey }
             type='category'
             tickSize={ 3 }
-            width={ widthYAxis * 1.3 }
+            width={ widthYAxis }
             tick={{ fontSize: 10, width: widthYAxis, fill: colorLabelAxis }}
             stroke={ borderColorBar }
             label={{ value: titleYAxis, position: 'insideLeft', angle: -90 }}
@@ -50,13 +54,12 @@ export const VerticalChart = <T extends unknown>({ w, h, layout = 'vertical', bo
 
          <Bar
             dataKey={ barDataKey }
-            barSize={ 20 }
-            label={{ fontSize: 14, position: 'right' }}
+            barSize={ barWidth ?? 40 }
+            label={{ fontSize: 10, position: 'right' }}
             fill={ borderColorBar }
-            /* stroke={ borderColorBar } */
          />
 
-         <Line type='linear' dataKey={ barDataKey } stroke='#ff7300' />
+         <Line type='step' dataKey={ barDataKey } stroke='#ff7300' />
 
          <XAxis
             dataKey={ xAxisDataKey }
@@ -65,6 +68,8 @@ export const VerticalChart = <T extends unknown>({ w, h, layout = 'vertical', bo
             tick={{ fontSize: fontSizeAxis, fill: colorLabelAxis }}
             domain={ [0, (dataMax: number) => Math.ceil(dataMax * 1.2)] }
          />
+
+         { CustomTooltip && <Tooltip content={ CustomTooltip } /> }
 
       </ComposedChart>
    )

@@ -22,3 +22,4 @@ export type Submodulo =
    | 'CREAR TIPO LÓGICO'
    | 'EVENTO'
    | 'REPORTE DE HORAS TRABAJADAS'
+   | 'REPORTE CONTROL MIGRATORIO'

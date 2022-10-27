@@ -1,4 +1,4 @@
-import { BaseDatos, MetaCampoTablaDinamica, TablaDinamicaDto } from 'interfaces'
+import { BaseDatos, MetaCampoTablaDinamica, RptControlMigratorioDto, TablaDinamicaDto } from 'interfaces'
 import { ExtraccionAction } from 'state/actions'
 
 type ExtraccionState = {
@@ -35,6 +35,7 @@ type ExtraccionState = {
    dnv: {
       loading: boolean
       data: Array<any>
+      rptControlMigratorio: Array<RptControlMigratorioDto>
       error: string | null
    }
 }
@@ -73,6 +74,7 @@ const initialState: ExtraccionState = {
    dnv: {
       loading: false,
       data: [],
+      rptControlMigratorio: [],
       error: null
    }
 }
@@ -149,11 +151,11 @@ export const extraccionReducer = (state: ExtraccionState = initialState, action:
    case '[Extracción] Update queryString error':
       return { ...state, basesDatos: { ...state.basesDatos, loading: false, error: action.payload } }
    case '[Extracción] Find all dnv by params loading':
-      return { ...state, dnv: { loading: true, data: [], error: null } }
+      return { ...state, dnv: { ...state.dnv, loading: true, data: [], error: null } }
    case '[Extracción] Find all dnv by params success':
-      return { ...state, dnv: { loading: false, data: action.payload, error: null } }
+      return { ...state, dnv: { ...state.dnv, loading: false, data: action.payload, error: null } }
    case '[Extracción] Find all dnv by params error':
-      return { ...state, dnv: { loading: false, data: [], error: action.payload } }
+      return { ...state, dnv: { ...state.dnv, loading: false, data: [], error: action.payload } }
    case '[Extracción] Find tabla dinámica by suffix loading':
       return { ...state, depuracion: { loading: true, data: [], error: null } }
    case '[Extracción] Find tabla dinámica by suffix success':
@@ -168,6 +170,12 @@ export const extraccionReducer = (state: ExtraccionState = initialState, action:
       return { ...state, extraccion: { ...state.extraccion, totalRegistros: action.payload, loading: false, error: null } }
    case '[Extracción] Count tabla by nombre error':
       return { ...state, extraccion: { ...state.extraccion, loading: false, error: action.payload } }
+   case '[Extracción] getRptControlMigratorio loading':
+      return { ...state, dnv: { ...state.dnv, loading: true, rptControlMigratorio: [], error: null } }
+   case '[Extracción] getRptControlMigratorio success':
+      return { ...state, dnv: { ...state.dnv, loading: false, rptControlMigratorio: action.payload, error: null } }
+   case '[Extracción] getRptControlMigratorio error':
+      return { ...state, dnv: { ...state.dnv, loading: false, rptControlMigratorio: [], error: action.payload } }
    default:
       return state
    }

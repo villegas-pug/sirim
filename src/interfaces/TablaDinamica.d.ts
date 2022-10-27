@@ -26,7 +26,7 @@ export type PrefixMetaFieldSqlType = {
 
 export type MetaFieldSqlType = keyof PrefixMetaFieldSqlType
 export interface TablaDinamicaDto extends TablaDinamica {
-   camposCsv: String
+   camposCsv: string
    alterTableType: AlterTableType
    grupoCamposAnalisis: Partial<GrupoCamposAnalisis>
 }
@@ -41,33 +41,31 @@ export interface MetaCampoTablaDinamica {
    grupo: Partial<GrupoCamposAnalisis>
 } */
 
-export interface RecordAssignedDto {
-   nombreTable: string
-   id: number
-   values: string
-   usrAnalista: Usuario
-   regAnalisisIni: number
-   regAnalisisFin: number
-   asigGrupo: Partial<AsigGrupoCamposAnalisisDto>
-
-   revisado: boolean
-   observacionesCtrlCal: string
-   metaFieldIdErrorCsv: string
-}
-
-export interface RegistroTablaDinamica {
+export interface RegistroTablaDinamicaDto {
    nId: number
-   dFecha_Creacion: Date
    nro?: number
+   dFecha_Creacion: Date
 
    // ► Aux-1 ...
    fechaAnalisis: string
    analizado: boolean
    revisado: boolean
    observacionesCtrlCal: string
+   hasFieldError: boolean
 
    // ► Aux-2 ...
    nombreTabla: string
    regAnalisisIni: number
    regAnalisisFin: number
+
+   // ► Aux-3 ...
+   id: number
+   values: string
+   usrAnalista: Usuario
+   asigGrupo: Partial<AsigGrupoCamposAnalisisDto>
+   metaFieldIdErrorCsv: string
+
+   // ► Aux-4 ...
+   idCtrlCal: number;
+
 }

@@ -1,4 +1,9 @@
-import { GrupoCamposAnalisis, Usuario, ProduccionAnalisis, CtrlCalCamposAnalisis } from 'interfaces'
+import {
+   GrupoCamposAnalisis,
+   Usuario,
+   ProduccionAnalisis,
+   CtrlCalCamposAnalisis
+} from 'interfaces'
 
 export interface AsigGrupoCamposAnalisis {
    idAsigGrupo: number
@@ -23,8 +28,15 @@ export interface AsigGrupoCamposAnalisisDto extends AsigGrupoCamposAnalisis {
    completo: boolean
 }
 
-export interface AnalizadosDto {
+export interface RecordsBetweenDatesDto {
    idAsigGrupo: number
    fecIni: string
    fecFin: string
+
+   // ► Aux-1: Propiedades para el reporte de `Administrador` ...
+   usrAdmin?: Usuario // ► Grupo del usuario dueño de la consulta ...
+   usrAnalista?: Usuario // ► Usuario en consulta ...
+
+   // ► Aux-2 ...
+   isAssignedTemplate: boolean
 }

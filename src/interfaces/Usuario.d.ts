@@ -7,7 +7,7 @@ export interface UsrProcedimiento {
    fechaRegistro: Date
 }
 
-export type RimGrupo = 'ANALISIS' | 'DEPURACION'
+export type Grupo = 'ANALISIS' | 'DEPURACION' | 'ADMINISTRADORES'
 export interface Usuario {
    idUsuario: string
    nombres: string
@@ -16,8 +16,9 @@ export interface Usuario {
    password: string
    dependencia: string
    cargo: string
-   grupo: RimGrupo
+   grupo: Grupo
    area: string
    dni: string
    regimenLaboral: string
+   foto: string
 }

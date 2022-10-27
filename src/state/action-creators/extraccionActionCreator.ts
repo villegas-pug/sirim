@@ -16,7 +16,8 @@ import {
    ModuloDto,
    QueryClauseDto,
    QueryString,
-   RequestParamsDnv
+   RequestParamsDnv,
+   RptControlMigratorioDto
 } from 'interfaces'
 
 const { AUTHORIZATION } = localStorage
@@ -43,6 +44,7 @@ export const createTablaExtraccion = (values: Partial<TablaDinamicaDto>) => asyn
       case 'WARNING':
       case 'ERROR':
          dispatch({ type: '[Extracción] Create new table error', payload: message })
+         dispatch({ type: '[Extracción] Create new table success', payload: data })
          noty('error', message)
          break
       }
@@ -60,7 +62,7 @@ export const findAllTablaDinamica = () => async (dispatch: Dispatch<ExtraccionAc
       const { usuario: { token } } = getState()
       const { data: { levelLog, data, message } } = await api.request<Response<TablaDinamicaDto[]>>({
          method: 'GET',
-         url: '/microservicio-rimextraccion/findAllTablaDinamica',
+         url: '/microservicio-rimcommon/findAllTablaDinamica',
          headers: {
             [AUTHORIZATION]: token
          }
@@ -105,11 +107,13 @@ export const updateNameTablaDinamica = (values: Partial<TablaDinamica>) => async
          break
       case 'WARNING':
       case 'ERROR':
+         dispatch({ type: '[Extracción] Update name tabla success', payload: data })
          dispatch({ type: '[Extracción] Update name tabla error', payload: message })
          noty('error', message)
          break
       }
    } catch (err: any) {
+      dispatch({ type: '[Extracción] Update name tabla error', payload: err?.response?.status })
       dispatch({ type: '[http-status] Response status', payload: err?.response?.status })
    }
 }
@@ -278,7 +282,7 @@ export const deleteGrupoCamposAnalisisbyId = (idGrupo: number) => async (dispatc
       const { usuario: { token } } = getState()
       const { data: { levelLog, data, message } } = await api.request<Response<TablaDinamicaDto[]>>({
          method: 'DELETE',
-         url: `/microservicio-rimextraccion/deleteGrupoCamposAnalisisbyId/${idGrupo}`,
+         url: `/microservicio-rimcommon/deleteGrupoCamposAnalisisbyId/${idGrupo}`,
          headers: {
             [AUTHORIZATION]: token
          }
@@ -525,7 +529,7 @@ export const findTablaDinamicaBySuffixOfField = (nombreTabla: String, suffix?: S
       const { usuario: { token } } = getState()
       const { data: { levelLog, data, message } } = await api.request<Response<Array<Object>>>({
          method: 'GET',
-         url: '/microservicio-rimextraccion/findTablaDinamicaBySuffixOfField',
+         url: '/microservicio-rimcommon/findTablaDinamicaBySuffixOfField',
          params: { nombreTabla, suffix },
          headers: {
             [AUTHORIZATION]: token
@@ -554,7 +558,7 @@ export const countTablaDinamicaByNombre = (nombreTabla: string) => async (dispat
       const { usuario: { token } } = getState()
       const { data: { levelLog, data, message } } = await api.request<Response<number>>({
          method: 'GET',
-         url: '/microservicio-rimextraccion/countTablaByNombre',
+         url: '/microservicio-rimcommon/countTablaByNombre',
          params: { nombreTabla },
          headers: {
             [AUTHORIZATION]: token
@@ -579,4 +583,33 @@ export const countTablaDinamicaByNombre = (nombreTabla: string) => async (dispat
 
 export const removeCamposTablaDinamica = () => async (dispatch: Dispatch<ExtraccionAction>, getState: () => any): Promise<void> => {
    dispatch({ type: '[Extracción] Remove campos tabla dinámica', payload: [] })
+}
+
+export const getRptControlMigratorio = (año: number, nacionalidad: string) => async (dispatch: Dispatch<ExtraccionAction>, getState: () => any): Promise<void> => {
+   dispatch({ type: '[Extracción] getRptControlMigratorio loading' })
+   try {
+      const { usuario: { token } } = getState()
+      const { data: { levelLog, data, message } } = await api.request<Response<RptControlMigratorioDto[]>>({
+         method: 'GET',
+         url: '/microservicio-rimreportes/getRptControlMigratorio',
+         params: { año, nacionalidad },
+         headers: {
+            [AUTHORIZATION]: token
+         }
+      })
+
+      switch (levelLog) {
+      case 'SUCCESS':
+         dispatch({ type: '[Extracción] getRptControlMigratorio success', payload: data })
+         break
+      case 'WARNING':
+      case 'ERROR':
+         dispatch({ type: '[Extracción] getRptControlMigratorio error', payload: message })
+         noty('error', message)
+         break
+      }
+   } catch (err: any) {
+      dispatch({ type: '[Extracción] getRptControlMigratorio error', payload: err?.message })
+      dispatch({ type: '[http-status] Response status', payload: err?.response?.status })
+   }
 }

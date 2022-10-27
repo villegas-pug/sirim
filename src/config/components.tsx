@@ -27,6 +27,7 @@ const RptProduccionDiarioSubMod = lazy(() => import('pages/submodulo/RptProducci
 const CrearTipoLogicoSubMod = lazy(() => import('pages/submodulo/CrearTipoLogicoSubMod'))
 const EventoSubMod = lazy(() => import('pages/submodulo/EventoSubMod'))
 const RptProduccionHorasLaboralesSubMod = lazy(() => import('pages/submodulo/RptProduccionHorasLaboralesSubMod'))
+const RptControlMigratorioSubMod = lazy(() => import('pages/submodulo/RptControlMigratorioSubMod'))
 
 /* » ITEM'S */
 const modulo: Array<ModuloType> = [
@@ -88,6 +89,9 @@ const subModulo: Array<SubModuloType> = [
    }, {
       name: 'REPORTE DE HORAS TRABAJADAS',
       component: <RptProduccionHorasLaboralesSubMod />
+   }, {
+      name: 'REPORTE CONTROL MIGRATORIO',
+      component: <RptControlMigratorioSubMod />
    }
 ]
 

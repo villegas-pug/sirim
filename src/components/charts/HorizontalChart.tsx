@@ -13,6 +13,8 @@ import {
    Line
 } from 'recharts'
 
+import { LabelProps } from 'recharts/types'
+
 const fontSizeAxis = 10
 const colorLabelAxis = '#444'
 
@@ -24,9 +26,10 @@ type VerticalChartProps<T> = {
    xAxisDataKey: keyof T
    barDataKey: keyof T
    titleXAxis: string
+   showTooltip?: boolean
 }
 
-export const HorizontalChart = <T extends unknown>({ w, h, colorBar, data, xAxisDataKey, barDataKey, titleXAxis }: VerticalChartProps<T>): ReactElement => {
+export const HorizontalChart = <T extends unknown>({ w, h, colorBar, data, xAxisDataKey, barDataKey, titleXAxis, showTooltip = false }: VerticalChartProps<T>): ReactElement => {
    return (
       <ComposedChart
          layout='horizontal'
@@ -48,8 +51,9 @@ export const HorizontalChart = <T extends unknown>({ w, h, colorBar, data, xAxis
 
          <Bar
             dataKey={ barDataKey }
-            barSize={ 20 }
-            label={{ fontSize: 12, position: 'top' }}
+            barSize={ 35 }
+            /* label={{ fontSize: 12, position: 'top' }} */
+            label={ <CustomBarLabel /> }
             fill={ colorBar }
          />
 
@@ -61,11 +65,9 @@ export const HorizontalChart = <T extends unknown>({ w, h, colorBar, data, xAxis
             label={{ fontSize: 11, value: titleXAxis, position: 'center' }}
          />
 
-         <Line type='linear' dataKey={ barDataKey } stroke={ '#AFAFAF' } />
+         <Line type='step' dataKey={ barDataKey } stroke={ '#AFAFAF' } />
 
-         <Tooltip
-            content={ <CustomTooltip /> }
-         />
+         { showTooltip && <Tooltip content={ <CustomTooltip /> } /> }
 
       </ComposedChart>
    )
@@ -76,34 +78,34 @@ type CustomTooltipProps = {
 }
 
 const CustomTooltip: FC<CustomTooltipProps> = ({ payload }) => {
-   if (payload && payload.length) {
-      return (
-         <Paper variant='outlined' sx={{ opacity: 0.9 }}>
-            <Box
-               p={ 1 }
-            >
-               <Box display='flex' gap={ 1 } alignItems='center'>
-                  <Typography variant='h5' color={ payload[0].color }>Fecha: </Typography>
-                  <Typography variant='h3'>{ payload[0].payload.fechaAnalisis.toLocaleString('es-PE', { timeZone: 'America/Lima' }) }</Typography>
-               </Box>
-               <Box display='flex' gap={ 1 } alignItems='center'>
-                  <Typography variant='h5' color={ payload[0].color }>Hora: </Typography>
-                  <Typography variant='h2'>{ `${payload[0].payload.horaAnalisis}:00` }</Typography>
-               </Box>
-               <Box display='flex' gap={ 1 } alignItems='center'>
-                  <Typography variant='h5' color={ payload[0].color }>Total Analizados: </Typography>
-                  <Typography variant='h2'>{ payload[0].payload.totalAnalizados }</Typography>
-               </Box>
+   // ► Render conditional ...
+   if (!payload) return null
+   if (payload.length === 0) return null
 
-               <Typography variant='h3' gutterBottom>Eventos</Typography>
-               <ListaEventos eventos={ payload[0].payload.eventos } />
-
+   return (
+      <Paper variant='outlined' sx={{ maxWidth: 200, opacity: 0.9 }}>
+         <Box
+            p={ 1 }
+         >
+            <Box display='flex' gap={ 1 } alignItems='center'>
+               <Typography variant='h5' color={ payload[0].color }>Fecha: </Typography>
+               <Typography variant='h3'>{ payload[0].payload.fechaAnalisis.toLocaleString('es-PE', { timeZone: 'America/Lima' }) }</Typography>
             </Box>
-         </Paper>
-      )
-   }
+            <Box display='flex' gap={ 1 } alignItems='center'>
+               <Typography variant='h5' color={ payload[0].color }>Hora: </Typography>
+               <Typography variant='h2'>{ `${payload[0].payload.horaAnalisis}:00` }</Typography>
+            </Box>
+            <Box display='flex' gap={ 1 } alignItems='center'>
+               <Typography variant='h5' color={ payload[0].color }>Total Analizados: </Typography>
+               <Typography variant='h2'>{ payload[0].payload.totalAnalizados }</Typography>
+            </Box>
 
-   return null
+            <Typography variant='h3' gutterBottom>Eventos</Typography>
+            <ListaEventos eventos={ payload[0].payload.eventos } />
+
+         </Box>
+      </Paper>
+   )
 }
 
 const ListaEventos: FC<{ eventos: string }> = ({ eventos }) => {
@@ -118,5 +120,23 @@ const ListaEventos: FC<{ eventos: string }> = ({ eventos }) => {
             ))
          }
       </Box>
+   )
+}
+
+type BarLabelProps = {
+   [k in keyof LabelProps]: LabelProps[k]
+}
+
+const CustomBarLabel: FC<BarLabelProps> = (props) => {
+   const { x, y, value } = props
+   return (
+      <text
+         x={ x }
+         y={ y }
+         dy={ -4 }
+         fontSize={ 11 }
+      >
+         { new Intl.NumberFormat('es-PE').format(parseInt(value as string)) }
+      </text>
    )
 }

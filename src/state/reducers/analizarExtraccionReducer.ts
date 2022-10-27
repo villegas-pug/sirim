@@ -1,12 +1,12 @@
 import { AnalizarExtraccionAction } from 'state/actions/analizarExtraccionAction'
 
-import { AsigGrupoCamposAnalisisDto, RegistroTablaDinamica } from 'interfaces'
+import { AsigGrupoCamposAnalisisDto, RegistroTablaDinamicaDto } from 'interfaces'
 
 type AnalisarExtraccionState = {
    asignacion: {
       loading: boolean
       data: Array<AsigGrupoCamposAnalisisDto>
-      tabla: Array<RegistroTablaDinamica>
+      tabla: Array<RegistroTablaDinamicaDto>
       error: string | null
    }
 }

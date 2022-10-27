@@ -37,7 +37,9 @@ export const RptProduccionHorasLaboralesSubMod = () => {
             <Fade top>
                <HeaderProduccionHorasLaborales />
             </Fade>
+
             <ChartsProduccionHorasLaborales />
+
          </Body>
 
          {/* ► Modal: Loader ...  */}
@@ -117,6 +119,7 @@ const ChartsProduccionHorasLaborales: FC = () => {
                      xAxisDataKey='horaAnalisis'
                      barDataKey='totalAnalizados'
                      titleXAxis={ multiple[i]?.nombres }
+                     showTooltip
                   />
                </ListItemFade>
             ))

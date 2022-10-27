@@ -16,7 +16,7 @@ export const saveEvento = (evento: Partial<Event>) => async (dispatch: Dispatch<
       const { usuario: { token, userCredentials: usuario } } = getState()
       const { data: { levelLog, message } } = await api.request<Response<[]>>({
          method: 'POST',
-         url: '/microservicio-rimextraccion/saveEvento',
+         url: '/microservicio-rimmantenimiento/saveEvento',
          data: { ...evento, usuario },
          headers: {
             [AUTHORIZATION]: token
@@ -46,7 +46,7 @@ export const findEventoByUsuario = () => async (dispatch: Dispatch<EventoAction>
       const { usuario: { token, userCredentials: { idUsuario } } } = getState()
       const { data: { levelLog, data, message } } = await api.request<Response<Event[]>>({
          method: 'POST',
-         url: '/microservicio-rimextraccion/findEventoByUsuario',
+         url: '/microservicio-rimmantenimiento/findEventoByUsuario',
          data: { idUsuario },
          headers: {
             [AUTHORIZATION]: token
@@ -75,7 +75,7 @@ export const deleteEventoById = (idEvento: number) => async (dispatch: Dispatch<
       const { usuario: { token } } = getState()
       const { data: { levelLog, message } } = await api.request<Response<[]>>({
          method: 'DELETE',
-         url: `/microservicio-rimextraccion/deleteEventoById/${idEvento}`,
+         url: `/microservicio-rimmantenimiento/deleteEventoById/${idEvento}`,
          headers: {
             [AUTHORIZATION]: token
          }

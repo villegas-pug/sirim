@@ -6,7 +6,7 @@ import { useAppActions, useAppSelector, useAuth } from 'hooks'
 import { undecorateMetaFieldName } from 'helpers'
 
 export const useExtraccion = () => {
-   /* » CUSTOM - HOOK'S  */
+   // » CUSTOM - HOOK'S ...
    const {
       loading: loadingExtraccionDb,
       data: extraccionDb,
@@ -31,9 +31,11 @@ export const useExtraccion = () => {
       },
       dnv: {
          data: dnvDb,
-         loading: loadingDnvDb
+         loading: loadingDnvDb,
+         rptControlMigratorio: rptControlMigratorioDb
       }
    } = useAppSelector(store => store.extraccion)
+
    const {
       findAllTablaDinamica,
       createTablaExtraccion,
@@ -53,8 +55,10 @@ export const useExtraccion = () => {
       updateQueryString,
       findDnvByParams,
       findTablaDinamicaBySuffixOfField,
-      removeCamposTablaDinamica
+      removeCamposTablaDinamica,
+      getRptControlMigratorio
    } = useAppActions()
+
    const { userCredentials: { idUsuario: idCurrentUsr } } = useAuth()
 
    /* ► HANDLER'S:  */
@@ -144,6 +148,7 @@ export const useExtraccion = () => {
       depuracion,
       dnvDb,
       loadingDnvDb,
+      rptControlMigratorioDb,
       camposDnvDb,
       bancoCamposExtraccionDb,
       bancoCamposAnalisisDb,
@@ -167,6 +172,7 @@ export const useExtraccion = () => {
       findDnvByParams,
       findTablaDinamicaBySuffixOfField,
       removeCamposTablaDinamica,
+      getRptControlMigratorio,
 
       /* » Off-Hook method's ... */
       convertObjectToFieldsSqlClause

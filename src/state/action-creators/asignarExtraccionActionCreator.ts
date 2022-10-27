@@ -15,7 +15,7 @@ export const assignedToGrupoAnalisis = (asigGrupoDto: Partial<AsigGrupoCamposAna
       const { usuario: { token } } = getState()
       const { data: { levelLog, data, message } } = await api.request<Response<TablaDinamicaDto[]>>({
          method: 'POST',
-         url: '/microservicio-rimextraccion/assignedToGrupoAnalisis',
+         url: '/microservicio-rimasignacion/assignedToGrupoAnalisis',
          data: { ...asigGrupoDto },
          headers: {
             [AUTHORIZATION]: token
@@ -29,6 +29,7 @@ export const assignedToGrupoAnalisis = (asigGrupoDto: Partial<AsigGrupoCamposAna
          break
       case 'WARNING':
       case 'ERROR':
+         dispatch({ type: '[Asignar-Extracción] Asignar usuario a grupo de analisis success', payload: data })
          dispatch({ type: '[Asignar-Extracción] Asignar usuario a grupo de analisis error', payload: message })
          noty('error', message)
          break
@@ -45,7 +46,7 @@ export const deleteAssignedToGrupoAById = (idAsign: number) => async (dispatch: 
       const { usuario: { token } } = getState()
       const { data: { levelLog, data, message } } = await api.request<Response<TablaDinamicaDto[]>>({
          method: 'DELETE',
-         url: `/microservicio-rimextraccion/deleteAssignedToGrupoAById/${idAsign}`,
+         url: `/microservicio-rimasignacion/deleteAssignedToGrupoAById/${idAsign}`,
          headers: {
             [AUTHORIZATION]: token
          }
@@ -74,7 +75,7 @@ export const reasignToGrupoAnalisis = (reasign: Pick<AsigGrupoCamposAnalisis, 'i
       const { usuario: { token } } = getState()
       const { data: { levelLog, data, message } } = await api.request<Response<TablaDinamicaDto[]>>({
          method: 'PUT',
-         url: '/microservicio-rimextraccion/reasignToGrupoAnalisis',
+         url: '/microservicio-rimasignacion/reasignToGrupoAnalisis',
          data: reasign,
          headers: {
             [AUTHORIZATION]: token
@@ -88,6 +89,7 @@ export const reasignToGrupoAnalisis = (reasign: Pick<AsigGrupoCamposAnalisis, 'i
          break
       case 'WARNING':
       case 'ERROR':
+         dispatch({ type: '[Asignar-Extracción] Reasign to grupo analisis success', payload: data })
          dispatch({ type: '[Asignar-Extracción] Reasign to grupo analisis error', payload: message })
          noty('error', message)
          break

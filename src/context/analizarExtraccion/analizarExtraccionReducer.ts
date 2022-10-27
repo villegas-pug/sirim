@@ -1,12 +1,12 @@
 
-import { AsigGrupoCamposAnalisisDto, RegistroTablaDinamica } from 'interfaces'
+import { AsigGrupoCamposAnalisisDto, RegistroTablaDinamicaDto } from 'interfaces'
 import { AnalizarExtraccionBandeja, AnalizarExtraccionState } from './AnalizarExtraccionProvider'
 
 type AnalizarExtraccionAction =
    | { type: '[Bandeja] Change page', payload: AnalizarExtraccionBandeja }
    | { type: '[asigGrupoCamposAnalisisTmp] Save grupo asignado de Campos de analisis', payload: AsigGrupoCamposAnalisisDto }
-   | { type: '[registroDinamicoAsignadoTmp] Save registro dinámico asignado', payload: RegistroTablaDinamica }
-   | { type: '[tablaAsignadaTmp] Save tabla dinámica asignada', payload: RegistroTablaDinamica[] }
+   | { type: '[registroDinamicoAsignadoTmp] Save registro dinámico asignado', payload: RegistroTablaDinamicaDto }
+   | { type: '[tablaAsignadaTmp] Save tabla dinámica asignada', payload: RegistroTablaDinamicaDto[] }
 
 export const analizarExtraccionReducer = (state: AnalizarExtraccionState, action: AnalizarExtraccionAction): AnalizarExtraccionState => {
    switch (action.type) {

@@ -1,7 +1,7 @@
-import { AuthActionType } from '../actions'
+import { AuthActionType } from 'state/actions'
 
-import { Usuario } from '../../interfaces'
-import { localStorage } from '../../constants'
+import { Usuario } from 'interfaces'
+import { localStorage } from 'constants/'
 
 const { AUTHORIZATION, USER_AUTH } = localStorage
 
@@ -34,10 +34,13 @@ const initialState: StateType = {
 export const authReducer = (state: StateType = initialState, action: AuthActionType): StateType => {
    switch (action.type) {
    case '[usuario] Find user by login loading':
-      return { ...state, loading: true, userCredentials: {} as Usuario, error: null }
+   case '[usuario] updateAccount loading':
+      return { ...state, loading: true, error: null }
    case '[usuario] Find user by login success':
+   case '[usuario] updateAccount success':
       return { ...state, loading: false, userCredentials: action.payload, error: null }
    case '[usuario] Find user by login error':
+   case '[usuario] updateAccount error':
       return { ...state, loading: false, userCredentials: {} as Usuario, error: action.payload }
    case '[usuario] Login loading':
       return { ...state, loading: true, error: null }
@@ -50,12 +53,6 @@ export const authReducer = (state: StateType = initialState, action: AuthActionT
          error: null
       }
    case '[usuario] Login error':
-      return { ...state, loading: false, error: action.payload }
-   case '[usuario] Update password by login loading':
-      return { ...state, loading: true, error: null }
-   case '[usuario] Update password by login success':
-      return { ...state, loading: false, error: null }
-   case '[usuario] Update password by login error':
       return { ...state, loading: false, error: action.payload }
    case '[usuario] Logout success':
       return { ...state, token: '', userAuth: '', userCredentials: {} as Usuario }

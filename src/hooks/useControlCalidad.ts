@@ -1,19 +1,28 @@
 import { useAppActions, useAppSelector } from 'hooks'
 
 export const useControlCalidad = () => {
-   /* ► STORE - HOOK'S ... */
-   const { loading: loadingTablaDinamicaDb } = useAppSelector(store => store.extraccion)
+   // ► STORE - HOOK'S ...
+   const {
+      loading: loadingControlCalidadDb,
+      tabla: tablaCtrlCalDb
+   } = useAppSelector(store => store.controlCalidad)
 
-   const { loading: loadingControlCalidadDb } = useAppSelector(store => store.controlCalidad)
+   const {
+      findTablaDinamicaByIdCtrlCalAndIds,
+      saveCtrlCalCamposAnalisis,
+      validateRecordAssigned,
+      saveMetaFieldIdErrorCsv
+   } = useAppActions()
 
-   const { saveCtrlCalCamposAnalisis } = useAppActions()
-
-   const { findAllTablaDinamica } = useAppActions()
+   // ► Handler's ...
 
    return {
       loadingControlCalidadDb,
-      loadingTablaDinamicaDb,
-      findAllTablaDinamica,
-      saveCtrlCalCamposAnalisis
+      tablaCtrlCalDb,
+
+      findTablaDinamicaByIdCtrlCalAndIds,
+      saveCtrlCalCamposAnalisis,
+      validateRecordAssigned,
+      saveMetaFieldIdErrorCsv
    }
 }
