@@ -60,7 +60,10 @@ import {
    FlightLandRounded,
    FlightTakeoffRounded,
    BoyRounded,
-   GirlRounded
+   GirlRounded,
+   StyleRounded,
+   LibraryAddCheckRounded,
+   Groups3Rounded
 } from '@mui/icons-material'
 
 const classes: { [key: string]: CSSProperties } = {
@@ -106,6 +109,7 @@ export const elementIcons = {
    EventNoteRounded: <EventNoteRounded color='action' style={ classes.subModIcon }/>,
    QueryBuilderRounded: <QueryBuilderRounded color='action' style={ classes.subModIcon }/>,
    StackedLineChartRounded: <StackedLineChartRounded color='action' style={ classes.subModIcon }/>,
+   StyleRounded: <StyleRounded color='action' style={ classes.subModIcon }/>,
 
    Test: <Build />,
    Cloud: <Cloud />,
@@ -130,7 +134,10 @@ export const elementIcons = {
    PlaneEntry: <FlightLandRounded fontSize='large' />,
    PlaneTakeOff: <FlightTakeoffRounded fontSize='large' />,
    BoyRounded: <BoyRounded fontSize='large' />,
-   GirlRounded: <GirlRounded fontSize='large' />
+   GirlRounded: <GirlRounded fontSize='large' />,
+   Passport: <StyleRounded fontSize='large' />,
+   PassportValid: <LibraryAddCheckRounded fontSize='large' />,
+   Persons: <Groups3Rounded fontSize='large' />
 
 }
 

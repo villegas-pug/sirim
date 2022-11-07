@@ -12,7 +12,7 @@ import {
 
 import { CustomBarLabel, CustomTooltipProps } from 'components'
 
-const fontSizeAxis = 14
+const fontSizeAxis = 12
 const colorLabelAxis = '#444'
 
 type SimpleLineChartProps<T> = {
@@ -20,18 +20,19 @@ type SimpleLineChartProps<T> = {
    h: number
    data: T[]
    colorLineAxis: string
+   titleXAxis: string
    xAxisDataKey: keyof T
    firstLineDataKey: keyof T
    colorFirstLine: string
-   colorSecondLine: string
-   titleXAxis: string
-   secondLineDataKey: keyof T
+   colorSecondLine?: string
+   secondLineDataKey?: keyof T
+   showLegend?: boolean
    customTooltip?: (props: CustomTooltipProps<T>) => ReactElement | null
 }
 
 export const SimpleLineChart = <T extends unknown>(props: SimpleLineChartProps<T>): ReactElement => {
    // ► Dep's
-   const { w, h, colorLineAxis, data, xAxisDataKey, firstLineDataKey, secondLineDataKey, titleXAxis, colorFirstLine, colorSecondLine, customTooltip: CustomTooltip } = props
+   const { w, h, colorLineAxis, data, xAxisDataKey, firstLineDataKey, secondLineDataKey, titleXAxis, colorFirstLine, colorSecondLine, showLegend = false, customTooltip: CustomTooltip } = props
 
    return (
       <LineChart
@@ -74,7 +75,7 @@ export const SimpleLineChart = <T extends unknown>(props: SimpleLineChartProps<T
             stroke={ colorSecondLine }
          />
 
-         <Legend />
+         { showLegend && <Legend /> }
 
          { CustomTooltip && <Tooltip content={ CustomTooltip } /> }
 

@@ -30,8 +30,7 @@ export const AnalizarExtraccionProvider: FC<{ children: ReactElement | ReactElem
    const { tablaAsignadaDb, asigGrupoCamposAnalisisDb, findAsigAnalisisByUsr } = useAnalizarExtraccion()
 
    // » EFFECT'S ...
-   // ► Update `store`: Si store `tablaAsignadaDb` cambia, llama a `findAsigAnalisisByUsr()` ...
-   useEffect(() => {
+   useEffect(() => { // ► Update `store`: Si store `tablaAsignadaDb` cambia, llama a `findAsigAnalisisByUsr()` ...
       if (tablaAsignadaDb.length === 0) return
       findAsigAnalisisByUsr()
    }, [tablaAsignadaDb])
@@ -52,7 +51,7 @@ export const AnalizarExtraccionProvider: FC<{ children: ReactElement | ReactElem
       })
    }, [state.asigGrupoCamposAnalisisTmp])
 
-   /* ► HANDLER'S ... */
+   // ► HANDLER'S ...
    const handleChangePage = (page: AnalizarExtraccionBandeja) => {
       dispatch({ type: '[Bandeja] Change page', payload: page })
    }

@@ -51,7 +51,6 @@ import {
    MySelect,
    MySelectItem,
    MyTextField,
-   Scrollbar,
    SimpleModal,
    SimpleModalRefProps
 } from 'components'
@@ -79,11 +78,11 @@ const durationFadeTop: number = 500
 
 const AsignarExtraccionSubMod: FC = () => {
    /* » CUSTOM-HOOK'S ... */
-   const { loadingExtraccion, loadingTablaDinamicaDb, findAllTablaDinamica } = useAsignarExtraccion()
+   const { loadingExtraccion, loadingTablaDinamicaDb, findTablaDinamicaByUsrCreador } = useAsignarExtraccion()
    const { findAllUser } = useAuth()
 
    /* ► EFFECT'S ...  */
-   useEffect(() => { findAllTablaDinamica() }, [])
+   useEffect(() => { findTablaDinamicaByUsrCreador() }, [])
    useEffect(() => { findAllUser() }, [])
 
    return (
@@ -93,13 +92,17 @@ const AsignarExtraccionSubMod: FC = () => {
             <Grid container item xs={ 3 } gap={ 0.5 }>
                <Grid item xs={ 12 }>
                   <MainPaper variant='outlined'>
-                     <ListaTablasExtraccion />
+                     <Box height='39vh' overflow='auto'>
+                        <ListaTablasExtraccion />
+                     </Box>
                   </MainPaper>
                </Grid>
 
                <Grid item xs={ 12 }>
                   <MainPaper variant='outlined'>
-                     <ListaGruposCamposAnalisis />
+                     <Box height='39vh' overflow='auto'>
+                        <ListaGruposCamposAnalisis />
+                     </Box>
                   </MainPaper>
                </Grid>
             </Grid>
@@ -128,37 +131,35 @@ const ListaTablasExtraccion: FC = () => {
    const [selectedItem, setSelectedItem] = useState(-1)
 
    /* ► CUSTOM-HOOK'S  */
-   const { tdDbFromCurrentUsr, countTablaDinamicaByNombre } = useAsignarExtraccion()
+   const { tablasDinamicasDb, countTablaDinamicaByNombre } = useAsignarExtraccion()
 
    return (
-      <Scrollbar>
-         <List
-            subheader={ <ListSubheader>Bases disponibles</ListSubheader> }
-         >
-            {
-               tdDbFromCurrentUsr.map((tablaDinamica, i) => (
-                  <ListItemFade key={ tablaDinamica.idTabla } i={ i } direction='left'>
-                     <ListItemButton
-                        selected={ selectedItem === i }
-                        onClick={ () => {
-                           countTablaDinamicaByNombre(tablaDinamica.nombre)
-                           handleAddTablaDinamicaTmp('ADD', tablaDinamica)
-                           setSelectedItem(i)
-                        } }
-                     >
-                        <ListItemIcon><TableViewRounded /></ListItemIcon>
-                        <ListItemText primary={
-                           <Box display='flex' justifyContent='space-between' gap={ 1 } flexWrap='wrap'>
-                              <Typography variant='h5'>{ tablaDinamica.nombre }</Typography>
-                              <Typography variant='h6'>{ format(parseJsonTimestampToDate(tablaDinamica.fechaCreacion), 'dd-MM-yyyy') }</Typography>
-                           </Box>
-                        } />
-                     </ListItemButton>
-                  </ListItemFade>
-               ))
-            }
-         </List>
-      </Scrollbar>
+      <List
+         subheader={ <ListSubheader>Bases disponibles</ListSubheader> }
+      >
+         {
+            tablasDinamicasDb.map((tablaDinamica, i) => (
+               <ListItemFade key={ tablaDinamica.idTabla } i={ i } direction='left'>
+                  <ListItemButton
+                     selected={ selectedItem === i }
+                     onClick={ () => {
+                        countTablaDinamicaByNombre(tablaDinamica.nombre)
+                        handleAddTablaDinamicaTmp('ADD', tablaDinamica)
+                        setSelectedItem(i)
+                     } }
+                  >
+                     <ListItemIcon><TableViewRounded /></ListItemIcon>
+                     <ListItemText primary={
+                        <Box display='flex' justifyContent='space-between' gap={ 1 } flexWrap='wrap'>
+                           <Typography variant='h5'>{ tablaDinamica.nombre }</Typography>
+                           <Typography variant='h6'>{ format(parseJsonTimestampToDate(tablaDinamica.fechaCreacion), 'dd-MM-yyyy') }</Typography>
+                        </Box>
+                     } />
+                  </ListItemButton>
+               </ListItemFade>
+            ))
+         }
+      </List>
    )
 }
 
@@ -200,45 +201,43 @@ const ListaGruposCamposAnalisis: FC = () => {
    return (
       <>
          {/* ► ... */}
-         <Scrollbar>
-            <List
-               subheader={ <ListSubheader>Grupos de analisis</ListSubheader> }
-            >
-               {
-                  gruposCamposAnalisisTmp.map((grupo, i) => (
-                     <ListItemFade key={ grupo.idGrupo } i={ i } direction='bottom' >
-                        <ListItemButton
-                           selected={ i === selectedItem }
-                           onClick={ () => {
-                              setSelectedItem(i)
-                              handleAddGrupoCamposAnalisisTmp(grupo)
-                           } }
-                        >
+         <List
+            subheader={ <ListSubheader>Grupos de analisis</ListSubheader> }
+         >
+            {
+               gruposCamposAnalisisTmp.map((grupo, i) => (
+                  <ListItemFade key={ grupo.idGrupo } i={ i } direction='bottom' >
+                     <ListItemButton
+                        selected={ i === selectedItem }
+                        onClick={ () => {
+                           setSelectedItem(i)
+                           handleAddGrupoCamposAnalisisTmp(grupo)
+                        } }
+                     >
 
-                           <ListItemIcon><GroupWorkRounded fontSize='small' /></ListItemIcon>
+                        <ListItemIcon><GroupWorkRounded fontSize='small' /></ListItemIcon>
 
-                           <ListItemText
-                              onClick={ () => handleAddAsigsGrupoCamposAnalisisTmp('ADD', grupo.asigGrupoCamposAnalisis) }
-                              primary={
-                                 <Typography variant='h5'>{ grupo.nombre }</Typography>
-                              }
-                           />
+                        <ListItemText
+                           onClick={ () => handleAddAsigsGrupoCamposAnalisisTmp('ADD', grupo.asigGrupoCamposAnalisis) }
+                           primary={
+                              <Typography variant='h5'>{ grupo.nombre }</Typography>
+                           }
+                        />
 
-                           <ListItemSecondaryAction>
-                              <IconButton
-                                 size='small'
-                                 onClick={ () => { modalAssing.current.setOpen(true) } }
-                              >
-                                 <GroupAddRounded fontSize='small' />
-                              </IconButton>
-                           </ListItemSecondaryAction>
+                        <ListItemSecondaryAction>
+                           <IconButton
+                              size='small'
+                              onClick={ () => { modalAssing.current.setOpen(true) } }
+                           >
+                              <GroupAddRounded fontSize='small' />
+                           </IconButton>
+                        </ListItemSecondaryAction>
 
-                        </ListItemButton>
-                     </ListItemFade>
-                  ))
-               }
-            </List>
-         </Scrollbar>
+                     </ListItemButton>
+                  </ListItemFade>
+               ))
+            }
+         </List>
 
          {/* ► MODAL: Assign ... */}
          <SimpleModal ref={ modalAssing } onOpen={ handleModalAssingOnOpen }>
@@ -415,7 +414,7 @@ const FrmAsign: FC<FrmAsignProps> = ({ rangoAsignacion, index = 0 }) => {
       errorTablaDinamicaDb,
       totalRegistrosTablaDinamica,
       loadingTablaDinamicaDb,
-      findAllTablaDinamica,
+      findTablaDinamicaByUsrCreador,
       assignedToGrupoAnalisis
    } = useAsignarExtraccion()
 
@@ -456,7 +455,7 @@ const FrmAsign: FC<FrmAsignProps> = ({ rangoAsignacion, index = 0 }) => {
                onSubmit={ async (values: Partial<AsigGrupoCamposAnalisisDto>, meta): Promise<void> => {
                   const { idGrupo } = grupoCamposAnalisisTmp
                   await assignedToGrupoAnalisis({ ...values, grupo: { idGrupo } })
-                  await findAllTablaDinamica()
+                  await findTablaDinamicaByUsrCreador()
                   meta.resetForm()
                   /* ► Si no existe errores del lado del servidor y el Componente fué creado masivamente  ... */
                   if (!errorTablaDinamicaDb && Boolean(rangoAsignacion)) setIsEnabled(false)
@@ -506,6 +505,7 @@ const ListaAsignacionesGrupo: FC = () => {
    /* ► CUSTOM-HOOk'S ... */
    const {
       totalRegistrosTablaDinamica,
+      findTablaDinamicaByUsrCreador,
       deleteAssignedToGrupoAById,
       reasignToGrupoAnalisis
    } = useAsignarExtraccion()
@@ -515,10 +515,14 @@ const ListaAsignacionesGrupo: FC = () => {
    /* » EFFECT'S ... */
    useEffect(() => { /* ► Si acepta eliminar los rangos asignados ... */
       if (!isConfirmEliminarAsign) return
-      deleteAssignedToGrupoAById(selectedAsign.idAsigGrupo)
-      /* ► Clean-up ... */
-      setIsConfirmEliminarAsign(false)
-      setSelectedAsign({} as AsigGrupoCamposAnalisisDto)
+      (async () => {
+         await deleteAssignedToGrupoAById(selectedAsign.idAsigGrupo)
+         await findTablaDinamicaByUsrCreador()
+
+         /* ► Clean-up ... */
+         setIsConfirmEliminarAsign(false)
+         setSelectedAsign({} as AsigGrupoCamposAnalisisDto)
+      })()
    }, [isConfirmEliminarAsign])
 
    /* ► DEP'S ...  */
@@ -567,81 +571,79 @@ const ListaAsignacionesGrupo: FC = () => {
          <FrmFilterListaAsignaciones />
 
          {/* ► BODY: ... */}
-         <Box height='76%'>
-            <Scrollbar>
-               <List subheader={ <ListSubheader>Rangos asignados</ListSubheader> }>
-                  {
-                     filteredAsigsAnalisisTmp.map((asign, i) => (
-                        <ListItemZoom key={asign.idAsigGrupo} i={i}>
-                           <ListItemButton
-                              selected={ i === selectedItem }
-                              onClick={ () => setSelectedItem(i) }
-                           >
+         <Box height='60vh' overflow='auto'>
+            <List subheader={ <ListSubheader>Rangos asignados</ListSubheader> }>
+               {
+                  filteredAsigsAnalisisTmp.map((asign, i) => (
+                     <ListItemZoom key={asign.idAsigGrupo} i={i}>
+                        <ListItemButton
+                           selected={ i === selectedItem }
+                           onClick={ () => setSelectedItem(i) }
+                        >
 
-                              <ListItemIcon>
-                                 {
-                                    asign.totalAsignados === asign.totalAnalizados ? <DoneRounded color='success' /> : <PersonRounded color='disabled' />
-                                 }
+                           <ListItemIcon>
+                              {
+                                 asign.totalAsignados === asign.totalAnalizados ? <DoneRounded color='success' /> : <PersonRounded color='disabled' />
+                              }
 
-                              </ListItemIcon>
+                           </ListItemIcon>
 
-                              <ListItemText
-                                 primary={
-                                    <Stack
-                                       width={ '92%' }
-                                       direction='row'
-                                       justifyContent='space-between'
-                                       overflow='auto'
-                                       spacing={ 1 }
-                                       divider={ <Divider orientation='vertical' flexItem /> }
-                                    >
-                                       <Typography variant='h5'>{ format(parseISO(asign.fechaAsignacion), 'dd-MM-yyyy') }</Typography>
-                                       <Typography variant='h5'>{ asign.usrAnalista.nombres }</Typography>
-                                       <Typography variant='h5'>{ `Asignados: ${applyCommaThousands(asign.totalAsignados)}` }</Typography>
-                                       <Typography variant='h5'>{ `Analizados: ${applyCommaThousands(asign.totalAnalizados)}` }</Typography>
-                                       <Typography variant='h5'>{ `Pendientes: ${applyCommaThousands(asign.totalPendientes)}` }</Typography>
-                                       <LinearWithValueLabel progress={ (asign.totalAnalizados / asign.totalAsignados) * 100 } width={ 100 } />
-                                       <Typography variant='h5'>{ `R: ${asign.regAnalisisIni}-${asign.regAnalisisFin}` }</Typography>
-                                    </Stack>
-                                 }
-                              />
+                           <ListItemText
+                              primary={
+                                 <Stack
+                                    width={ '92%' }
+                                    direction='row'
+                                    justifyContent='space-between'
+                                    overflow='auto'
+                                    spacing={ 1 }
+                                    divider={ <Divider orientation='vertical' flexItem /> }
+                                 >
+                                    <Typography variant='h5'>{ format(parseISO(asign.fechaAsignacion), 'dd-MM-yyyy') }</Typography>
+                                    <Typography variant='h5'>{ asign.usrAnalista.nombres }</Typography>
+                                    <Typography variant='h5'>{ `Asignados: ${applyCommaThousands(asign.totalAsignados)}` }</Typography>
+                                    <Typography variant='h5'>{ `Analizados: ${applyCommaThousands(asign.totalAnalizados)}` }</Typography>
+                                    <Typography variant='h5'>{ `Pendientes: ${applyCommaThousands(asign.totalPendientes)}` }</Typography>
+                                    <LinearWithValueLabel progress={ (asign.totalAnalizados / asign.totalAsignados) * 100 } width={ 100 } />
+                                    <Typography variant='h5'>{ `R: ${asign.regAnalisisIni}-${asign.regAnalisisFin}` }</Typography>
+                                 </Stack>
+                              }
+                           />
 
-                              <ListItemSecondaryAction>
+                           <ListItemSecondaryAction>
 
-                                 <Tooltip title='Eliminar asignación' placement='top-start' arrow>
-                                    <IconButton
-                                       size='small'
-                                       disabled={ asign.totalAsignados === asign.totalAnalizados }
-                                       onClick={ () => {
-                                          setSelectedAsign(asign)
-                                          confirmEliminarAsign.current.setIsOpen(true)
-                                       } }
-                                    >
-                                       <HighlightOffRounded fontSize='small' />
-                                    </IconButton>
-                                 </Tooltip>
+                              <Tooltip title='Eliminar asignación' placement='top-start' arrow>
+                                 <IconButton
+                                    size='small'
+                                    disabled={ asign.totalAsignados === asign.totalAnalizados }
+                                    onClick={ () => {
+                                       setSelectedAsign(asign)
+                                       confirmEliminarAsign.current.setIsOpen(true)
+                                    } }
+                                 >
+                                    <HighlightOffRounded fontSize='small' />
+                                 </IconButton>
+                              </Tooltip>
 
-                                 <Tooltip title='Reasignar' placement='top-start' arrow>
-                                    <IconButton
-                                       size='small'
-                                       disabled={ asign.totalAsignados === asign.totalAnalizados }
-                                       onClick={ () => {
-                                          setSelectedAsign(asign)
-                                          modalReasignacion.current.setOpen(true)
-                                       } }
-                                    >
-                                       <PersonSearchRounded fontSize='small' />
-                                    </IconButton>
-                                 </Tooltip>
+                              <Tooltip title='Reasignar' placement='top-start' arrow>
+                                 <IconButton
+                                    size='small'
+                                    disabled={ asign.totalAsignados === asign.totalAnalizados }
+                                    onClick={ () => {
+                                       setSelectedAsign(asign)
+                                       modalReasignacion.current.setOpen(true)
+                                    } }
+                                 >
+                                    <PersonSearchRounded fontSize='small' />
+                                 </IconButton>
+                              </Tooltip>
 
-                              </ListItemSecondaryAction>
+                           </ListItemSecondaryAction>
 
-                           </ListItemButton>
-                        </ListItemZoom>
-                     ))
-                  }
-               </List>
-            </Scrollbar>
+                        </ListItemButton>
+                     </ListItemZoom>
+                  ))
+               }
+            </List>
          </Box>
 
          {/* » MODAL: Confirm ...  */}
@@ -658,6 +660,7 @@ const ListaAsignacionesGrupo: FC = () => {
                      idAsigGrupo: selectedAsign.idAsigGrupo,
                      usrAnalista
                   })
+                  await findTablaDinamicaByUsrCreador()
                   meta.resetForm()
                   modalReasignacion.current.setOpen(false)
                } }

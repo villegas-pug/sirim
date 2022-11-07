@@ -179,6 +179,7 @@ const RptControlMigratorioMensual: FC = () => {
             colorFirstLine={ '#6EADDC' }
             colorSecondLine={ '#FBB614' }
             titleXAxis={ 'Control Mensual' }
+            showLegend
             customTooltip={(props) => (
                <CustomTooltip { ...props }>
                   {({ payload }) => (

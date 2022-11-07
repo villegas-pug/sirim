@@ -3,7 +3,7 @@ import { Dispatch } from 'redux'
 import { AsignarExtraccionAction } from 'state/actions'
 import { api } from 'config'
 
-import { AsigGrupoCamposAnalisis, AsigGrupoCamposAnalisisDto, Response, TablaDinamicaDto } from 'interfaces'
+import { AsigGrupoCamposAnalisis, AsigGrupoCamposAnalisisDto, Response } from 'interfaces'
 import { localStorage } from 'constants/'
 import { noty } from 'helpers'
 
@@ -13,7 +13,7 @@ export const assignedToGrupoAnalisis = (asigGrupoDto: Partial<AsigGrupoCamposAna
    dispatch({ type: '[Asignar-Extracción] Asignar usuario a grupo de analisis loading' })
    try {
       const { usuario: { token } } = getState()
-      const { data: { levelLog, data, message } } = await api.request<Response<TablaDinamicaDto[]>>({
+      const { data: { levelLog, message } } = await api.request<Response<[]>>({
          method: 'POST',
          url: '/microservicio-rimasignacion/assignedToGrupoAnalisis',
          data: { ...asigGrupoDto },
@@ -24,12 +24,11 @@ export const assignedToGrupoAnalisis = (asigGrupoDto: Partial<AsigGrupoCamposAna
 
       switch (levelLog) {
       case 'SUCCESS':
-         dispatch({ type: '[Asignar-Extracción] Asignar usuario a grupo de analisis success', payload: data })
+         dispatch({ type: '[Asignar-Extracción] Asignar usuario a grupo de analisis success' })
          noty('success', message)
          break
       case 'WARNING':
       case 'ERROR':
-         dispatch({ type: '[Asignar-Extracción] Asignar usuario a grupo de analisis success', payload: data })
          dispatch({ type: '[Asignar-Extracción] Asignar usuario a grupo de analisis error', payload: message })
          noty('error', message)
          break
@@ -44,7 +43,7 @@ export const deleteAssignedToGrupoAById = (idAsign: number) => async (dispatch: 
    dispatch({ type: '[Asignar-Extracción] Eliminar asignación de grupo analisis loading' })
    try {
       const { usuario: { token } } = getState()
-      const { data: { levelLog, data, message } } = await api.request<Response<TablaDinamicaDto[]>>({
+      const { data: { levelLog, message } } = await api.request<Response<[]>>({
          method: 'DELETE',
          url: `/microservicio-rimasignacion/deleteAssignedToGrupoAById/${idAsign}`,
          headers: {
@@ -54,7 +53,7 @@ export const deleteAssignedToGrupoAById = (idAsign: number) => async (dispatch: 
 
       switch (levelLog) {
       case 'SUCCESS':
-         dispatch({ type: '[Asignar-Extracción] Eliminar asignación de grupo analisis success', payload: data })
+         dispatch({ type: '[Asignar-Extracción] Eliminar asignación de grupo analisis success' })
          noty('success', message)
          break
       case 'WARNING':
@@ -73,7 +72,7 @@ export const reasignToGrupoAnalisis = (reasign: Pick<AsigGrupoCamposAnalisis, 'i
    dispatch({ type: '[Asignar-Extracción] Reasign to grupo analisis loading' })
    try {
       const { usuario: { token } } = getState()
-      const { data: { levelLog, data, message } } = await api.request<Response<TablaDinamicaDto[]>>({
+      const { data: { levelLog, message } } = await api.request<Response<[]>>({
          method: 'PUT',
          url: '/microservicio-rimasignacion/reasignToGrupoAnalisis',
          data: reasign,
@@ -84,12 +83,11 @@ export const reasignToGrupoAnalisis = (reasign: Pick<AsigGrupoCamposAnalisis, 'i
 
       switch (levelLog) {
       case 'SUCCESS':
-         dispatch({ type: '[Asignar-Extracción] Reasign to grupo analisis success', payload: data })
+         dispatch({ type: '[Asignar-Extracción] Reasign to grupo analisis success' })
          noty('success', message)
          break
       case 'WARNING':
       case 'ERROR':
-         dispatch({ type: '[Asignar-Extracción] Reasign to grupo analisis success', payload: data })
          dispatch({ type: '[Asignar-Extracción] Reasign to grupo analisis error', payload: message })
          noty('error', message)
          break

@@ -11,7 +11,7 @@ import {
 } from 'recharts'
 import { CustomBarLabel, CustomTooltipProps } from 'components'
 
-const fontSizeAxis = 14
+const fontSizeAxis = 12
 const colorLabelAxis = '#444'
 
 type SimpleLineChartProps<T> = {
@@ -31,7 +31,7 @@ type SimpleLineChartProps<T> = {
 
 export const SimpleBarChart = <T extends unknown>(props: SimpleLineChartProps<T>): ReactElement => {
    // ► Dep's
-   const { w, h, colorLineAxis, data, xAxisDataKey, firstBarDataKey, secondBarDataKey, colorFirstBar, colorSecondBar, titleXAxis, showLegend = true, customTooltip: CustomTooltip } = props
+   const { w, h, colorLineAxis, data, xAxisDataKey, firstBarDataKey, secondBarDataKey, colorFirstBar, colorSecondBar, titleXAxis, showLegend = false, customTooltip: CustomTooltip } = props
 
    return (
       <BarChart

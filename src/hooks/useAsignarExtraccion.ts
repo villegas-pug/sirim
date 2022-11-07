@@ -1,4 +1,3 @@
-import { useMemo } from 'react'
 import { useAppActions } from './useAppActions'
 import { useAppSelector } from './useAppSelector'
 
@@ -16,32 +15,25 @@ export const useAsignarExtraccion = () => {
       }
    } = useAppSelector(state => ({ ...state.extraccion, ...state.asignarExtraccion }))
 
-   const { userCredentials: { idUsuario: idCurrentUsr } } = useAppSelector(state => state.usuario)
-
    const {
-      findAllTablaDinamica,
+      findTablaDinamicaByUsrCreador,
       countTablaDinamicaByNombre,
       assignedToGrupoAnalisis,
       deleteAssignedToGrupoAById,
       reasignToGrupoAnalisis
    } = useAppActions()
 
-   /* ► EFFECT'S  */
-
-   /* ► DEP'S  */
-   const tdDbFromCurrentUsr = useMemo(() => {
-      return tablasDinamicasDb.filter(({ usrCreador: { idUsuario } }) => idCurrentUsr === idUsuario) || []
-   }, [tablasDinamicasDb])
+   // ► EFFECT'S ...
+   // ► DEP'S ...
 
    return {
       tablasDinamicasDb,
       loadingTablaDinamicaDb,
       errorTablaDinamicaDb,
-      tdDbFromCurrentUsr,
       loadingExtraccion,
       totalRegistrosTablaDinamica,
 
-      findAllTablaDinamica,
+      findTablaDinamicaByUsrCreador,
       countTablaDinamicaByNombre,
       assignedToGrupoAnalisis,
       reasignToGrupoAnalisis,

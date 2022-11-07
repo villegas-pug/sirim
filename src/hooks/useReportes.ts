@@ -7,7 +7,11 @@ export const useReportes = () => {
       rptAñosControlMigratorio: rptAñosControlMigratorioDb,
       rptDependenciaControlMigratorio: rptDependenciaControlMigratorioDb,
       rptEdadesControlMigratorioDto: rptEdadesControlMigratorioDb,
-      rptNacionalidadControlMigratorioDto: rptNacionalidadControlMigratorioDb
+      rptNacionalidadControlMigratorioDto: rptNacionalidadControlMigratorioDb,
+      rptPasaportesIndicadores: rptPasaportesIndicadoresDb,
+      rptPasaportesEntregadosPorAños: rptPasaportesEntregadosPorAñosDb,
+      rptPasaportesEntregadosPor12UltimosMeses: rptPasaportesEntregadosPor12UltimosMesesDb,
+      rptPasaportesEntregadosPor31UltimosDias: rptPasaportesEntregadosPor31UltimosDiasDb
    } = useAppSelector(store => store.reportes)
 
    const {
@@ -15,7 +19,11 @@ export const useReportes = () => {
       getRptAñosControlMigratorio,
       getRptDependenciaControlMigratorio,
       getRptEdadesControlMigratorio,
-      getRptNacionalidadControlMigratorio
+      getRptNacionalidadControlMigratorio,
+      getRptPasaportesIndicadores,
+      getRptPasaportesEntregadosPorAños,
+      getRptPasaportesEntregadosPor12UltimosMeses,
+      getRptPasaportesEntregadosPor31UltimosDias
    } = useAppActions()
 
    return {
@@ -25,11 +33,20 @@ export const useReportes = () => {
       rptDependenciaControlMigratorioDb,
       rptEdadesControlMigratorioDb,
       rptNacionalidadControlMigratorioDb,
+      rptPasaportesIndicadoresDb,
+      rptPasaportesEntregadosPorAñosDb,
+      rptPasaportesEntregadosPor12UltimosMesesDb,
+      rptPasaportesEntregadosPor31UltimosDiasDb,
 
       getRptControlMigratorio,
       getRptAñosControlMigratorio,
       getRptDependenciaControlMigratorio,
       getRptEdadesControlMigratorio,
-      getRptNacionalidadControlMigratorio
+      getRptNacionalidadControlMigratorio,
+      getRptPasaportesIndicadores,
+      getRptPasaportesEntregadosPorAños,
+      getRptPasaportesEntregadosPor12UltimosMeses,
+      getRptPasaportesEntregadosPor31UltimosDias
+
    }
 }

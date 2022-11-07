@@ -8,7 +8,6 @@ interface AssignedToGrupoAnalisisLoading {
 
 interface AssignedToGrupoAnalisisSuccess {
    type: '[Asignar-Extracción] Asignar usuario a grupo de analisis success'
-   payload: Array<TablaDinamicaDto>
 }
 
 interface AssignedToGrupoAnalisisError {
@@ -22,7 +21,6 @@ interface DeleteAssignedToGrupoAByIdLoading {
 
 interface DeleteAssignedToGrupoAByIdSuccess {
    type: '[Asignar-Extracción] Eliminar asignación de grupo analisis success'
-   payload: Array<TablaDinamicaDto>
 }
 
 interface DeleteAssignedToGrupoAByIdError {
@@ -30,17 +28,17 @@ interface DeleteAssignedToGrupoAByIdError {
    payload: string | null
 }
 
-interface FindAllTablaDinamicaALoading {
-   type: '[Asignar-Extracción] Find all tabla dinámica loading'
+interface FindTablaDinamicaByUsrCreadorAELoading {
+   type: '[Asignar-Extracción] findTablaDinamicaByUsrCreador loading'
 }
 
-interface FindAllTablaDinamicaASuccess {
-   type: '[Asignar-Extracción] Find all tabla dinámica success',
+interface FindTablaDinamicaByUsrCreadorAESuccess {
+   type: '[Asignar-Extracción] findTablaDinamicaByUsrCreador success'
    payload: TablaDinamicaDto[]
 }
 
-interface FindAllTablaDinamicaAError {
-   type: '[Asignar-Extracción] Find all tabla dinamica error',
+interface FindTablaDinamicaByUsrCreadorAEError {
+   type: '[Asignar-Extracción] findTablaDinamicaByUsrCreador error'
    payload: string | null
 }
 
@@ -50,7 +48,6 @@ interface ReasignToGrupoAnalisisLoading {
 
 interface ReasignToGrupoAnalisisSuccess {
    type: '[Asignar-Extracción] Reasign to grupo analisis success'
-   payload: Array<TablaDinamicaDto>
 }
 
 interface ReasignToGrupoAnalisisError {
@@ -66,9 +63,9 @@ export type AsignarExtraccionAction =
    | DeleteAssignedToGrupoAByIdLoading
    | DeleteAssignedToGrupoAByIdSuccess
    | DeleteAssignedToGrupoAByIdError
-   | FindAllTablaDinamicaALoading
-   | FindAllTablaDinamicaASuccess
-   | FindAllTablaDinamicaAError
+   | FindTablaDinamicaByUsrCreadorAELoading
+   | FindTablaDinamicaByUsrCreadorAESuccess
+   | FindTablaDinamicaByUsrCreadorAEError
    | ReasignToGrupoAnalisisLoading
    | ReasignToGrupoAnalisisSuccess
    | ReasignToGrupoAnalisisError

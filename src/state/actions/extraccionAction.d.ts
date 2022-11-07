@@ -29,6 +29,20 @@ interface FindAllTablaDinamicaError {
    payload: string | null
 }
 
+interface FindTablaDinamicaByUsrCreadorLoading {
+   type: '[Extracción] findTablaDinamicaByUsrCreador loading'
+}
+
+interface FindTablaDinamicaByUsrCreadorSuccess {
+   type: '[Extracción] findTablaDinamicaByUsrCreador success'
+   payload: TablaDinamicaDto[]
+}
+
+interface FindTablaDinamicaByUsrCreadorError {
+   type: '[Extracción] findTablaDinamicaByUsrCreador error'
+   payload: string | null
+}
+
 interface UpdateNameTablaExtracciónLoading {
    type: '[Extracción] Update name tabla loading'
 }
@@ -119,7 +133,6 @@ interface DeleteGrupoCamposAnalisisbyIdLoading {
 
 interface DeleteGrupoCamposAnalisisbyIdSuccess {
    type: '[Extracción] Delete grupo analisis by id success'
-   payload: Array<TablaDinamicaDto>
 }
 
 interface DeleteGrupoCamposAnalisisbyIdError {
@@ -272,6 +285,9 @@ export type ExtraccionAction =
    | FindAllTablaDinamicaLoading
    | FindAllTablaDinamicaSuccess
    | FindAllTablaDinamicaError
+   | FindTablaDinamicaByUsrCreadorLoading
+   | FindTablaDinamicaByUsrCreadorSuccess
+   | FindTablaDinamicaByUsrCreadorError
    | UpdateNameTablaExtracciónLoading
    | UpdateNameTablaExtracciónSuccess
    | UpdateNameTablaExtracciónError

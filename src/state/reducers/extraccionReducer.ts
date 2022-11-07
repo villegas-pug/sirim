@@ -83,27 +83,31 @@ export const extraccionReducer = (state: ExtraccionState = initialState, action:
    switch (action.type) {
    case '[Extracción] Create new table loading':
    case '[Extracción] Find all tabla dinámica loading':
+   case '[Extracción] findTablaDinamicaByUsrCreador loading':
    case '[Extracción] Save grupo analisis loading':
    case '[Extracción] Delete grupo analisis by id loading':
-      return { ...state, loading: true, data: [], error: null }
+      return { ...state, loading: true, error: null }
    case '[Extracción] Create new table success':
    case '[Extracción] Find all tabla dinámica success':
+   case '[Extracción] findTablaDinamicaByUsrCreador success':
    case '[Extracción] Save grupo analisis success':
-   case '[Extracción] Delete grupo analisis by id success':
       return { ...state, loading: false, data: action.payload, error: null }
    case '[Extracción] Create new table error':
    case '[Extracción] Find all tabla dinamica error':
+   case '[Extracción] findTablaDinamicaByUsrCreador error':
    case '[Extracción] Save grupo analisis error':
    case '[Extracción] Delete grupo analisis by id error':
-      return { ...state, loading: false, data: [], error: action.payload }
+      return { ...state, loading: false, error: action.payload }
+   case '[Extracción] Delete grupo analisis by id success':
+      return { ...state, loading: false, error: null }
    case '[Extracción] Update name tabla loading':
-      return { ...state, loading: true, data: [], error: null }
+      return { ...state, loading: true, error: null }
    case '[Extracción] Update name tabla success':
       return { ...state, loading: false, data: action.payload, error: null }
    case '[Extracción] Update name tabla error':
       return { ...state, loading: false, data: [], error: action.payload }
    case '[Extracción] Delete tabla loading':
-      return { ...state, loading: true, data: [], error: null }
+      return { ...state, loading: true, error: null }
    case '[Extracción] Delete tabla success':
       return { ...state, loading: false, data: action.payload, error: null }
    case '[Extracción] Delete tabla error':

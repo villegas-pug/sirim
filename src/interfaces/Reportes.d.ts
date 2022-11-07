@@ -57,16 +57,43 @@ export interface RptEdadesControlMigratorioDto {
 }
 
 export interface RptNacionalidadControlMigratorioDto {
-
    nacionalidad: string
    totalCtrlMig: number
-
 }
 
 export interface RptProduccionDiariaDto {
-
    usrAnalista: string
    grupo: Grupo
    totalAnalizados: number
+}
 
+export interface RptPasaportesIndicadoresDto {
+
+    entregados: number
+    vigentes: number
+    personas: number
+    hombres: number
+    mujeres: number
+
+}
+
+export interface RptPasaportesPor12UltimosMesesDto {
+
+   año: number
+   mes: number
+   añomes: string
+   entregados: number
+
+}
+
+export interface RptPasaportesPor31UltimosDiasDto {
+   mes: number
+   dia: number
+   diames: String
+   entregados: number
+}
+
+export interface RptPasaportesPorAñosDto {
+   año: number
+   entregados: number
 }

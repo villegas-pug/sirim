@@ -1,6 +1,6 @@
 import { ReportesAction } from 'state/actions'
 
-import { RptAñosControlMigratorioDto, RptDependenciaControlMigratorioDto, RptEdadesControlMigratorioDto, RptNacionalidadControlMigratorioDto, RptProduccionDiariaDto } from 'interfaces'
+import { RptAñosControlMigratorioDto, RptDependenciaControlMigratorioDto, RptEdadesControlMigratorioDto, RptNacionalidadControlMigratorioDto, RptPasaportesIndicadoresDto, RptPasaportesPor12UltimosMesesDto, RptPasaportesPor31UltimosDiasDto, RptPasaportesPorAñosDto, RptProduccionDiariaDto } from 'interfaces'
 
 type ReportesState = {
    loading: boolean
@@ -9,6 +9,10 @@ type ReportesState = {
    rptEdadesControlMigratorioDto: RptEdadesControlMigratorioDto[]
    rptNacionalidadControlMigratorioDto: RptNacionalidadControlMigratorioDto[]
    rptProduccionDiaria: RptProduccionDiariaDto[]
+   rptPasaportesIndicadores: RptPasaportesIndicadoresDto
+   rptPasaportesEntregadosPorAños: RptPasaportesPorAñosDto[]
+   rptPasaportesEntregadosPor12UltimosMeses: RptPasaportesPor12UltimosMesesDto[]
+   rptPasaportesEntregadosPor31UltimosDias: RptPasaportesPor31UltimosDiasDto[]
    error: string | null
 }
 
@@ -18,8 +22,12 @@ const INITIAL_STATE: ReportesState = {
    rptDependenciaControlMigratorio: [],
    rptEdadesControlMigratorioDto: [],
    rptNacionalidadControlMigratorioDto: [],
-   error: null,
-   rptProduccionDiaria: []
+   rptProduccionDiaria: [],
+   rptPasaportesIndicadores: {} as RptPasaportesIndicadoresDto,
+   rptPasaportesEntregadosPorAños: [],
+   rptPasaportesEntregadosPor12UltimosMeses: [],
+   rptPasaportesEntregadosPor31UltimosDias: [],
+   error: null
 }
 
 export const reportesReducer = (state: ReportesState = INITIAL_STATE, action: ReportesAction): ReportesState => {
@@ -54,6 +62,30 @@ export const reportesReducer = (state: ReportesState = INITIAL_STATE, action: Re
       return { ...state, loading: false, rptProduccionDiaria: action.payload, error: null }
    case '[Reportes] getRptProduccionDiaria error':
       return { ...state, loading: false, error: action.payload }
+   case '[Reportes] getRptPasaportesIndicadores loading':
+      return { ...state, loading: true, rptPasaportesIndicadores: {} as RptPasaportesIndicadoresDto, error: null }
+   case '[Reportes] getRptPasaportesIndicadores success':
+      return { ...state, loading: false, rptPasaportesIndicadores: action.payload, error: null }
+   case '[Reportes] getRptPasaportesIndicadores error':
+      return { ...state, loading: false, rptPasaportesIndicadores: {} as RptPasaportesIndicadoresDto, error: action.payload }
+   case '[Reportes] getRptPasaportesEntregadosPorAños loading':
+      return { ...state, loading: true, rptPasaportesEntregadosPorAños: [], error: null }
+   case '[Reportes] getRptPasaportesEntregadosPorAños success':
+      return { ...state, loading: false, rptPasaportesEntregadosPorAños: action.payload, error: null }
+   case '[Reportes] getRptPasaportesEntregadosPorAños error':
+      return { ...state, loading: false, rptPasaportesEntregadosPorAños: [], error: action.payload }
+   case '[Reportes] getRptPasaportesEntregadosPor12UltimosMeses loading':
+      return { ...state, loading: true, rptPasaportesEntregadosPor12UltimosMeses: [], error: null }
+   case '[Reportes] getRptPasaportesEntregadosPor12UltimosMeses success':
+      return { ...state, loading: false, rptPasaportesEntregadosPor12UltimosMeses: action.payload, error: null }
+   case '[Reportes] getRptPasaportesEntregadosPor12UltimosMeses error':
+      return { ...state, loading: false, rptPasaportesEntregadosPor12UltimosMeses: [], error: action.payload }
+   case '[Reportes] getRptPasaportesEntregadosPor31UltimosDias loading':
+      return { ...state, loading: true, rptPasaportesEntregadosPor31UltimosDias: [], error: null }
+   case '[Reportes] getRptPasaportesEntregadosPor31UltimosDias success':
+      return { ...state, loading: false, rptPasaportesEntregadosPor31UltimosDias: action.payload, error: null }
+   case '[Reportes] getRptPasaportesEntregadosPor31UltimosDias error':
+      return { ...state, loading: false, rptPasaportesEntregadosPor31UltimosDias: [], error: action.payload }
    default:
       return state
    }

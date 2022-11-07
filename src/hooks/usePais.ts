@@ -11,9 +11,11 @@ export const usePais = () => {
    /* » DEP'S  */
 
    const nacionalidadDb = useMemo(() => {
-      return paisDb
+      const nacionalidades = paisDb
          .map(({ nacionalidad }) => nacionalidad)
          .filter(nac => nac.trim())
+
+      return Array.from(new Set(nacionalidades))
    }, [paisDb])
 
    return {

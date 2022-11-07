@@ -72,6 +72,8 @@ export const AnalizarExtraccionSubMod: FC = () => {
       findTablaDinamicaByRangoFromIds
    } = useAnalizarExtraccion()
 
+   const { findAllTipoLogico } = useTipoLogico()
+
    const [, setBandejaAnalisisNroPagina] = useLocalStorage('ANALIZAR_EXTRACCION_BANDEJA_ANALISIS_NRO_PAGINA')
 
    useEffect(() => { setBandejaAnalisisNroPagina(0) }, [])
@@ -83,6 +85,7 @@ export const AnalizarExtraccionSubMod: FC = () => {
          icon: <CachedRounded />,
          handleClick: async () => {
             await findAsigAnalisisByUsr()
+            await findAllTipoLogico()
             findTablaDinamicaByRangoFromIds({
                asigGrupo: { idAsigGrupo: asigGrupoCamposAnalisisTmp.idAsigGrupo },
                regAnalisisIni: asigGrupoCamposAnalisisTmp.regAnalisisIni,
@@ -188,7 +191,7 @@ const BandejaEntrada: FC = () => {
 
    const { currentScreen } = useBreakpoints()
 
-   /* ► EFFECT'S ...  */
+   // ► EFFECT'S ...
    useEffect(() => { findAsigAnalisisByUsr() }, [])
 
    /* » DEP'S ... */
@@ -305,7 +308,7 @@ const BandejaEntrada: FC = () => {
          <HeaderBandejaEntrada />
 
          {/* ► BODY ... */}
-         <Zoom bottom>
+         <Zoom>
             <SimpleDataGrid
                columns={ dgColumns }
                rows={ asigGrupoCamposAnalisisDb }
@@ -416,6 +419,7 @@ const BandejaAnalisis: FC = () => {
    const { findAllTipoLogico } = useTipoLogico()
 
    /* ► EFFECT'S ... */
+   useEffect(() => { findAllTipoLogico() }, [])
 
    /* » DEP'S ... */
    const dgColumns = useMemo<Array<GridColDef<RegistroTablaDinamicaDto>>>(() => ([
@@ -425,8 +429,7 @@ const BandejaAnalisis: FC = () => {
          ...commonGridColDef,
          renderCell: ({ row }) => <Tooltip title='Analizar' placement='left-start' arrow>
             <IconButton
-               onClick={ async () => {
-                  await findAllTipoLogico()
+               onClick={ () => {
                   handleSaveRegistroDinamicoAsignadoTmp(row)
                   modalAnalisis.current.setOpen(true)
                } }
@@ -482,17 +485,11 @@ const BandejaAnalisis: FC = () => {
          </Fade>
 
          {/* ► BODY ... */}
-         <Zoom bottom>
+         <Zoom>
             <SimpleDataGrid
                columns={ dgColumns }
                rows={ tablaAsignadaTmp }
-               pageSize={
-                  currentScreen === 'desktopLarge'
-                     ? 8
-                     : currentScreen === 'desktopWide'
-                        ? 10
-                        : 4
-               }
+               pageSize={ currentScreen === 'desktop' ? 4 : 10 }
                getRowId={ row => row.nId }
                localStoragePageKey='ANALIZAR_EXTRACCION_BANDEJA_ANALISIS_NRO_PAGINA'
             />
@@ -561,7 +558,7 @@ const AnalizarExtraccion: FC = () => {
    const [showDatosExtraccion, setShowDatosExtraccion] = useState(true)
 
    /* ► CUSTOM - HOOK'S ... */
-   const { loadingAsigGrupoCamposAnalisisDb, saveRecordAssigned, findAsigAnalisisByUsr } = useAnalizarExtraccion()
+   const { loadingAsigGrupoCamposAnalisisDb, saveRecordAssigned } = useAnalizarExtraccion()
 
    /* ► HANDLER'S ... */
    const handleShowCamposExtraccion = ({ target: { checked } }: ChangeEvent<HTMLInputElement>) => {
@@ -640,7 +637,7 @@ const AnalizarExtraccion: FC = () => {
                      asigGrupo: { idAsigGrupo: asigGrupoCamposAnalisisTmp.idAsigGrupo }
                   })
 
-                  findAsigAnalisisByUsr()
+                  /* findAsigAnalisisByUsr() */
                } }>
                {(formikprops) => (
                   <Form>

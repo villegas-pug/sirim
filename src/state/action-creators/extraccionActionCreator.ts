@@ -57,7 +57,6 @@ export const createTablaExtraccion = (values: Partial<TablaDinamicaDto>) => asyn
 
 export const findAllTablaDinamica = () => async (dispatch: Dispatch<ExtraccionAction | AsignarExtraccionAction>, getState: any): Promise<void> => {
    dispatch({ type: '[Extracción] Find all tabla dinámica loading' })
-   dispatch({ type: '[Asignar-Extracción] Find all tabla dinámica loading' })
    try {
       const { usuario: { token } } = getState()
       const { data: { levelLog, data, message } } = await api.request<Response<TablaDinamicaDto[]>>({
@@ -71,18 +70,48 @@ export const findAllTablaDinamica = () => async (dispatch: Dispatch<ExtraccionAc
       switch (levelLog) {
       case 'SUCCESS':
          dispatch({ type: '[Extracción] Find all tabla dinámica success', payload: data })
-         dispatch({ type: '[Asignar-Extracción] Find all tabla dinámica success', payload: data })
          break
       case 'WARNING':
       case 'ERROR':
          dispatch({ type: '[Extracción] Find all tabla dinamica error', payload: message })
-         dispatch({ type: '[Asignar-Extracción] Find all tabla dinamica error', payload: message })
          noty('error', message)
          break
       }
    } catch (err: any) {
       dispatch({ type: '[Extracción] Find all tabla dinamica error', payload: err.response?.status })
-      dispatch({ type: '[Asignar-Extracción] Find all tabla dinamica error', payload: err.response?.status })
+      dispatch({ type: '[http-status] Response status', payload: err.response?.status })
+   }
+}
+
+export const findTablaDinamicaByUsrCreador = () => async (dispatch: Dispatch<ExtraccionAction | AsignarExtraccionAction>, getState: any): Promise<void> => {
+   dispatch({ type: '[Extracción] findTablaDinamicaByUsrCreador loading' })
+   dispatch({ type: '[Asignar-Extracción] findTablaDinamicaByUsrCreador loading' })
+   try {
+      const { usuario: { token, userCredentials } } = getState()
+      const { data: { levelLog, data, message } } = await api.request<Response<TablaDinamicaDto[]>>({
+         method: 'POST',
+         url: '/microservicio-rimcommon/findTablaDinamicaByUsrCreador',
+         data: userCredentials,
+         headers: {
+            [AUTHORIZATION]: token
+         }
+      })
+
+      switch (levelLog) {
+      case 'SUCCESS':
+         dispatch({ type: '[Extracción] findTablaDinamicaByUsrCreador success', payload: data })
+         dispatch({ type: '[Asignar-Extracción] findTablaDinamicaByUsrCreador success', payload: data })
+         break
+      case 'WARNING':
+      case 'ERROR':
+         dispatch({ type: '[Extracción] findTablaDinamicaByUsrCreador error', payload: message })
+         dispatch({ type: '[Asignar-Extracción] findTablaDinamicaByUsrCreador error', payload: message })
+         noty('error', message)
+         break
+      }
+   } catch (err: any) {
+      dispatch({ type: '[Extracción] findTablaDinamicaByUsrCreador error', payload: err.response?.status })
+      dispatch({ type: '[Asignar-Extracción] findTablaDinamicaByUsrCreador error', payload: err.response?.status })
       dispatch({ type: '[http-status] Response status', payload: err.response?.status })
    }
 }
@@ -90,7 +119,8 @@ export const findAllTablaDinamica = () => async (dispatch: Dispatch<ExtraccionAc
 export const updateNameTablaDinamica = (values: Partial<TablaDinamica>) => async (dispatch: Dispatch<ExtraccionAction>, getState: any): Promise<void> => {
    dispatch({ type: '[Extracción] Update name tabla loading' })
    try {
-      const { usuario: { token } } = getState()
+      const { usuario: { token, userCredentials } } = getState()
+      values.usrCreador = userCredentials
       const { data: { levelLog, data, message } } = await api.request<Response<TablaDinamicaDto[]>>({
          method: 'PUT',
          url: '/microservicio-rimextraccion/updateNameTablaDinamica',
@@ -121,7 +151,8 @@ export const updateNameTablaDinamica = (values: Partial<TablaDinamica>) => async
 export const deleteTablaExtraccion = (values: Partial<TablaDinamica>) => async (dispatch: Dispatch<ExtraccionAction>, getState: any): Promise<void> => {
    dispatch({ type: '[Extracción] Delete tabla loading' })
    try {
-      const { usuario: { token } } = getState()
+      const { usuario: { token, userCredentials } } = getState()
+      values.usrCreador = userCredentials
       const { data: { levelLog, data, message } } = await api.request<Response<TablaDinamicaDto[]>>({
          method: 'DELETE',
          url: '/microservicio-rimextraccion/deleteTablaDinamica',
@@ -265,7 +296,6 @@ export const saveGrupoCamposAnalisis = (tablaDinamica: Partial<TablaDinamicaDto>
       case 'WARNING':
       case 'ERROR':
          dispatch({ type: '[Extracción] Save grupo analisis error', payload: message })
-         dispatch({ type: '[Extracción] Find all tabla dinámica success', payload: data })
          noty('error', message)
          break
       }
@@ -280,7 +310,7 @@ export const deleteGrupoCamposAnalisisbyId = (idGrupo: number) => async (dispatc
    dispatch({ type: '[Extracción] Delete grupo analisis by id loading' })
    try {
       const { usuario: { token } } = getState()
-      const { data: { levelLog, data, message } } = await api.request<Response<TablaDinamicaDto[]>>({
+      const { data: { levelLog, message } } = await api.request<Response<TablaDinamicaDto[]>>({
          method: 'DELETE',
          url: `/microservicio-rimcommon/deleteGrupoCamposAnalisisbyId/${idGrupo}`,
          headers: {
@@ -290,7 +320,7 @@ export const deleteGrupoCamposAnalisisbyId = (idGrupo: number) => async (dispatc
 
       switch (levelLog) {
       case 'SUCCESS':
-         dispatch({ type: '[Extracción] Delete grupo analisis by id success', payload: data })
+         dispatch({ type: '[Extracción] Delete grupo analisis by id success' })
          noty('success', message)
          break
       case 'WARNING':

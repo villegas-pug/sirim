@@ -28,6 +28,7 @@ const CrearTipoLogicoSubMod = lazy(() => import('pages/submodulo/CrearTipoLogico
 const EventoSubMod = lazy(() => import('pages/submodulo/EventoSubMod'))
 const RptProduccionHorasLaboralesSubMod = lazy(() => import('pages/submodulo/RptProduccionHorasLaboralesSubMod'))
 const RptControlMigratorioSubMod = lazy(() => import('pages/submodulo/RptControlMigratorioSubMod'))
+const RptPasaportesSubMod = lazy(() => import('pages/submodulo/RptPasaportesSubMod'))
 
 /* » ITEM'S */
 const modulo: Array<ModuloType> = [
@@ -92,6 +93,9 @@ const subModulo: Array<SubModuloType> = [
    }, {
       name: 'REPORTE CONTROL MIGRATORIO',
       component: <RptControlMigratorioSubMod />
+   }, {
+      name: 'REPORTE PASAPORTES',
+      component: <RptPasaportesSubMod />
    }
 ]
 

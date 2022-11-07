@@ -1,6 +1,6 @@
 import { ResponseHttpStatusType } from 'state/actions/httpStatusAction'
 
-import { RptAñosControlMigratorioDto, RptDependenciaControlMigratorioDto, RptEdadesControlMigratorioDto, RptNacionalidadControlMigratorioDto, RptProduccionDiariaDto } from 'interfaces'
+import { RptAñosControlMigratorioDto, RptDependenciaControlMigratorioDto, RptEdadesControlMigratorioDto, RptNacionalidadControlMigratorioDto, RptPasaportesIndicadoresDto, RptPasaportesPor12UltimosMesesDto, RptPasaportesPor31UltimosDiasDto, RptPasaportesPorAñosDto, RptProduccionDiariaDto } from 'interfaces'
 
 interface GetRptAñosControlMigratorioLoading {
    type: '[Reportes] getRptAñosControlMigratorio loading'
@@ -72,6 +72,62 @@ interface GetRptProduccionDiariaError {
    payload: string | null
 }
 
+interface GetRptPasaportesIndicadoresLoading {
+   type: '[Reportes] getRptPasaportesIndicadores loading'
+}
+
+interface GetRptPasaportesIndicadoresSuccess {
+   type: '[Reportes] getRptPasaportesIndicadores success'
+   payload: RptPasaportesIndicadoresDto
+}
+
+interface GetRptPasaportesIndicadoresError {
+   type: '[Reportes] getRptPasaportesIndicadores error'
+   payload: string | null
+}
+
+interface GetRptPasaportesEntregadosPorAñosLoading {
+   type: '[Reportes] getRptPasaportesEntregadosPorAños loading'
+}
+
+interface GetRptPasaportesEntregadosPorAñosSuccess {
+   type: '[Reportes] getRptPasaportesEntregadosPorAños success'
+   payload: Array<RptPasaportesPorAñosDto>
+}
+
+interface GetRptPasaportesEntregadosPorAñosError {
+   type: '[Reportes] getRptPasaportesEntregadosPorAños error'
+   payload: string | null
+}
+
+interface GetRptPasaportesEntregadosPor12UltimosMesesLoading {
+   type: '[Reportes] getRptPasaportesEntregadosPor12UltimosMeses loading'
+}
+
+interface GetRptPasaportesEntregadosPor12UltimosMesesSuccess {
+   type: '[Reportes] getRptPasaportesEntregadosPor12UltimosMeses success'
+   payload: Array<RptPasaportesPor12UltimosMesesDto>
+}
+
+interface GetRptPasaportesEntregadosPor12UltimosMesesError {
+   type: '[Reportes] getRptPasaportesEntregadosPor12UltimosMeses error'
+   payload: string | null
+}
+
+interface GetRptPasaportesEntregadosPor31UltimosDiasLoading {
+   type: '[Reportes] getRptPasaportesEntregadosPor31UltimosDias loading'
+}
+
+interface GetRptPasaportesEntregadosPor31UltimosDiasSuccess {
+   type: '[Reportes] getRptPasaportesEntregadosPor31UltimosDias success'
+   payload: Array<RptPasaportesPor31UltimosDiasDto>
+}
+
+interface GetRptPasaportesEntregadosPor31UltimosDiasError {
+   type: '[Reportes] getRptPasaportesEntregadosPor31UltimosDias error'
+   payload: string | null
+}
+
 export type ReportesAction =
    | ResponseHttpStatusType
    | GetRptAñosControlMigratorioLoading
@@ -89,3 +145,15 @@ export type ReportesAction =
    | GetRptProduccionDiariaLoading
    | GetRptProduccionDiariaSuccess
    | GetRptProduccionDiariaError
+   | GetRptPasaportesIndicadoresLoading
+   | GetRptPasaportesIndicadoresSuccess
+   | GetRptPasaportesIndicadoresError
+   | GetRptPasaportesEntregadosPorAñosLoading
+   | GetRptPasaportesEntregadosPorAñosSuccess
+   | GetRptPasaportesEntregadosPorAñosError
+   | GetRptPasaportesEntregadosPor12UltimosMesesLoading
+   | GetRptPasaportesEntregadosPor12UltimosMesesSuccess
+   | GetRptPasaportesEntregadosPor12UltimosMesesError
+   | GetRptPasaportesEntregadosPor31UltimosDiasLoading
+   | GetRptPasaportesEntregadosPor31UltimosDiasSuccess
+   | GetRptPasaportesEntregadosPor31UltimosDiasError

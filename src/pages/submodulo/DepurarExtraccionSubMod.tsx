@@ -49,7 +49,6 @@ import {
    SimpleModal,
    SimpleModalRefProps,
    ModalLoader,
-   Scrollbar,
    SpeedDialActionProps,
    SpeedDialBackdrop,
    BandejaProcesos,
@@ -79,13 +78,14 @@ const DepurarExtraccionSubMod: FC = () => {
       loadingcamposTablaDinamicaDb,
       loadingTablaDinamica,
       loadingDepuracion,
-      findAllTablaDinamica,
+      findTablaDinamicaByUsrCreador,
       createTablaExtraccion
    } = useExtraccion()
+
    const { findAllTipoLogico } = useTipoLogico()
 
    /* » EFFECT'S ... */
-   useEffect(() => { findAllTablaDinamica() }, [])
+   useEffect(() => { findTablaDinamicaByUsrCreador() }, [])
    useEffect(() => { findAllTipoLogico() }, [])
 
    /* » HANDLER'S ... */
@@ -96,7 +96,7 @@ const DepurarExtraccionSubMod: FC = () => {
       {
          name: 'Refrescar',
          icon: <HistoryOutlined />,
-         handleClick: () => { findAllTablaDinamica() }
+         handleClick: () => { findTablaDinamicaByUsrCreador() }
       }
    ]
 
@@ -145,7 +145,7 @@ const DepurarExtraccionSubMod: FC = () => {
                      </Formik>
 
                      {/* ► ... */}
-                     <Box height='58vh'>
+                     <Box height='57vh' overflow='auto'>
                         <ListaTablasExtraccion />
                      </Box>
 
@@ -157,9 +157,11 @@ const DepurarExtraccionSubMod: FC = () => {
             {/* ► CAMPOS DE EXTRACCIÓN ...  */}
             <Grid item xs={ 3 }>
                <MainPaper>
-                  <Typography variant='h5' >CAMPOS DE EXTRACCIÓN</Typography>
+                  <Typography variant='h5'>CAMPOS DE EXTRACCIÓN</Typography>
                   <Divider />
-                  <ListaCamposExtraccion />
+                  <Box height='75vh' overflow='auto'>
+                     <ListaCamposExtraccion />
+                  </Box>
                </MainPaper>
             </Grid>
 
@@ -170,7 +172,9 @@ const DepurarExtraccionSubMod: FC = () => {
                   <MainPaper>
                      <Typography variant='h5' >GRUPOS DE ANALISIS</Typography>
                      <Divider />
-                     <ListaGrupoAnalisis />
+                     <Box height='35vh' overflow='auto'>
+                        <ListaGrupoAnalisis />
+                     </Box>
                   </MainPaper>
                </Grid>
 
@@ -178,7 +182,9 @@ const DepurarExtraccionSubMod: FC = () => {
                   <MainPaper>
                      <Typography variant='h5' >CAMPOS DE ANALISIS</Typography>
                      <Divider />
-                     <ListaCamposAnalisis />
+                     <Box height='35vh' overflow='auto'>
+                        <ListaCamposAnalisis />
+                     </Box>
                   </MainPaper>
                </Grid>
 
@@ -220,7 +226,7 @@ const ListaTablasExtraccion: FC = () => {
 
    /* ► CUSTOM - HOOK'S  */
    const {
-      extraccionDbFromCurrentUsr,
+      extraccionDb,
       depuracion,
       loadingExtraccionDb,
       bancoCamposExtraccionDb,
@@ -265,100 +271,98 @@ const ListaTablasExtraccion: FC = () => {
 
    return (
       <>
-         <Scrollbar>
-            <List
-               subheader={ <ListSubheader component='div'>Tabla de extracción</ListSubheader> }
-            >
-               {
-                  extraccionDbFromCurrentUsr?.map((tablaDinamica, i) => (
-                     <ListItemFade key={ tablaDinamica.idTabla } i={ i } direction='top' >
-                        <ListItemButton selected={ selectedItem === i }>
-                           <ListItemText
-                              primary={
-                                 <Box display='flex' gap={ 1 }>
-                                    <Typography variant='h4'>{ `${i + 1}►` }</Typography>
-                                    <Typography variant='h5'>{ tablaDinamica.nombre }</Typography>
-                                 </Box>
-                              }
-                              onClick={ () => {
-                                 findMetaTablaDinamica({ nombre: tablaDinamica.nombre })/* ► request ... */
+         <List
+            subheader={ <ListSubheader component='div'>Tabla de extracción</ListSubheader> }
+         >
+            {
+               extraccionDb?.map((tablaDinamica, i) => (
+                  <ListItemFade key={ tablaDinamica.idTabla } i={ i } direction='top' >
+                     <ListItemButton selected={ selectedItem === i }>
+                        <ListItemText
+                           primary={
+                              <Box display='flex' gap={ 1 }>
+                                 <Typography variant='h4'>{ `${i + 1}►` }</Typography>
+                                 <Typography variant='h5'>{ tablaDinamica.nombre }</Typography>
+                              </Box>
+                           }
+                           onClick={ () => {
+                              findMetaTablaDinamica({ nombre: tablaDinamica.nombre })/* ► request ... */
+                              handleSaveTablaDinamicaDto(tablaDinamica)
+                              handleSavegruposAnalisisDto(tablaDinamica.idTabla)
+                              handleSaveCamposAnalisisTmp({} as GrupoCamposAnalisis, 'RESET')
+                              setSelectedItem(i)
+                           }
+                           }
+                        />
+
+                        {/* ► Action's ... */}
+                        <ListItemSecondaryAction>
+
+                           <Tooltip title='Modificar nombre' placement='top' arrow>
+                              <IconButton onClick={() => {
                                  handleSaveTablaDinamicaDto(tablaDinamica)
-                                 handleSavegruposAnalisisDto(tablaDinamica.idTabla)
-                                 handleSaveCamposAnalisisTmp({} as GrupoCamposAnalisis, 'RESET')
-                                 setSelectedItem(i)
-                              }
-                              }
-                           />
+                                 modalEditNombreTabla.current.setOpen(true)
+                              }}>
+                                 <EditRounded fontSize='small' />
+                              </IconButton>
+                           </Tooltip>
 
-                           {/* ► Action's ... */}
-                           <ListItemSecondaryAction>
+                           <Tooltip title='Eliminar tabla' placement='top' arrow>
+                              <IconButton onClick={() => {
+                                 handleSaveTablaDinamicaDto(tablaDinamica)
+                                 confirmEliminarTabla.current.setIsOpen(true)
+                              }}>
+                                 <RemoveCircleOutlineRounded fontSize='small' />
+                              </IconButton>
+                           </Tooltip>
 
-                              <Tooltip title='Modificar nombre' placement='top' arrow>
-                                 <IconButton onClick={() => {
+                           <Tooltip title='Crear campo extracción' placement='top' arrow>
+                              <IconButton
+                                 onClick={() => {
                                     handleSaveTablaDinamicaDto(tablaDinamica)
-                                    modalEditNombreTabla.current.setOpen(true)
-                                 }}>
-                                    <EditRounded fontSize='small' />
-                                 </IconButton>
-                              </Tooltip>
+                                    modalAddFieldExtraccion.current.setOpen(true)
+                                 }}
+                              >
+                                 <ViewWeekRounded fontSize='small' />
+                              </IconButton>
+                           </Tooltip>
 
-                              <Tooltip title='Eliminar tabla' placement='top' arrow>
-                                 <IconButton onClick={() => {
+                           <Tooltip title='Cargar datos de extracción' placement='top' arrow>
+                              <IconButton
+                                 onClick={() => {
+                                    setFileExtraccion({ fileName: tablaDinamica.nombre })
+                                    inputFile.current.click()
+                                 }}
+                              >
+                                 <UploadOutlined fontSize='small' />
+                              </IconButton>
+                           </Tooltip >
+
+                           <Tooltip title='Descargar datos de extracción' placement='top' arrow>
+                              <IconButton
+                                 onClick={() => { findTablaDinamicaBySuffixOfField(tablaDinamica.nombre) }}
+                              >
+                                 <DownloadRounded fontSize='small' />
+                              </IconButton>
+                           </Tooltip >
+
+                           <Tooltip title='Crear grupo de analisis' placement='top' arrow>
+                              <IconButton
+                                 onClick={ () => {
                                     handleSaveTablaDinamicaDto(tablaDinamica)
-                                    confirmEliminarTabla.current.setIsOpen(true)
-                                 }}>
-                                    <RemoveCircleOutlineRounded fontSize='small' />
-                                 </IconButton>
-                              </Tooltip>
+                                    modalAddGrupoAnalisis.current.setOpen(true)
+                                 } }
+                              >
+                                 <GroupWorkRounded fontSize='small' />
+                              </IconButton>
+                           </Tooltip>
 
-                              <Tooltip title='Crear campo extracción' placement='top' arrow>
-                                 <IconButton
-                                    onClick={() => {
-                                       handleSaveTablaDinamicaDto(tablaDinamica)
-                                       modalAddFieldExtraccion.current.setOpen(true)
-                                    }}
-                                 >
-                                    <ViewWeekRounded fontSize='small' />
-                                 </IconButton>
-                              </Tooltip>
-
-                              <Tooltip title='Cargar datos de extracción' placement='top' arrow>
-                                 <IconButton
-                                    onClick={() => {
-                                       setFileExtraccion({ fileName: tablaDinamica.nombre })
-                                       inputFile.current.click()
-                                    }}
-                                 >
-                                    <UploadOutlined fontSize='small' />
-                                 </IconButton>
-                              </Tooltip >
-
-                              <Tooltip title='Descargar datos de extracción' placement='top' arrow>
-                                 <IconButton
-                                    onClick={() => { findTablaDinamicaBySuffixOfField(tablaDinamica.nombre) }}
-                                 >
-                                    <DownloadRounded fontSize='small' />
-                                 </IconButton>
-                              </Tooltip >
-
-                              <Tooltip title='Crear grupo de analisis' placement='top' arrow>
-                                 <IconButton
-                                    onClick={ () => {
-                                       handleSaveTablaDinamicaDto(tablaDinamica)
-                                       modalAddGrupoAnalisis.current.setOpen(true)
-                                    } }
-                                 >
-                                    <GroupWorkRounded fontSize='small' />
-                                 </IconButton>
-                              </Tooltip>
-
-                           </ListItemSecondaryAction>
-                        </ListItemButton>
-                     </ListItemFade>
-                  ))
-               }
-            </List>
-         </Scrollbar>
+                        </ListItemSecondaryAction>
+                     </ListItemButton>
+                  </ListItemFade>
+               ))
+            }
+         </List>
 
          {/* » MODAL: Editar nombre tabla extracción ...  */}
          <SimpleModal ref={ modalEditNombreTabla }>
@@ -370,8 +374,10 @@ const ListaTablasExtraccion: FC = () => {
                   nombre: Yup.string().required('¡Campo requerido!').matches(/^[a-zA-Z_0-9]+$/gi, '¡Caracter no permitido!')
                })}
                onSubmit={ async (values: Partial<TablaDinamica>, meta: FormikHelpers<Partial<TablaDinamica>>): Promise<any> => {
-                  tablaDinamicaDto.nombre = values.nombre ?? ''
-                  await updateNameTablaDinamica(tablaDinamicaDto)
+                  await updateNameTablaDinamica({
+                     idTabla: tablaDinamicaDto.idTabla,
+                     nombre: values.nombre ?? ''
+                  })
                   meta.resetForm()
                   modalEditNombreTabla.current.setOpen(false)
                }}>
@@ -532,7 +538,7 @@ const FrmCrearCampoExtraccion: FC<{ metaCampo?: MetaCampoTablaDinamica}> = ({ me
    const { tablaDinamicaDto } = useDepurarExtraccionContext()
 
    /* ► CUSTOM - HOOK'S ...  */
-   const { handleAlterFieldTablaDinamica, findAllTablaDinamica } = useExtraccion()
+   const { handleAlterFieldTablaDinamica, findTablaDinamicaByUsrCreador } = useExtraccion()
 
    return (
       <Formik
@@ -546,7 +552,7 @@ const FrmCrearCampoExtraccion: FC<{ metaCampo?: MetaCampoTablaDinamica}> = ({ me
          })}
          onSubmit={ async (values: Partial<MetaCampoTablaDinamica>, meta): Promise<void> => {
             await handleAlterFieldTablaDinamica(tablaDinamicaDto, values, 'ADD_COLUMN_E')
-            await findAllTablaDinamica()
+            await findTablaDinamicaByUsrCreador()
             meta.resetForm()
          }}
       >
@@ -637,58 +643,56 @@ const ListaCamposExtraccion: FC = () => {
       camposExtraccionDb,
       loadingcamposTablaDinamicaDb,
       loadingExtraccionDb,
-      findAllTablaDinamica,
+      findTablaDinamicaByUsrCreador,
       handleAlterFieldTablaDinamica
    } = useExtraccion()
 
    return (
       <>
-         <Scrollbar>
-            <ListPuffLoader
-               loading={ loadingExtraccionDb || loadingcamposTablaDinamicaDb }
-            >
-               <List>
-                  {
-                     camposExtraccionDb.map((metaCampo, i) => (
-                        <ListItemButton key={ metaCampo.nombre }>
-                           <ListItemText primary={
-                              <Box display='flex' gap={ 1 }>
-                                 <Typography variant='h4'>{ `${i + 1}►` }</Typography>
-                                 <Typography variant='h5'>{ metaCampo.nombre }</Typography>
-                              </Box>
-                           }
-                           />
+         <ListPuffLoader
+            loading={ loadingExtraccionDb || loadingcamposTablaDinamicaDb }
+         >
+            <List>
+               {
+                  camposExtraccionDb.map((metaCampo, i) => (
+                     <ListItemButton key={ metaCampo.nombre }>
+                        <ListItemText primary={
+                           <Box display='flex' gap={ 1 }>
+                              <Typography variant='h4'>{ `${i + 1}►` }</Typography>
+                              <Typography variant='h5'>{ metaCampo.nombre }</Typography>
+                           </Box>
+                        }
+                        />
 
-                           {/* ► Action's  */}
-                           <ListItemSecondaryAction>
+                        {/* ► Action's  */}
+                        <ListItemSecondaryAction>
 
-                              <Tooltip title='Editar campo' placement='top' arrow>
-                                 <IconButton
-                                    onClick={() => {
-                                       setPrevMetaField(convertMetaTypeToSqlType(metaCampo))
-                                       modalEditarCampo.current.setOpen(true)
-                                    }}
-                                 >
-                                    <EditOutlined fontSize='small' />
-                                 </IconButton>
-                              </Tooltip>
+                           <Tooltip title='Editar campo' placement='top' arrow>
+                              <IconButton
+                                 onClick={() => {
+                                    setPrevMetaField(convertMetaTypeToSqlType(metaCampo))
+                                    modalEditarCampo.current.setOpen(true)
+                                 }}
+                              >
+                                 <EditOutlined fontSize='small' />
+                              </IconButton>
+                           </Tooltip>
 
-                              <Tooltip title='Eliminar campo' placement='top' arrow>
-                                 <IconButton
-                                    onClick={() => { handleAlterFieldTablaDinamica(tablaDinamicaDto, metaCampo, 'DROP_COLUMN_E') }}
-                                 >
-                                    <RemoveCircleOutlined fontSize='small' />
-                                 </IconButton>
-                              </Tooltip>
+                           <Tooltip title='Eliminar campo' placement='top' arrow>
+                              <IconButton
+                                 onClick={() => { handleAlterFieldTablaDinamica(tablaDinamicaDto, metaCampo, 'DROP_COLUMN_E') }}
+                              >
+                                 <RemoveCircleOutlined fontSize='small' />
+                              </IconButton>
+                           </Tooltip>
 
-                           </ListItemSecondaryAction>
+                        </ListItemSecondaryAction>
 
-                        </ListItemButton>
-                     ))
-                  }
-               </List>
-            </ListPuffLoader>
-         </Scrollbar>
+                     </ListItemButton>
+                  ))
+               }
+            </List>
+         </ListPuffLoader>
 
          {/* » MODAL: Editar campo ...  */}
          <SimpleModal ref={ modalEditarCampo }>
@@ -704,7 +708,7 @@ const ListaCamposExtraccion: FC = () => {
                onSubmit={ async (values: Partial<MetaCampoTablaDinamica>, meta): Promise<void> => {
                   const tdDto = { ...tablaDinamicaDto, camposCsv: `${prevMetaField.nombre} | ${prevMetaField.tipo} | ${metaFieldInfoTablaDinamicaTmp[prevMetaField.nombre!]}` }
                   await handleAlterFieldTablaDinamica(tdDto, values, 'ALTER_COLUMN_E')
-                  await findAllTablaDinamica()
+                  await findTablaDinamicaByUsrCreador()
                   meta.setValues({ nombre: '', info: '' })
                   modalEditarCampo.current.setOpen(false)
                } }>
@@ -751,83 +755,85 @@ const ListaGrupoAnalisis:FC = () => {
       loadingExtraccionDb,
       bancoCamposAnalisisDb,
       saveGrupoCamposAnalisis,
-      deleteGrupoCamposAnalisisbyId
+      deleteGrupoCamposAnalisisbyId,
+      findTablaDinamicaByUsrCreador
    } = useExtraccion()
 
    /* ► EFFEC'S ... */
    useEffect(() => { /* ► Si confirma eliminar el grupo ... */
       if (!hasAcceptedEliminarGrupo) return
-      deleteGrupoCamposAnalisisbyId(grupoAnalisisTmp.idGrupo)
-      setHasAcceptedEliminarGrupo(false)
+      (async () => {
+         await deleteGrupoCamposAnalisisbyId(grupoAnalisisTmp.idGrupo)
+         await findTablaDinamicaByUsrCreador()
+         setHasAcceptedEliminarGrupo(false)
+      })()
    }, [hasAcceptedEliminarGrupo])
 
    return (
       <>
-         <Scrollbar>
-            <List>
-               {
-                  gruposAnalisisDto.map((grupo, i) => (
-                     <ListItemFade key={ grupo.idGrupo } i={ i } direction='top'>
-                        <ListItemButton
-                           selected={ selectedItem === i }
-                        >
-                           <ListItemText
-                              primary={
-                                 <Box display='flex' gap={ 1 }>
-                                    <Typography variant='h4'>{ `${i + 1}►` }</Typography>
-                                    <Typography variant='h5'>{ grupo.nombre }</Typography>
-                                 </Box>
-                              }
-                              onClick={ () => {
-                                 setSelectedItem(i)
-                                 handleSaveGrupoAnalisisTmp(grupo)
-                                 handleSaveCamposAnalisisTmp(grupo, 'SAVE')
-                              } }
-                           />
+         <List>
+            {
+               gruposAnalisisDto.map((grupo, i) => (
+                  <ListItemFade key={ grupo.idGrupo } i={ i } direction='top'>
+                     <ListItemButton
+                        selected={ selectedItem === i }
+                     >
+                        <ListItemText
+                           primary={
+                              <Box display='flex' gap={ 1 }>
+                                 <Typography variant='h4'>{ `${i + 1}►` }</Typography>
+                                 <Typography variant='h5'>{ grupo.nombre }</Typography>
+                              </Box>
+                           }
+                           onClick={ () => {
+                              setSelectedItem(i)
+                              handleSaveGrupoAnalisisTmp(grupo)
+                              handleSaveCamposAnalisisTmp(grupo, 'SAVE')
+                           } }
+                        />
 
-                           <ListItemSecondaryAction>
+                        <ListItemSecondaryAction>
 
-                              <Tooltip title='Editar Grupo' placement='top' arrow>
-                                 <IconButton
-                                    onClick={() => {
-                                       handleSaveGrupoAnalisisTmp(grupo)
-                                       modalEditarNombreGrupo.current.setOpen(true)
-                                    }}
-                                 >
-                                    <EditOutlined fontSize='small' />
-                                 </IconButton>
-                              </Tooltip>
+                           <Tooltip title='Editar Grupo' placement='top' arrow>
+                              <IconButton
+                                 onClick={() => {
+                                    handleSaveGrupoAnalisisTmp(grupo)
+                                    modalEditarNombreGrupo.current.setOpen(true)
+                                 }}
+                              >
+                                 <EditOutlined fontSize='small' />
+                              </IconButton>
+                           </Tooltip>
 
-                              <Tooltip title='Agregar campo' placement='top' arrow>
-                                 <IconButton
-                                    onClick={() => {
-                                       handleSaveGrupoAnalisisTmp(grupo)
-                                       modalAgregarCampo.current.setOpen(true)
-                                    }}
-                                 >
-                                    <AddCircleOutlined fontSize='small' />
-                                 </IconButton>
-                              </Tooltip>
+                           <Tooltip title='Agregar campo' placement='top' arrow>
+                              <IconButton
+                                 onClick={() => {
+                                    handleSaveGrupoAnalisisTmp(grupo)
+                                    modalAgregarCampo.current.setOpen(true)
+                                 }}
+                              >
+                                 <AddCircleOutlined fontSize='small' />
+                              </IconButton>
+                           </Tooltip>
 
-                              <Tooltip title='Eliminar Grupo' placement='top' arrow>
-                                 <IconButton
-                                    onClick={ () => {
-                                       handleSaveGrupoAnalisisTmp(grupo)
-                                       confirmEliminarGrupo.current.setIsOpen(true)
-                                    } }
-                                 >
-                                    <RemoveCircleOutlined fontSize='small' />
-                                 </IconButton>
-                              </Tooltip>
+                           <Tooltip title='Eliminar Grupo' placement='top' arrow>
+                              <IconButton
+                                 onClick={ () => {
+                                    handleSaveGrupoAnalisisTmp(grupo)
+                                    confirmEliminarGrupo.current.setIsOpen(true)
+                                 } }
+                              >
+                                 <RemoveCircleOutlined fontSize='small' />
+                              </IconButton>
+                           </Tooltip>
 
-                           </ListItemSecondaryAction>
+                        </ListItemSecondaryAction>
 
-                        </ListItemButton>
-                     </ListItemFade>
-                  ))
-               }
-            </List>
-         </Scrollbar>
+                     </ListItemButton>
+                  </ListItemFade>
+               ))
+            }
+         </List>
 
          {/* » MODAL: Editar grupo ... */}
          <SimpleModal ref={ modalEditarNombreGrupo }>
@@ -922,55 +928,53 @@ const ListaCamposAnalisis: FC = () => {
 
    return (
       <>
-         <Scrollbar>
-            <ListPuffLoader
-               loading={ loadingcamposTablaDinamicaDb || loadingExtraccionDb }
-               size={ 40 }
-            >
-               <List>
-                  {
-                     camposAnalisisTmp.map((metaCampo, i) => (
+         <ListPuffLoader
+            loading={ loadingcamposTablaDinamicaDb || loadingExtraccionDb }
+            size={ 40 }
+         >
+            <List>
+               {
+                  camposAnalisisTmp.map((metaCampo, i) => (
 
-                        <ListItemButton key={ metaCampo.nombre }>
-                           <ListItemText primary={
-                              <Box display='flex' gap={ 1 }>
-                                 <Typography variant='h4'>{ `${i + 1}►` }</Typography>
-                                 <Typography variant='h5'>{ metaCampo.nombre }</Typography>
-                              </Box>
-                           }
-                           />
+                     <ListItemButton key={ metaCampo.nombre }>
+                        <ListItemText primary={
+                           <Box display='flex' gap={ 1 }>
+                              <Typography variant='h4'>{ `${i + 1}►` }</Typography>
+                              <Typography variant='h5'>{ metaCampo.nombre }</Typography>
+                           </Box>
+                        }
+                        />
 
-                           <ListItemSecondaryAction>
+                        <ListItemSecondaryAction>
 
-                              <Tooltip title='Editar campo' placement='top' arrow>
-                                 <IconButton
-                                    onClick={() => {
-                                       setPrevMetaField(metaCampo)
-                                       modalEliminarCampo.current.setOpen(true)
-                                    }}
-                                 >
-                                    <EditOutlined fontSize='small' />
-                                 </IconButton>
-                              </Tooltip>
+                           <Tooltip title='Editar campo' placement='top' arrow>
+                              <IconButton
+                                 onClick={() => {
+                                    setPrevMetaField(metaCampo)
+                                    modalEliminarCampo.current.setOpen(true)
+                                 }}
+                              >
+                                 <EditOutlined fontSize='small' />
+                              </IconButton>
+                           </Tooltip>
 
-                              <Tooltip title='Eliminar campo' placement='top' arrow>
-                                 <IconButton
-                                    onClick={() => {
-                                       setPrevMetaField(metaCampo)
-                                       confirmEliminarCampo.current.setIsOpen(true)
-                                    }}
-                                 >
-                                    <RemoveCircleOutlined fontSize='small' />
-                                 </IconButton>
-                              </Tooltip>
-                           </ListItemSecondaryAction>
+                           <Tooltip title='Eliminar campo' placement='top' arrow>
+                              <IconButton
+                                 onClick={() => {
+                                    setPrevMetaField(metaCampo)
+                                    confirmEliminarCampo.current.setIsOpen(true)
+                                 }}
+                              >
+                                 <RemoveCircleOutlined fontSize='small' />
+                              </IconButton>
+                           </Tooltip>
+                        </ListItemSecondaryAction>
 
-                        </ListItemButton>
-                     ))
-                  }
-               </List>
-            </ListPuffLoader>
-         </Scrollbar>
+                     </ListItemButton>
+                  ))
+               }
+            </List>
+         </ListPuffLoader>
 
          {/* » MODAL: Editar campo ...  */}
          <SimpleModal ref={ modalEliminarCampo }>

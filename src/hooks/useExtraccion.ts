@@ -2,7 +2,7 @@ import { useCallback, useMemo } from 'react'
 
 import { AlterTableType, MetaCampoTablaDinamica, MetaFieldSqlType, PrefixMetaFieldSqlType, TablaDinamicaDto } from 'interfaces'
 
-import { useAppActions, useAppSelector, useAuth } from 'hooks'
+import { useAppActions, useAppSelector } from 'hooks'
 import { undecorateMetaFieldName } from 'helpers'
 
 export const useExtraccion = () => {
@@ -38,6 +38,7 @@ export const useExtraccion = () => {
 
    const {
       findAllTablaDinamica,
+      findTablaDinamicaByUsrCreador,
       createTablaExtraccion,
       updateNameTablaDinamica,
       deleteTablaExtraccion,
@@ -59,7 +60,7 @@ export const useExtraccion = () => {
       getRptControlMigratorio
    } = useAppActions()
 
-   const { userCredentials: { idUsuario: idCurrentUsr } } = useAuth()
+   /* const { userCredentials: { idUsuario: idCurrentUsr } } = useAuth() */
 
    /* ► HANDLER'S:  */
    const handleAlterFieldTablaDinamica = useCallback(async ({ lstGrupoCamposAnalisis, ...tablaDinamicaDtoRest }: Partial<TablaDinamicaDto>, metaCampo: Partial<MetaCampoTablaDinamica>, type: AlterTableType) => {
@@ -101,15 +102,16 @@ export const useExtraccion = () => {
             grupoCamposAnalisis: { idGrupo: tablaDinamicaDtoRest.grupoCamposAnalisis?.idGrupo }
          }
          await alterTablaDinamica(tablaDinamicaDtoRest)
-         findAllTablaDinamica()
+         findTablaDinamicaByUsrCreador()
          break
       }
    }, [])
 
    /* ► DEP'S  */
-   const extraccionDbFromCurrentUsr = useMemo(() => {
+   // Eliminar ...
+   /* const extraccionDbFromCurrentUsr = useMemo(() => {
       return extraccionDb.filter(({ usrCreador: { idUsuario } }) => idCurrentUsr === idUsuario) || []
-   }, [extraccionDb])
+   }, [extraccionDb]) */
 
    const camposExtraccionDb = useMemo(() => camposTablaDinamicaDb.filter(({ nombre }) => nombre.endsWith('_e')), [camposTablaDinamicaDb])
 
@@ -135,7 +137,6 @@ export const useExtraccion = () => {
    return {
       loadingExtraccionDb,
       extraccionDb,
-      extraccionDbFromCurrentUsr,
       loadingcamposTablaDinamicaDb,
       camposTablaDinamicaDb,
       camposExtraccionDb,
@@ -155,6 +156,7 @@ export const useExtraccion = () => {
 
       handleAlterFieldTablaDinamica,
       findAllTablaDinamica,
+      findTablaDinamicaByUsrCreador,
       createTablaExtraccion,
       updateNameTablaDinamica,
       deleteTablaExtraccion,

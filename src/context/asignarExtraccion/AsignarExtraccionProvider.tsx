@@ -51,11 +51,11 @@ export const AsignarExtraccionProvider: FC<ProviderProps> = ({ children }) => {
       errorTablaDinamicaDb,
       totalRegistrosTablaDinamica:
       totalRegistrosTD,
-      findAllTablaDinamica
+      findTablaDinamicaByUsrCreador
    } = useAsignarExtraccion()
 
    useEffect(() => { // ► When request error, call `action-creator` ...
-      Boolean(errorTablaDinamicaDb) && findAllTablaDinamica()
+      Boolean(errorTablaDinamicaDb) && findTablaDinamicaByUsrCreador()
    }, [errorTablaDinamicaDb])
 
    /* ► EFFECT'S ... */
