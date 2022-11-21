@@ -24,6 +24,7 @@ import {
    QueryStatsRounded,
    RemoveRedEyeRounded,
    SaveAsRounded,
+   SearchOffRounded,
    UnpublishedRounded
 } from '@mui/icons-material'
 import { GridColDef } from '@mui/x-data-grid'
@@ -42,7 +43,8 @@ import {
    SimpleModal,
    SimpleModalRefProps,
    SpeedDialBackdrop,
-   SpeedDialActionProps
+   SpeedDialActionProps,
+   StandarTooltip
 } from 'components'
 
 import { AnalizarExtraccionProvider, useAnalizarExtraccionContext } from 'context'
@@ -170,6 +172,24 @@ const commonGridColDef: Partial<GridColDef> = {
    align: 'center'
 }
 
+const renderShowResultOfQCAction = (asig: AsigGrupoCamposAnalisisDto) => {
+   // ► Dep's ...
+   const hasErrInQC = useMemo(() => !asig.ctrlCalConforme && asig.produccionAnalisis.some(p => p.metaFieldIdErrorCsv), [asig])
+
+   // ► Conditional render ...
+   if (!hasErrInQC) return <></>
+
+   return (
+      <StandarTooltip title='Ver resultado de Q.C.'>
+         <IconButton>
+            <SearchOffRounded />
+         </IconButton>
+      </StandarTooltip>
+   )
+}
+
+const hasErrInQC = (asig: AsigGrupoCamposAnalisisDto) => !asig.ctrlCalConforme && asig.produccionAnalisis.some(p => p.metaFieldIdErrorCsv)
+
 const BandejaEntrada: FC = () => {
    /* ► CONTEXT ... */
    const {
@@ -246,6 +266,11 @@ const BandejaEntrada: FC = () => {
             </IconButton>
          </Tooltip>
       }, {
+         field: '>>>>',
+         width: 50,
+         ...commonGridColDef,
+         renderCell: ({ row }) => renderShowResultOfQCAction(row)
+      }, {
          field: 'fechaAsignacion',
          headerName: 'Fecha Asignación',
          width: 110,
@@ -254,9 +279,16 @@ const BandejaEntrada: FC = () => {
          ...commonGridColDef
       }, {
          field: 'Estado',
+         type: 'boolean',
          width: 80,
          ...commonGridColDef,
          renderCell: ({ row }) => row.totalAsignados === row.totalAnalizados ? <CheckCircleRounded color='success' /> : <UnpublishedRounded color='disabled' />
+      }, {
+         field: 'Estado Q.C.',
+         type: 'boolean',
+         width: 80,
+         ...commonGridColDef,
+         renderCell: ({ row }) => hasErrInQC(row) ? <UnpublishedRounded color='disabled' /> : <CheckCircleRounded color='success' />
       }, {
          field: 'Base',
          minWidth: 250,
@@ -376,13 +408,19 @@ const HeaderBandejaEntrada: FC = () => {
 
    /* ► CUSTOM - HOOK'S ... */
    const {
+      asigGrupoCamposAnalisisDb,
       asigSummaryDb,
       loadingAsigGrupoCamposAnalisisDb
    } = useAnalizarExtraccion()
 
    const { currentScreen } = useBreakpoints()
 
-   /* ► RENDER CONDITIONAL ... */
+   // ► Dep's ...
+   const asigsNoConformeQA = useMemo(() => asigGrupoCamposAnalisisDb.filter(asig => {
+      return !asig.ctrlCalConforme && asig.produccionAnalisis.some(p => p.revisado && p.metaFieldIdErrorCsv)
+   }).length, [asigGrupoCamposAnalisisDb])
+
+   // ► RENDER CONDITIONAL ...
    if (currentScreen === 'mobileLandscape') return <></>
 
    return (
@@ -397,6 +435,7 @@ const HeaderBandejaEntrada: FC = () => {
                <InfoCard iconName='Assignment' title='Total Asignados' value={ applyCommaThousands(asigSummaryDb.totalAsignados) } />
                <InfoCard iconName='AssignmentComplete' title='Total Analizados' value={ applyCommaThousands(asigSummaryDb.totalAnalizados) } />
                <InfoCard iconName='AssignmentPendent' title='Total Pendientes' value={ applyCommaThousands(asigSummaryDb.totalPendientes) } />
+               <InfoCard iconName='ErrQC' title='Total Observados en Q.C.' value={ applyCommaThousands(asigsNoConformeQA) } />
             </Stack>
          </Fade>
       </Fade>
@@ -603,7 +642,7 @@ const AnalizarExtraccion: FC = () => {
                               gap={ 1 }
                            >
                               <Typography variant='h4' color='primary'>{ `${undecorateMetaFieldName(k, 'prefix | underscore | suffix')}: ` }</Typography>
-                              <Typography variant='h5' color='GrayText'>{ v }</Typography>
+                              <Typography variant='h4' color='GrayText'>{ v }</Typography>
                            </Box>
                         ))
                      }

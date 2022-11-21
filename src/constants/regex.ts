@@ -5,5 +5,5 @@ export const regex = {
    INPUT_INFO_REGEX: /^[a-zA-Z0-9_\-.;\sáéíóúñÑ]+$/gi,
    INPUT_LOGICO_REGEX: /^[\w\sáéíóúñÑ]+$/gi,
    INPUT_VALUE_LOGICO_REGEX: /^[^|]+$/g,
-   INPUT_FIELD_TEXT_REGEX: /^[^:,|{}=]*$/g
+   INPUT_FIELD_TEXT_REGEX: /^[^:,|{}='"]*$/g
 }

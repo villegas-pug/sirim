@@ -4,14 +4,17 @@ export const useControlCalidad = () => {
    // ► STORE - HOOK'S ...
    const {
       loading: loadingControlCalidadDb,
-      tabla: tablaCtrlCalDb
+      tabla: tablaCtrlCalDb,
+      asig: asigGrupoCamposAnalisisDb
    } = useAppSelector(store => store.controlCalidad)
 
    const {
       findTablaDinamicaByIdCtrlCalAndIds,
       saveCtrlCalCamposAnalisis,
       validateRecordAssigned,
-      saveMetaFieldIdErrorCsv
+      saveMetaFieldIdErrorCsv,
+      findAsigGrupoCamposAnalisisById,
+      setValidationResultOfCtrlCal
    } = useAppActions()
 
    // ► Handler's ...
@@ -19,10 +22,13 @@ export const useControlCalidad = () => {
    return {
       loadingControlCalidadDb,
       tablaCtrlCalDb,
+      asigGrupoCamposAnalisisDb,
 
       findTablaDinamicaByIdCtrlCalAndIds,
       saveCtrlCalCamposAnalisis,
       validateRecordAssigned,
-      saveMetaFieldIdErrorCsv
+      saveMetaFieldIdErrorCsv,
+      findAsigGrupoCamposAnalisisById,
+      setValidationResultOfCtrlCal
    }
 }

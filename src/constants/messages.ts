@@ -16,5 +16,5 @@ export const messages = {
    INPUT_GRUPO_ANALISIS_VALIDATION: '¡Caracteres no permitidos: (símbolos)!',
    INPUT_TIPO_LOGICO_VALIDATION: '¡Caracteres no permitidos: (Símbolos)!',
    INPUT_VALOR_TIPO_LOGICO_VALIDATION: '¡Caracteres no permitido: (|)!',
-   INPUT_FIELD_TEXT_REGEX_VALIDATION: '¡Caracteres no permitidos: (,), (:), ({}), (=) y (|).!'
+   INPUT_FIELD_TEXT_REGEX_VALIDATION: '¡Caracteres no permitidos: (,), (:), ({}), (=), (|), (\') y (").!'
 }

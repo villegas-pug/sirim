@@ -24,17 +24,19 @@ import {
    ClearRounded,
    DeleteForeverRounded,
    DoneAllRounded,
-   Forward10Rounded,
    HistoryToggleOffRounded,
    PersonOutlineRounded,
    PlaylistAddCheckCircleRounded,
    QueryStatsRounded,
+   RemoveDoneRounded,
    SearchRounded,
-   TroubleshootRounded
+   TroubleshootRounded,
+   VerifiedRounded
 } from '@mui/icons-material'
 import { styled } from '@mui/styles'
 import { Form, Formik } from 'formik'
 import { format, parseISO } from 'date-fns'
+import Zoom from 'react-reveal/Zoom'
 
 import { ControlCalidadProvider, useControlCalidadContext } from 'context'
 
@@ -42,7 +44,7 @@ import { BandejaProcesos, BootstrapTooltip, ListItemFade, ModalLoader, MySelect,
 
 import { useAuth, useControlCalidad, useExtraccion, useTipoLogico } from 'hooks'
 import { applyCommaThousands, undecorateMetaFieldName } from 'helpers'
-import { AsigGrupoCamposAnalisis, PrefixMetaFieldName, RegistroTablaDinamicaDto } from 'interfaces'
+import { AsigGrupoCamposAnalisis, AsigGrupoCamposAnalisisDto, PrefixMetaFieldName, RegistroTablaDinamicaDto } from 'interfaces'
 import { GridColDef } from '@mui/x-data-grid'
 
 const MainPaper = styled(Paper)({
@@ -51,13 +53,12 @@ const MainPaper = styled(Paper)({
 
 const ControlCalidadSubMod: FC = () => {
    // ► CUSTOM-HOOK'S ...
-   const { loadingExtraccionDb, findAllTablaDinamica } = useExtraccion()
+   const { loadingExtraccionDb, findTablaDinamicaByUsrCreador } = useExtraccion()
    const { loadingControlCalidadDb } = useControlCalidad()
-
    const { findAllUser, authLoading } = useAuth()
 
    // ► EFFECT'S ...
-   useEffect(() => { findAllTablaDinamica() }, [])
+   useEffect(() => { findTablaDinamicaByUsrCreador() }, [])
    useEffect(() => { findAllUser() }, [])
 
    return (
@@ -150,9 +151,9 @@ const ListaAsignaciones: FC = () => {
    const [selectedItem, setSelectedItem] = useState(-1)
 
    // ► CUSTOM-HOOK'S ...
-   const { findAllTablaDinamica } = useExtraccion()
+   const { findTablaDinamicaByUsrCreador } = useExtraccion()
 
-   const { saveCtrlCalCamposAnalisis } = useControlCalidad()
+   const { saveCtrlCalCamposAnalisis, setValidationResultOfCtrlCal } = useControlCalidad()
 
    // ► EFFECT'S ...
    useEffect(() => { // ► Clean-up: When `filteredAsigsGrupoCamposAnalisisTmp` change, selectItem is updated ...
@@ -162,8 +163,21 @@ const ListaAsignaciones: FC = () => {
    // ► HANDLER'S ...
    const handleGenerateRecordsToCtrlCal = async (idAsigGrupo: number): Promise<void> => {
       await saveCtrlCalCamposAnalisis(idAsigGrupo)
-      findAllTablaDinamica()
+      findTablaDinamicaByUsrCreador()
    }
+
+   const handleSelectedAsig = async (asig: AsigGrupoCamposAnalisisDto) => {
+      handleActionAsigGrupoCamposAnalisisTmp('SAVE', asig)
+      handleActionCtrlsCalCamposAnalisisTmp('SAVE', asig.ctrlsCalCamposAnalisis)
+   }
+
+   const handleSetValidationResultOfCtrlCal = async (asig: AsigGrupoCamposAnalisisDto) => {
+      asig.ctrlCalConforme = true
+      await setValidationResultOfCtrlCal(asig)
+      findTablaDinamicaByUsrCreador()
+   }
+
+   const isDisabledBtnGenerarRegistros = (asig: AsigGrupoCamposAnalisisDto) => asig.totalPendientes > 0 || asig.ctrlsCalCamposAnalisis.length > 0
 
    return (
       <>
@@ -181,10 +195,12 @@ const ListaAsignaciones: FC = () => {
                         selected={ selectedItem === i }
                         onClick={ () => {
                            setSelectedItem(i)
-                           handleActionAsigGrupoCamposAnalisisTmp('SAVE', asig)
-                           handleActionCtrlsCalCamposAnalisisTmp('SAVE', asig.ctrlsCalCamposAnalisis)
+                           handleSelectedAsig(asig)
                         } }
                      >
+                        <ListItemIcon>
+                           { asig.ctrlCalConforme ? <DoneAllRounded /> : <RemoveDoneRounded /> }
+                        </ListItemIcon>
                         <ListItemText primary={
                            <Stack
                               direction='row'
@@ -195,22 +211,46 @@ const ListaAsignaciones: FC = () => {
                                  { format(parseISO(asig.fechaAsignacion), 'dd-MM-yyyy') }
                               </Typography>
                               <Typography variant='h5'>
-                                 { `${applyCommaThousands(asig.regAnalisisIni)} - ${applyCommaThousands(asig.regAnalisisFin)}` }
+                                 { `Asignados: ${applyCommaThousands(asig.totalAsignados)}` }
                               </Typography>
                               <Typography variant='h5'>
-                                 { applyCommaThousands(asig.totalAsignados) }
+                                 { `Analizados: ${applyCommaThousands(asig.totalAnalizados)}` }
+                              </Typography>
+                              <Typography variant='h5'>
+                                 { `Pendientes: ${applyCommaThousands(asig.totalPendientes)}` }
                               </Typography>
                            </Stack>
                         } />
 
                         {/* ► Action's ...  */}
                         <ListItemSecondaryAction>
-                           <StandarTooltip title='Generar registros, para Control Calidad'>
+                           <StandarTooltip title={ `Generar el ${asig.grupo.tablaDinamica?.porcentajeQC}% de registros, para Q.C.` }>
                               <IconButton
-                                 size='small'
+                                 size='large'
+                                 disabled={ isDisabledBtnGenerarRegistros(asig) }
                                  onClick={ () => handleGenerateRecordsToCtrlCal(asig.idAsigGrupo) }
                               >
-                                 <Forward10Rounded />
+                                 <Typography
+                                    variant='h6'
+                                    color={ isDisabledBtnGenerarRegistros(asig) ? '#D2D2D2' : '#004795' }
+                                    sx={{ width: 18 }}
+                                 >
+                                    { `${asig.grupo.tablaDinamica?.porcentajeQC}%` }
+                                 </Typography>
+                              </IconButton>
+                           </StandarTooltip>
+                           <StandarTooltip title='Calidad conforme'>
+                              <IconButton
+                                 size='large'
+                                 disabled={
+                                    asig.totalPendientes > 0 ||
+                                    asig.ctrlsCalCamposAnalisis.length === 0 ||
+                                    asig.produccionAnalisis.some(p => p.revisado) === false ||
+                                    asig.ctrlCalConforme
+                                 }
+                                 onClick={ () => handleSetValidationResultOfCtrlCal(asig) }
+                              >
+                                 <VerifiedRounded />
                               </IconButton>
                            </StandarTooltip>
                         </ListItemSecondaryAction>
@@ -379,6 +419,7 @@ const BandejaControlCalidad: FC = () => {
    const { findAllTipoLogico } = useTipoLogico()
 
    // ► EFFECT'S ...
+   useEffect(() => { findAllTipoLogico() }, [])
 
    // ► DEP'S ...
    const dgColumns = useMemo<Array<GridColDef<RegistroTablaDinamicaDto>>>(() => ([
@@ -389,7 +430,6 @@ const BandejaControlCalidad: FC = () => {
          renderCell: ({ row }) => <Tooltip title='Revisar' placement='left-start' arrow>
             <IconButton
                onClick={ async () => {
-                  await findAllTipoLogico()
                   handleActionRegistroCtrlCalidadTmp('SAVE', row)
                   modalCtrlCalidad.current.setOpen(true)
                } }
@@ -437,14 +477,16 @@ const BandejaControlCalidad: FC = () => {
          {/* <HeaderBandejaAnalisis /> */}
 
          {/* ► BODY ... */}
-         <SimpleDataGrid
-            columns={ dgColumns }
-            rows={ tablaCtrlCalidadTmp }
-            pageSize={ 4 }
-            getRowId={ row => row.nId }
-            localStoragePageKey='CONTROL_CALIDAD_BANDEJA_CTRLCAL_NROPAG'
-            sx={{ width: '90vw' }}
-         />
+         <Zoom when={ tablaCtrlCalidadTmp.length }>
+            <SimpleDataGrid
+               columns={ dgColumns }
+               rows={ tablaCtrlCalidadTmp }
+               pageSize={ 4 }
+               getRowId={ row => row.nId }
+               localStoragePageKey='CONTROL_CALIDAD_BANDEJA_CTRLCAL_NROPAG'
+               sx={{ width: '90vw' }}
+            />
+         </Zoom>
 
          {/* ► MODAL: Analisis ... */}
          <SimpleModal ref={ modalCtrlCalidad }>
@@ -471,7 +513,7 @@ const ControlCalidad: FC = () => {
       validateRecordAssigned
    } = useControlCalidad()
 
-   const { findAllTablaDinamica } = useExtraccion()
+   const { findTablaDinamicaByUsrCreador } = useExtraccion()
 
    // ► HANDLER'S ...
 
@@ -543,7 +585,7 @@ const ControlCalidad: FC = () => {
                   observacionesCtrlCal
                })
 
-               findAllTablaDinamica()
+               findTablaDinamicaByUsrCreador()
             } }>
             {(formikprops) => (
                <Form>
@@ -598,7 +640,7 @@ const InputControlCalidad: FC<{k: string}> = ({ k }) => {
    // ► CUSTOM - HOOK'S ...
    const { optValoresTiposCurrentGrupoAuth } = useTipoLogico()
    const { saveMetaFieldIdErrorCsv } = useControlCalidad()
-   const { findAllTablaDinamica } = useExtraccion()
+   const { findTablaDinamicaByUsrCreador } = useExtraccion()
 
    // ► DEP'S ...
    const prefix = useMemo(() => k.substring(0, 1) as PrefixMetaFieldName, [k])
@@ -643,7 +685,7 @@ const InputControlCalidad: FC<{k: string}> = ({ k }) => {
          metaFieldIdErrorCsv: label,
          hasFieldError: e.target.checked
       })
-      findAllTablaDinamica()
+      findTablaDinamicaByUsrCreador()
    }
 
    return (

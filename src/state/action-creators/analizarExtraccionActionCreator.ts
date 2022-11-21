@@ -102,11 +102,11 @@ export const saveRecordAssigned = (recordAssignedDto: Partial<RegistroTablaDinam
 export const downloadAnalisadosByDates = (recordAssigned: Partial<RecordsBetweenDatesDto>) => async (dispatch: Dispatch<AnalizarExtraccionAction>, getState: () => any): Promise<void> => {
    dispatch({ type: '[Analizar-Extracción] Download analisados by dates loading' })
    try {
-      const { usuario: { token } } = getState()
+      const { usuario: { token, userCredentials } } = getState()
       const { data, headers } = await api({
          method: 'POST',
          url: '/microservicio-rimanalisis/downloadAnalisadosByDates',
-         data: recordAssigned,
+         data: { ...recordAssigned, usr: userCredentials },
          responseType: 'blob',
          headers: {
             [AUTHORIZATION]: token

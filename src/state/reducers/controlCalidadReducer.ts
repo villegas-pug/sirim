@@ -1,11 +1,12 @@
 import { ControlCalidadAction } from 'state/actions'
 
-import { RegistroTablaDinamicaDto } from 'interfaces'
+import { AsigGrupoCamposAnalisisDto, RegistroTablaDinamicaDto } from 'interfaces'
 
 type ControlCalidadReducerState = {
    loading: boolean
    data: [],
    tabla: Array<RegistroTablaDinamicaDto>
+   asig: AsigGrupoCamposAnalisisDto
    error: string | null
 }
 
@@ -13,6 +14,7 @@ const INITIAL_STATE: ControlCalidadReducerState = {
    loading: false,
    data: [],
    tabla: [],
+   asig: {} as AsigGrupoCamposAnalisisDto,
    error: null
 }
 
@@ -34,10 +36,19 @@ export const controlCalidadReducer = (state: ControlCalidadReducerState = INITIA
    case '[Control-Calidad] validateRecordAssigned error':
       return { ...state, loading: false, tabla: [], error: action.payload }
    case '[Control-Calidad] saveMetaFieldIdErrorCsv loading':
+   case '[Control-Calidad] setValidationResultOfCtrlCal loading':
       return { ...state, loading: true }
    case '[Control-Calidad] saveMetaFieldIdErrorCsv success':
+   case '[Control-Calidad] setValidationResultOfCtrlCal success':
       return { ...state, loading: false }
    case '[Control-Calidad] saveMetaFieldIdErrorCsv error':
+   case '[Control-Calidad] setValidationResultOfCtrlCal error':
+      return { ...state, loading: false, error: action.payload }
+   case '[Control-Calidad] findAsigGrupoCamposAnalisisById loading':
+      return { ...state, loading: true, error: null }
+   case '[Control-Calidad] findAsigGrupoCamposAnalisisById success':
+      return { ...state, loading: false, asig: action.payload, error: null }
+   case '[Control-Calidad] findAsigGrupoCamposAnalisisById error':
       return { ...state, loading: false, error: action.payload }
    default:
       return state

@@ -6,7 +6,7 @@ import { ControlCalidadAction } from 'state/actions'
 
 import { noty } from 'helpers'
 import { localStorage } from 'constants/'
-import { RegistroTablaDinamicaDto, Response } from 'interfaces'
+import { AsigGrupoCamposAnalisisDto, RegistroTablaDinamicaDto, Response } from 'interfaces'
 
 const { AUTHORIZATION } = localStorage
 
@@ -124,6 +124,65 @@ export const saveMetaFieldIdErrorCsv = (registroTablaDinamica: Partial<RegistroT
       }
    } catch (err: any) {
       dispatch({ type: '[Control-Calidad] saveMetaFieldIdErrorCsv error', payload: err?.message })
+      dispatch({ type: '[http-status] Response status', payload: err?.response?.status })
+   }
+}
+
+export const findAsigGrupoCamposAnalisisById = (idAsigGrupo: number) => async (dispatch: Dispatch<ControlCalidadAction>, getState: () => any): Promise<void> => {
+   dispatch({ type: '[Control-Calidad] findAsigGrupoCamposAnalisisById loading' })
+   try {
+      const { usuario: { token } } = getState()
+      const { data: { levelLog, data, message } } = await api.request<Response<AsigGrupoCamposAnalisisDto>>({
+         method: 'GET',
+         url: '/microservicio-rimctrlcalidad/findAsigGrupoCamposAnalisisById',
+         params: { idAsigGrupo },
+         headers: {
+            [AUTHORIZATION]: token
+         }
+      })
+
+      switch (levelLog) {
+      case 'SUCCESS':
+         dispatch({ type: '[Control-Calidad] findAsigGrupoCamposAnalisisById success', payload: data })
+         break
+      case 'WARNING':
+      case 'ERROR':
+         dispatch({ type: '[Control-Calidad] findAsigGrupoCamposAnalisisById error', payload: message })
+         noty('error', message)
+         break
+      }
+   } catch (err: any) {
+      dispatch({ type: '[Control-Calidad] findAsigGrupoCamposAnalisisById error', payload: err?.message })
+      dispatch({ type: '[http-status] Response status', payload: err?.response?.status })
+   }
+}
+
+export const setValidationResultOfCtrlCal = (asigGrupoCamposAnalisis: AsigGrupoCamposAnalisisDto) => async (dispatch: Dispatch<ControlCalidadAction>, getState: () => any): Promise<void> => {
+   dispatch({ type: '[Control-Calidad] setValidationResultOfCtrlCal loading' })
+   try {
+      const { usuario: { token } } = getState()
+      const { data: { levelLog, message } } = await api.request<Response<[]>>({
+         method: 'PUT',
+         url: '/microservicio-rimctrlcalidad/setValidationResultOfCtrlCal',
+         data: asigGrupoCamposAnalisis,
+         headers: {
+            [AUTHORIZATION]: token
+         }
+      })
+
+      switch (levelLog) {
+      case 'SUCCESS':
+         dispatch({ type: '[Control-Calidad] setValidationResultOfCtrlCal success' })
+         noty('success', message)
+         break
+      case 'WARNING':
+      case 'ERROR':
+         dispatch({ type: '[Control-Calidad] setValidationResultOfCtrlCal error', payload: message })
+         noty('error', message)
+         break
+      }
+   } catch (err: any) {
+      dispatch({ type: '[Control-Calidad] setValidationResultOfCtrlCal error', payload: err?.message })
       dispatch({ type: '[http-status] Response status', payload: err?.response?.status })
    }
 }

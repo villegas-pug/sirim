@@ -1,4 +1,4 @@
-import { RegistroTablaDinamicaDto } from 'interfaces'
+import { AsigGrupoCamposAnalisisDto, RegistroTablaDinamicaDto } from 'interfaces'
 import { ResponseHttpStatusType } from 'state/actions/httpStatusAction'
 
 interface SaveCtrlCalCamposAnalisisLoading {
@@ -55,6 +55,33 @@ interface SaveMetaFieldIdErrorCsvError {
    payload: string | null
 }
 
+interface FindAsigGrupoCamposAnalisisByIdLoading {
+   type: '[Control-Calidad] findAsigGrupoCamposAnalisisById loading'
+}
+
+interface FindAsigGrupoCamposAnalisisByIdSuccess {
+   type: '[Control-Calidad] findAsigGrupoCamposAnalisisById success'
+   payload: AsigGrupoCamposAnalisisDto
+}
+
+interface FindAsigGrupoCamposAnalisisByIdError {
+   type: '[Control-Calidad] findAsigGrupoCamposAnalisisById error'
+   payload: string | null
+}
+
+interface SetValidationResultOfCtrlCalLoading {
+   type: '[Control-Calidad] setValidationResultOfCtrlCal loading'
+}
+
+interface SetValidationResultOfCtrlCalSuccess {
+   type: '[Control-Calidad] setValidationResultOfCtrlCal success'
+}
+
+interface SetValidationResultOfCtrlCalError {
+   type: '[Control-Calidad] setValidationResultOfCtrlCal error'
+   payload: string | null
+}
+
 export type ControlCalidadAction =
    | ResponseHttpStatusType
    | SaveCtrlCalCamposAnalisisLoading
@@ -69,3 +96,9 @@ export type ControlCalidadAction =
    | SaveMetaFieldIdErrorCsvLoading
    | SaveMetaFieldIdErrorCsvSuccess
    | SaveMetaFieldIdErrorCsvError
+   | FindAsigGrupoCamposAnalisisByIdLoading
+   | FindAsigGrupoCamposAnalisisByIdSuccess
+   | FindAsigGrupoCamposAnalisisByIdError
+   | SetValidationResultOfCtrlCalLoading
+   | SetValidationResultOfCtrlCalSuccess
+   | SetValidationResultOfCtrlCalError

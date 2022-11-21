@@ -98,8 +98,8 @@ const InfoCardControlMigratorio: FC = () => {
             >
                <InfoCard iconName='PlaneEntry' title='Total Entradas' value={ applyCommaThousands(totalEntradas) } />
                <InfoCard iconName='PlaneTakeOff' title='Total Salidas' value={ applyCommaThousands(totalSalidas) } />
-               <InfoCard iconName='GirlRounded' title='Total Femenino' value={ applyCommaThousands(totalFemenino) } />
-               <InfoCard iconName='BoyRounded' title='Total Masculino' value={ applyCommaThousands(totalMasculino) } />
+               <InfoCard iconName='GirlRounded' title='Total Mujeres' value={ applyCommaThousands(totalFemenino) } />
+               <InfoCard iconName='BoyRounded' title='Total Hombres' value={ applyCommaThousands(totalMasculino) } />
             </Stack>
          </Fade>
       </Fade>
@@ -125,12 +125,12 @@ const FilterRptControlMigratorio: FC = () => {
                   año: 2022,
                   nacionalidad: ''
                }}
-               onSubmit={ async (values: { año: number, nacionalidad: string }, meta): Promise<any> => {
-                  getRptAñosControlMigratorio()
-                  getRptControlMigratorio(values.año, values.nacionalidad)
-                  getRptDependenciaControlMigratorio(values.año, values.nacionalidad)
+               onSubmit={ async (values: { año: number, nacionalidad: string }, meta): Promise<void> => {
+                  await getRptAñosControlMigratorio()
+                  await getRptControlMigratorio(values.año, values.nacionalidad)
+                  await getRptDependenciaControlMigratorio(values.año, values.nacionalidad)
+                  await getRptNacionalidadControlMigratorio(values.año)
                   getRptEdadesControlMigratorio(values.año, values.nacionalidad)
-                  getRptNacionalidadControlMigratorio(values.año)
                } }>
                {(formikProps) => (
                   <Form>
@@ -217,6 +217,7 @@ const RptControlMigratorioAnual: FC = () => {
             colorFirstBar={ '#6EADDC' }
             colorSecondBar={ '#FBB614' }
             titleXAxis={ 'Control Anual' }
+            showLegend
             customTooltip={(props) => (
                <CustomTooltip { ...props }>
                   {({ payload }) => (
@@ -271,13 +272,7 @@ const RptControlMigratorioNacionalidad: FC = () => {
    const { currentScreen } = useBreakpoints()
 
    const WIDTH_CHART = useMemo(() => currentScreen === 'desktopWide' ? 500 : 400, [currentScreen])
-
-   const HEIGHT_CHART = useMemo(() => {
-      const height = currentScreen === 'desktopWide'
-         ? rptNacionalidadControlMigratorioDb.length * 2
-         : rptNacionalidadControlMigratorioDb.length * 22
-      return height
-   }, [currentScreen, rptNacionalidadControlMigratorioDb])
+   const HEIGHT_CHART = useMemo(() => rptNacionalidadControlMigratorioDb.length * 22, [currentScreen, rptNacionalidadControlMigratorioDb])
    const HEIGHT_CONTAINER = useMemo(() => currentScreen === 'desktopWide' ? 230 : 150, [currentScreen])
 
    return (
@@ -291,6 +286,7 @@ const RptControlMigratorioNacionalidad: FC = () => {
                borderColorBar='#00E4FF'
                yAxisDataKey='nacionalidad'
                barDataKey='totalCtrlMig'
+               barWidth={ 10 }
                customTooltip={(props) => (
                   <CustomTooltip { ...props }>
                      {({ payload }) => (

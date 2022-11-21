@@ -38,6 +38,7 @@ export const useExtraccion = () => {
 
    const {
       findAllTablaDinamica,
+      findAllTablaDinamicaOnlyNombres,
       findTablaDinamicaByUsrCreador,
       createTablaExtraccion,
       updateNameTablaDinamica,
@@ -156,6 +157,7 @@ export const useExtraccion = () => {
 
       handleAlterFieldTablaDinamica,
       findAllTablaDinamica,
+      findAllTablaDinamicaOnlyNombres,
       findTablaDinamicaByUsrCreador,
       createTablaExtraccion,
       updateNameTablaDinamica,

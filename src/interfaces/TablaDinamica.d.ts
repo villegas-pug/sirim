@@ -7,6 +7,7 @@ export interface TablaDinamica {
    metaFieldsCsv: string
    usrCreador: Usuario
    lstGrupoCamposAnalisis: GrupoCamposAnalisis[]
+   porcentajeQC: number
    fechaCreacion: string
    activo: boolean
 }

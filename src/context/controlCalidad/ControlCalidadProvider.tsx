@@ -118,7 +118,10 @@ export const ControlCalidadProvider: FC<{ children: ReactElement | ReactElement[
    const handleActionAsigGrupoCamposAnalisisTmp = (action: Action, asig?: AsigGrupoCamposAnalisisDto): void => {
       switch (action) {
       case 'SAVE':
-         dispatch({ type: '[asigGrupoCamposAnalisisTmp] Save', payload: asig! })
+         dispatch({
+            type: '[asigGrupoCamposAnalisisTmp] Save',
+            payload: asig!
+         })
          break
       case 'RESET':
          dispatch({ type: '[asigGrupoCamposAnalisisTmp] Save', payload: {} as AsigGrupoCamposAnalisisDto })
@@ -236,19 +239,19 @@ const findAsigsGrupoCamposAnalisisByUsr = (tablaDinamica: TablaDinamicaDto[], us
 type ParamsFiltro = Pick<AsigGrupoCamposAnalisis, 'fechaAsignacion' | 'ctrlCalConforme'>
 const findAsigsGrupoCamposAnalisisByParams = (asigs: AsigGrupoCamposAnalisisDto[], filtro: Partial<ParamsFiltro>): AsigGrupoCamposAnalisisDto[] => {
    // ► Si recibe filtros vacios ...
-   if (!filtro.fechaAsignacion && !filtro.ctrlCalConforme) return asigs
+   if (!filtro.fechaAsignacion && String(filtro.ctrlCalConforme).trim() === '') return asigs
 
    const asigsGrupoCamposAnalisis = asigs
       .filter(({ fechaAsignacion, ctrlCalConforme }) => {
-         // ► Si únicamente recibe filtro `fechaAsignacion` ...
-         if (filtro.fechaAsignacion && !filtro.ctrlCalConforme) {
+         if (filtro.fechaAsignacion && String(filtro.ctrlCalConforme).trim() === '') { // ► Si únicamente recibe filtro `fechaAsignacion` ...
             return fechaAsignacion === filtro.fechaAsignacion
-         // ► Si únicamente recibe filtro `ctrlCalConforme` ...
-         } else if (!filtro.fechaAsignacion && filtro.ctrlCalConforme) {
-            return ctrlCalConforme === filtro.ctrlCalConforme
          }
 
-         return fechaAsignacion === filtro.fechaAsignacion && ctrlCalConforme === filtro.ctrlCalConforme
+         if (!filtro.fechaAsignacion && String(filtro.ctrlCalConforme).trim() !== '') { // ► Si únicamente recibe filtro `ctrlCalConforme` ...
+            return ctrlCalConforme === Boolean(filtro.ctrlCalConforme)
+         }
+
+         return fechaAsignacion === filtro.fechaAsignacion && ctrlCalConforme === Boolean(filtro.ctrlCalConforme)
       })
 
    return asigsGrupoCamposAnalisis
@@ -268,7 +271,7 @@ const assignPropsToTablaCtrlCalTmp = (asigGrupoCamposAnalisis: AsigGrupoCamposAn
    if (Object.entries(asigGrupoCamposAnalisis).length === 0) return []
 
    const someFieldsFromProduccionAnalisis: SomeFieldsFromProduccionAnalisis =
-   asigGrupoCamposAnalisis?.produccionAnalisis.reduce((map, prod) => {
+   asigGrupoCamposAnalisis.produccionAnalisis?.reduce((map, prod) => {
       map[prod.idRegistroAnalisis] = {
          revisado: prod.revisado,
          metaFieldIdErrorCsv: prod.metaFieldIdErrorCsv,

@@ -277,6 +277,20 @@ interface GetRptControlMigratorioError {
    payload: string | null
 }
 
+interface FindAllTablaDinamicaOnlyNombresLoading {
+   type: '[Extracción] findAllTablaDinamicaOnlyNombres loading'
+}
+
+interface FindAllTablaDinamicaOnlyNombresSuccess {
+   type: '[Extracción] findAllTablaDinamicaOnlyNombres success'
+   payload: Array<TablaDinamicaDto>
+}
+
+interface FindAllTablaDinamicaOnlyNombresError {
+   type: '[Extracción] findAllTablaDinamicaOnlyNombres error'
+   payload: string | null
+}
+
 export type ExtraccionAction =
    | ResponseHttpStatusType
    | CreateTablaExtracciónLoading
@@ -339,3 +353,6 @@ export type ExtraccionAction =
    | GetRptControlMigratorioLoading
    | GetRptControlMigratorioSuccess
    | GetRptControlMigratorioError
+   | FindAllTablaDinamicaOnlyNombresLoading
+   | FindAllTablaDinamicaOnlyNombresSuccess
+   | FindAllTablaDinamicaOnlyNombresError

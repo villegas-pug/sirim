@@ -15,7 +15,8 @@ import {
    Tooltip,
    Button,
    CircularProgress,
-   TextField
+   TextField,
+   InputAdornment
 } from '@mui/material'
 import {
    AddCircleRounded,
@@ -31,7 +32,8 @@ import {
    EditOutlined,
    AddCircleOutlined,
    HistoryOutlined,
-   DownloadRounded
+   DownloadRounded,
+   PercentRounded
 } from '@mui/icons-material'
 import { styled } from '@mui/styles'
 import { Formik, Form, FormikHelpers } from 'formik'
@@ -368,23 +370,41 @@ const ListaTablasExtraccion: FC = () => {
          <SimpleModal ref={ modalEditNombreTabla }>
             <Formik
                initialValues={{
-                  nombre: tablaDinamicaDto.nombre
+                  nombre: tablaDinamicaDto.nombre,
+                  porcentajeQC: tablaDinamicaDto.porcentajeQC
                }}
                validationSchema={Yup.object({
-                  nombre: Yup.string().required('¡Campo requerido!').matches(/^[a-zA-Z_0-9]+$/gi, '¡Caracter no permitido!')
+                  nombre: Yup.string().required('¡Campo requerido!').matches(/^[a-zA-Z_0-9]+$/gi, '¡Caracter no permitido!'),
+                  porcentajeQC: Yup.number().required('¡Campo requerido!').min(1, '¡El porcentaje mínimo es 1!')
                })}
                onSubmit={ async (values: Partial<TablaDinamica>, meta: FormikHelpers<Partial<TablaDinamica>>): Promise<any> => {
                   await updateNameTablaDinamica({
                      idTabla: tablaDinamicaDto.idTabla,
-                     nombre: values.nombre ?? ''
+                     nombre: values.nombre,
+                     porcentajeQC: values.porcentajeQC
                   })
                   meta.resetForm()
                   modalEditNombreTabla.current.setOpen(false)
                }}>
                {() => (
                   <Form>
-                     <Box width={390} display='flex' justifyContent='space-between' alignItems='flex-start' >
-                        <MyTextField type='text' name='nombre' label='Nombre tabla' width={20} focused />
+                     <Box display='flex' justifyContent='space-between' alignItems='flex-start' gap={ 1 } >
+                        <MyTextField type='text' name='nombre' label='Nombre tabla' width={ 30 } focused />
+                        <MyTextField
+                           type='number'
+                           name='porcentajeQC'
+                           label='Porcentaje Q.C.'
+                           width={ 6 }
+                           muiProps={{
+                              InputProps: {
+                                 endAdornment: (
+                                    <InputAdornment position='end'>
+                                       <PercentRounded />
+                                    </InputAdornment>
+                                 )
+                              }
+                           }}
+                        />
                         <Button
                            type='submit'
                            variant='contained'

@@ -83,6 +83,34 @@ export const findAllTablaDinamica = () => async (dispatch: Dispatch<ExtraccionAc
    }
 }
 
+export const findAllTablaDinamicaOnlyNombres = () => async (dispatch: Dispatch<ExtraccionAction | AsignarExtraccionAction>, getState: any): Promise<void> => {
+   dispatch({ type: '[Extracción] findAllTablaDinamicaOnlyNombres loading' })
+   try {
+      const { usuario: { token } } = getState()
+      const { data: { levelLog, data, message } } = await api.request<Response<TablaDinamicaDto[]>>({
+         method: 'GET',
+         url: '/microservicio-rimcommon/findAllTablaDinamicaOnlyNombres',
+         headers: {
+            [AUTHORIZATION]: token
+         }
+      })
+
+      switch (levelLog) {
+      case 'SUCCESS':
+         dispatch({ type: '[Extracción] findAllTablaDinamicaOnlyNombres success', payload: data })
+         break
+      case 'WARNING':
+      case 'ERROR':
+         dispatch({ type: '[Extracción] findAllTablaDinamicaOnlyNombres error', payload: message })
+         noty('error', message)
+         break
+      }
+   } catch (err: any) {
+      dispatch({ type: '[Extracción] findAllTablaDinamicaOnlyNombres error', payload: err.response?.status })
+      dispatch({ type: '[http-status] Response status', payload: err.response?.status })
+   }
+}
+
 export const findTablaDinamicaByUsrCreador = () => async (dispatch: Dispatch<ExtraccionAction | AsignarExtraccionAction>, getState: any): Promise<void> => {
    dispatch({ type: '[Extracción] findTablaDinamicaByUsrCreador loading' })
    dispatch({ type: '[Asignar-Extracción] findTablaDinamicaByUsrCreador loading' })

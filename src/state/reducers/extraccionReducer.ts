@@ -86,17 +86,20 @@ export const extraccionReducer = (state: ExtraccionState = initialState, action:
    case '[Extracción] findTablaDinamicaByUsrCreador loading':
    case '[Extracción] Save grupo analisis loading':
    case '[Extracción] Delete grupo analisis by id loading':
+   case '[Extracción] findAllTablaDinamicaOnlyNombres loading':
       return { ...state, loading: true, error: null }
    case '[Extracción] Create new table success':
    case '[Extracción] Find all tabla dinámica success':
    case '[Extracción] findTablaDinamicaByUsrCreador success':
    case '[Extracción] Save grupo analisis success':
+   case '[Extracción] findAllTablaDinamicaOnlyNombres success':
       return { ...state, loading: false, data: action.payload, error: null }
    case '[Extracción] Create new table error':
    case '[Extracción] Find all tabla dinamica error':
    case '[Extracción] findTablaDinamicaByUsrCreador error':
    case '[Extracción] Save grupo analisis error':
    case '[Extracción] Delete grupo analisis by id error':
+   case '[Extracción] findAllTablaDinamicaOnlyNombres error':
       return { ...state, loading: false, error: action.payload }
    case '[Extracción] Delete grupo analisis by id success':
       return { ...state, loading: false, error: null }

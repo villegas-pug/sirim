@@ -107,12 +107,12 @@ const InfoCardControlMigratorio: FC = () => {
                <InfoCard iconName='Persons' title='Personas' value={ applyCommaThousands(personas || 0) } />
                <InfoCard
                   iconName='GirlRounded'
-                  title='Mujeres'
+                  title='(%) Mujeres'
                   value={ `${applyCommaThousands(((mujeres / personas) * 100) || 0)}%` }
                />
                <InfoCard
                   iconName='BoyRounded'
-                  title='Hombres'
+                  title='(%) Hombres'
                   value={ `${applyCommaThousands(((hombres / personas) * 100) || 0)}%` }
                />
             </Stack>

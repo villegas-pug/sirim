@@ -63,7 +63,9 @@ import {
    GirlRounded,
    StyleRounded,
    LibraryAddCheckRounded,
-   Groups3Rounded
+   Groups3Rounded,
+   KeyboardDoubleArrowDownRounded,
+   NewReleasesRounded
 } from '@mui/icons-material'
 
 const classes: { [key: string]: CSSProperties } = {
@@ -110,6 +112,7 @@ export const elementIcons = {
    QueryBuilderRounded: <QueryBuilderRounded color='action' style={ classes.subModIcon }/>,
    StackedLineChartRounded: <StackedLineChartRounded color='action' style={ classes.subModIcon }/>,
    StyleRounded: <StyleRounded color='action' style={ classes.subModIcon }/>,
+   KeyboardDoubleArrowDownRounded: <KeyboardDoubleArrowDownRounded color='action' style={ classes.subModIcon }/>,
 
    Test: <Build />,
    Cloud: <Cloud />,
@@ -137,7 +140,8 @@ export const elementIcons = {
    GirlRounded: <GirlRounded fontSize='large' />,
    Passport: <StyleRounded fontSize='large' />,
    PassportValid: <LibraryAddCheckRounded fontSize='large' />,
-   Persons: <Groups3Rounded fontSize='large' />
+   Persons: <Groups3Rounded fontSize='large' />,
+   ErrQC: <NewReleasesRounded fontSize='large' />
 
 }
 
