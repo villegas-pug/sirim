@@ -141,6 +141,6 @@ const convertCsvToMetaCampoTablaDinamica = (grupoAnalisis: GrupoCamposAnalisis):
       .map(mf => mf.trim())
       .map(mf => {
          const meta = mf.split('|')
-         return { nombre: meta[0].trim(), tipo: meta[1].trim() as MetaFieldSqlType, info: meta[2].trim() }
+         return { nombre: meta[0].trim(), tipo: meta[1].trim() as MetaFieldSqlType, info: meta[2].trim(), obligatorio: meta[3].trim() === 'true' }
       }) || []
 }

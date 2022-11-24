@@ -17,7 +17,7 @@ export const findAsigAnalisisByUsr = () => async (dispatch: Dispatch<AnalizarExt
       const { usuario: { token, userCredentials } } = getState()
       const { data: { levelLog, data, message } } = await api.request<Response<AsigGrupoCamposAnalisisDto[]>>({
          method: 'POST',
-         url: '/microservicio-rimasignacion/findAsigAnalisisByUsr',
+         url: '/microservicio-rimcommon/findAsigAnalisisByUsr',
          data: userCredentials,
          headers: {
             [AUTHORIZATION]: token

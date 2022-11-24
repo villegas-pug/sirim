@@ -193,7 +193,7 @@ const prefixMetaFieldSqlType: PrefixMetaFieldSqlType = {
    bit: 'b'
 }
 
-const decorateMetaFieldByAlterType = ({ nombre, tipo, info }: Partial<MetaCampoTablaDinamica>, type: AlterTableType): string => {
+const decorateMetaFieldByAlterType = ({ nombre, tipo, info, obligatorio }: Partial<MetaCampoTablaDinamica>, type: AlterTableType): string => {
    switch (type) {
    case 'ADD_COLUMN_E':
    case 'ALTER_COLUMN_E':
@@ -201,9 +201,9 @@ const decorateMetaFieldByAlterType = ({ nombre, tipo, info }: Partial<MetaCampoT
    case 'ADD_COLUMN_A':
    case 'ALTER_COLUMN_A':
       if (tipo! in prefixMetaFieldSqlType) {
-         return `${prefixMetaFieldSqlType[tipo!]}${nombre}_a | ${tipo} | ${info}`
+         return `${prefixMetaFieldSqlType[tipo!]}${nombre}_a | ${tipo} | ${info} | ${obligatorio}`
       } else {
-         return `b${nombre}_a | ${tipo} | ${info}`
+         return `b${nombre}_a | ${tipo} | ${info} | ${obligatorio}`
       }
    default:
       return ''
@@ -239,7 +239,8 @@ const convertMetaFieldCsvToMetaCampoTablaDinamica = (metaFieldCsv: string): Meta
          metaCamposTablaDinamica.push({
             nombre: undecorateMetaFieldName(meta[0], 'prefix | suffix'),
             tipo: meta[1] as MetaFieldSqlType,
-            info: meta[2]
+            info: meta[2],
+            obligatorio: meta[3]?.trim() === 'true'
          })
       })
 

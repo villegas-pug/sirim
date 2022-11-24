@@ -36,6 +36,7 @@ export interface MetaCampoTablaDinamica {
    nombre: string
    tipo: MetaFieldSqlType
    info: string
+   obligatorio: boolean
 }
 
 /* export interface AsigGrupoCamposAnalisisDto extends AsigGrupoCamposAnalisis {

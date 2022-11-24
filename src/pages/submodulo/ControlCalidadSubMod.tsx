@@ -40,7 +40,7 @@ import Zoom from 'react-reveal/Zoom'
 
 import { ControlCalidadProvider, useControlCalidadContext } from 'context'
 
-import { BandejaProcesos, BootstrapTooltip, ListItemFade, ModalLoader, MySelect, MySelectItem, MyTextField, Scrollbar, SimpleDataGrid, SimpleModal, SimpleModalRefProps, StandarTooltip } from 'components'
+import { BandejaProcesos, BootstrapTooltip, LinearWithValueLabel, ListItemFade, ModalLoader, MySelect, MySelectItem, MyTextField, Scrollbar, SimpleDataGrid, SimpleModal, SimpleModalRefProps, StandarTooltip } from 'components'
 
 import { useAuth, useControlCalidad, useExtraccion, useTipoLogico } from 'hooks'
 import { applyCommaThousands, undecorateMetaFieldName } from 'helpers'
@@ -332,11 +332,28 @@ const ListaControlCalidad: FC = () => {
    // ► Dep's ...
    const ctrlsCalidadCamposAnalisis = useMemo(() => asigGrupoCamposAnalisisTmp.ctrlsCalCamposAnalisis ?? [], [asigGrupoCamposAnalisisTmp])
 
+   const totalCamposAnalisis = useMemo(() => {
+      return asigGrupoCamposAnalisisTmp.grupo?.metaFieldsCsv?.split(/[,]/g).length || 0
+   }, [asigGrupoCamposAnalisisTmp])
+
+   const avgMetaFieldIdErrorCsv = useMemo(() => {
+      if (Object.entries(asigGrupoCamposAnalisisTmp).length === 0) return 0
+
+      const failedProd = asigGrupoCamposAnalisisTmp.produccionAnalisis.filter(({ revisado, metaFieldIdErrorCsv }) => revisado && metaFieldIdErrorCsv)
+      if (!failedProd.length) return 0
+
+      const totalFailedProd = failedProd.reduce((totalErr, prodErr) => {
+         totalErr += prodErr.metaFieldIdErrorCsv.split(/[,]/g).length / totalCamposAnalisis
+         return totalErr
+      }, 0)
+      return totalFailedProd / failedProd.length
+   }, [asigGrupoCamposAnalisisTmp, totalCamposAnalisis])
+
    return (
       <>
          { /* ► ... */ }
          <List
-            subheader={ <ListSubheader>Asignaciones para Control de Calidad</ListSubheader> }
+            subheader={ <ListSubheader>Registros aleatorios, para Control de Calidad</ListSubheader> }
          >
             {
                ctrlsCalidadCamposAnalisis.map((ctrlCal, i) => (
@@ -365,6 +382,7 @@ const ListaControlCalidad: FC = () => {
                               <Typography variant='h5'>
                                  { `Revisados: ${applyCommaThousands(ctrlCal.totalRevisados)}` }
                               </Typography>
+                              <LinearWithValueLabel progress={ avgMetaFieldIdErrorCsv * 100 } width={ '25%' } />
                            </Stack>
                         } />
 
@@ -422,6 +440,11 @@ const BandejaControlCalidad: FC = () => {
    useEffect(() => { findAllTipoLogico() }, [])
 
    // ► DEP'S ...
+   const totalCamposAnalisis = useMemo(() => {
+      if (tablaCtrlCalidadTmp.length === 0) return 0
+      return Object.keys(tablaCtrlCalidadTmp[0]).filter(k => k.endsWith('_a')).length
+   }, [tablaCtrlCalidadTmp])
+
    const dgColumns = useMemo<Array<GridColDef<RegistroTablaDinamicaDto>>>(() => ([
       {
          field: '>',
@@ -468,6 +491,16 @@ const BandejaControlCalidad: FC = () => {
          minWidth: 300,
          flex: 1,
          ...commonGridColDef
+      }, {
+         field: '(%) Margen error',
+         width: 150,
+         ...commonGridColDef,
+         renderCell: ({ row }) => {
+            const percentErr = row.metaFieldIdErrorCsv
+               ? row.metaFieldIdErrorCsv.split(/[,]/g).length
+               : 0
+            return <LinearWithValueLabel progress={ (percentErr / totalCamposAnalisis) * 100 } width={ '100%' } />
+         }
       }
    ]), [tablaCtrlCalidadTmp])
 
@@ -484,7 +517,7 @@ const BandejaControlCalidad: FC = () => {
                pageSize={ 4 }
                getRowId={ row => row.nId }
                localStoragePageKey='CONTROL_CALIDAD_BANDEJA_CTRLCAL_NROPAG'
-               sx={{ width: '90vw' }}
+               sx={{ width: '95vw' }}
             />
          </Zoom>
 

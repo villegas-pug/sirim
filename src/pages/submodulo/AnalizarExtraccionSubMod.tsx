@@ -611,6 +611,18 @@ const AnalizarExtraccion: FC = () => {
       .join(',')
    ), [asigGrupoCamposAnalisisTmp])
 
+   const metaFieldsRequiredAssigned = useMemo(() => {
+      const metaFieldsRequired: { [k: string]: boolean } = {}
+
+      asigGrupoCamposAnalisisTmp.grupo.metaFieldsCsv?.split(',')
+         .map(i => i.trim())
+         .forEach(i => {
+            metaFieldsRequired[i.split('|')[0].trim()] = i.split('|')[3]?.trim() === 'true'
+         })
+
+      return metaFieldsRequired
+   }, [asigGrupoCamposAnalisisTmp])
+
    return (
       <Box
          width={ '93vw' }
@@ -665,7 +677,7 @@ const AnalizarExtraccion: FC = () => {
          <Box overflow='auto'>
             <Formik
                initialValues={ { ...getInitialValuesFromCsv(metaFieldsNameAssigned!, registroDinamicoAsignadoTmp) } }
-               validationSchema={ Yup.object({ ...getValidationSchemaFromCsv(metaFieldsNameAssigned!, asigGrupoCamposAnalisisTmp.grupo.obligatorio!) }) }
+               validationSchema={ Yup.object({ ...getValidationSchemaFromCsv(metaFieldsNameAssigned!, metaFieldsRequiredAssigned) }) }
                onSubmit={ async (values: any, meta): Promise<void> => {
                   await saveRecordAssigned({
                      nombreTabla: asigGrupoCamposAnalisisTmp.grupo.tablaDinamica?.nombre,
@@ -791,9 +803,9 @@ const getInitialValuesFromCsv = (metaFieldsNameCsv: string, registroDinamicoAsig
    return initialValues
 }
 
-const getValidationSchemaFromCsv = (metaFieldsNameCsv: string, obligatorio: boolean): {} => {
+const getValidationSchemaFromCsv = (metaFieldsNameCsv: string, metaFieldsRequiredAssigned: { [k: string]: boolean }): {} => {
    // ► Validación: ...
-   if (!metaFieldsNameCsv || typeof obligatorio === 'undefined') return {}
+   if (!metaFieldsNameCsv || typeof metaFieldsRequiredAssigned === 'undefined') return {}
 
    const schemaValues: { [k: string]: Yup.StringSchema | Yup.NumberSchema } = {}
    metaFieldsNameCsv
@@ -813,7 +825,7 @@ const getValidationSchemaFromCsv = (metaFieldsNameCsv: string, obligatorio: bool
             return
          }
 
-         if (obligatorio) {
+         if (metaFieldsRequiredAssigned[k]) {
             schemaValues[k] = schemaValues[k].required('¡Campo requerido!')
          }
       })

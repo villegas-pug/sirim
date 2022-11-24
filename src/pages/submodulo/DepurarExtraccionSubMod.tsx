@@ -618,24 +618,27 @@ const FrmCrearCampoAnalisis: FC<{ metaCampo?: MetaCampoTablaDinamica}> = ({ meta
          initialValues={{
             nombre: metaCampo?.nombre || '',
             tipo: (metaCampo?.tipo || '') as MetaFieldSqlType,
-            info: metaCampo?.info || ''
+            info: metaCampo?.info || '',
+            obligatorio: metaCampo?.obligatorio || false
          }}
          validationSchema={Yup.object({
             nombre: Yup.string().required('¡Campo requerido!').matches(regex.INPUT_FIELD_REGEX, messages.INPUT_FIELD_VALIDATION),
             tipo: Yup.string().required('¡Campo requerido!'),
-            info: Yup.string().required('¡Campo requerido!').matches(regex.INPUT_INFO_REGEX, messages.INPUT_INFO_VALIDATION)
+            info: Yup.string().required('¡Campo requerido!').matches(regex.INPUT_INFO_REGEX, messages.INPUT_INFO_VALIDATION),
+            obligatorio: Yup.boolean().required('¡Campo requerido!')
          })}
          onSubmit={ async (values: MetaCampoTablaDinamica, meta): Promise<void> => {
             const tdDto = { ...tablaDinamicaDto, grupoCamposAnalisis: { ...grupoAnalisisTmp } }
             await handleAlterFieldTablaDinamica(tdDto, values, 'ADD_COLUMN_A')
-            meta.setValues({ nombre: '', tipo: '' as MetaFieldSqlType, info: '' })
+            meta.setValues({ nombre: '', tipo: '' as MetaFieldSqlType, info: '', obligatorio: false })
          } }>
          {() => (
             <Form>
                <Box height={ 50 } display='inline-flex' alignItems='flex-start' gap={ 1 }>
                   <MyTextField type='text' name='nombre' label='Nombre de campo' width={ 18 } focused={ !metaCampo } />
                   <MySelect name='tipo' label='Tipo de campo' width={ 18 } opt={ optTiposCurrentGrupoAuth } />
-                  <MyTextField type='text' name='info' label='Información de campo de analisis' width={ 35 } />
+                  <MyTextField type='text' name='info' label='Información de campo de analisis' width={ 30 } />
+                  <MyCheckBox name='obligatorio' label='¿obligatorio?' width={ 6 } />
                   <Button
                      type='submit'
                      variant='outlined'
@@ -859,23 +862,21 @@ const ListaGrupoAnalisis:FC = () => {
          <SimpleModal ref={ modalEditarNombreGrupo }>
             <Formik
                initialValues={{
-                  nombre: grupoAnalisisTmp.nombre,
-                  obligatorio: grupoAnalisisTmp.obligatorio
+                  nombre: grupoAnalisisTmp.nombre
                }}
                validationSchema={Yup.object({
                   nombre: Yup.string().required('¡Campo requerido!')
                      .matches(regex.INPUT_GRUPO_ANALISIS_REGEX, messages.INPUT_GRUPO_ANALISIS_VALIDATION)
                })}
-               onSubmit={ async (values: Pick<GrupoCamposAnalisis, 'nombre' | 'obligatorio'>, meta): Promise<void> => {
+               onSubmit={ async (values: Pick<GrupoCamposAnalisis, 'nombre'>, meta): Promise<void> => {
                   const tdDto: Partial<TablaDinamicaDto> = { ...tablaDinamicaDto, grupoCamposAnalisis: { ...grupoAnalisisTmp, ...values } }
                   await saveGrupoCamposAnalisis(tdDto)
-                  meta.setValues({ nombre: '', obligatorio: false })
+                  meta.setValues({ nombre: '' })
                } }>
                {() => (
                   <Form>
                      <Box height={ 50 } display='inline-flex' alignItems='flex-start' gap={ 5 }>
                         <MyTextField type='text' name='nombre' label='Nuevo nombre grupo' width={ 25 } focused />
-                        <MyCheckBox name='obligatorio' label='¿Campos son obligatorios?' width={ 12 } />
                         <Button
                            type='submit'
                            variant='contained'
@@ -1002,28 +1003,31 @@ const ListaCamposAnalisis: FC = () => {
                initialValues={{
                   nombre: undecorateMetaFieldName(prevMetaField.nombre, 'prefix | suffix'),
                   tipo: prevMetaField.tipo,
-                  info: prevMetaField.info
+                  info: prevMetaField.info,
+                  obligatorio: prevMetaField?.obligatorio || false
                }}
                validationSchema={Yup.object({
                   nombre: Yup.string().required('¡Campo requerido!').matches(regex.INPUT_FIELD_REGEX, messages.INPUT_FIELD_VALIDATION),
                   tipo: Yup.string().required('¡Campo requerido!'),
-                  info: Yup.string().required('¡Campo requerido!').matches(regex.INPUT_INFO_REGEX, messages.INPUT_INFO_VALIDATION)
+                  info: Yup.string().required('¡Campo requerido!').matches(regex.INPUT_INFO_REGEX, messages.INPUT_INFO_VALIDATION),
+                  obligatorio: Yup.boolean().required('¡Campo requerido!')
                })}
                onSubmit={ async (values: MetaCampoTablaDinamica, meta): Promise<void> => {
                   const tdDto: Partial<TablaDinamicaDto> = {
                      ...tablaDinamicaDto,
                      grupoCamposAnalisis: { ...grupoAnalisisTmp },
-                     camposCsv: `${prevMetaField.nombre} | ${prevMetaField.tipo} | ${prevMetaField.info}`
+                     camposCsv: `${prevMetaField.nombre} | ${prevMetaField.tipo} | ${prevMetaField.info} | ${prevMetaField.obligatorio}`
                   }
                   await handleAlterFieldTablaDinamica(tdDto, values, 'ALTER_COLUMN_A')
-                  meta.setValues({ nombre: '', tipo: '' as MetaFieldSqlType, info: '' })
+                  meta.setValues({ nombre: '', tipo: '' as MetaFieldSqlType, info: '', obligatorio: false })
                } }>
                {() => (
                   <Form>
                      <Box height={ 50 } display='inline-flex' alignItems='flex-start' gap={ 1 }>
                         <MyTextField type='text' name='nombre' label='Nuevo nombre' width={ 18 } focused />
                         <MySelect name='tipo' label='Tipo de campo' width={ 18 } opt={ optTiposCurrentGrupoAuth } />
-                        <MyTextField type='text' name='info' label='Nueva información de campo' width={ 35 } multiple />
+                        <MyTextField type='text' name='info' label='Nueva información de campo' width={ 30 } multiple />
+                        <MyCheckBox name='obligatorio' label='¿obligatorio?' width={ 6 } />
                         <Button
                            type='submit'
                            variant='contained'
