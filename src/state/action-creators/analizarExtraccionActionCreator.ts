@@ -11,14 +11,14 @@ import { localStorage } from 'constants/'
 
 const { AUTHORIZATION } = localStorage
 
-export const findAsigAnalisisByUsr = () => async (dispatch: Dispatch<AnalizarExtraccionAction>, getState: () => any): Promise<void> => {
+export const findAsigAnalisisByUsr = (unfinished: boolean = false) => async (dispatch: Dispatch<AnalizarExtraccionAction>, getState: () => any): Promise<void> => {
    dispatch({ type: '[Analizar-Extracción] Find asignaciones by usuario loading' })
    try {
-      const { usuario: { token, userCredentials } } = getState()
+      const { usuario: { token, userCredentials: usrAnalista } } = getState()
       const { data: { levelLog, data, message } } = await api.request<Response<AsigGrupoCamposAnalisisDto[]>>({
          method: 'POST',
          url: '/microservicio-rimcommon/findAsigAnalisisByUsr',
-         data: userCredentials,
+         data: { usrAnalista, unfinished },
          headers: {
             [AUTHORIZATION]: token
          }
@@ -36,6 +36,35 @@ export const findAsigAnalisisByUsr = () => async (dispatch: Dispatch<AnalizarExt
       }
    } catch (err: any) {
       dispatch({ type: '[Analizar-Extracción] Find asignaciones by usuario error', payload: err?.message })
+      dispatch({ type: '[http-status] Response status', payload: err?.response?.status })
+   }
+}
+
+export const findAsigById = (idAsig: number) => async (dispatch: Dispatch<AnalizarExtraccionAction>, getState: () => any): Promise<void> => {
+   dispatch({ type: '[Analizar-Extracción] findAsigById loading' })
+   try {
+      const { usuario: { token } } = getState()
+      const { data: { levelLog, data, message } } = await api.request<Response<AsigGrupoCamposAnalisisDto>>({
+         method: 'GET',
+         url: '/microservicio-rimcommon/findAsigById',
+         params: { idAsig },
+         headers: {
+            [AUTHORIZATION]: token
+         }
+      })
+
+      switch (levelLog) {
+      case 'SUCCESS':
+         dispatch({ type: '[Analizar-Extracción] findAsigById success', payload: data })
+         break
+      case 'WARNING':
+      case 'ERROR':
+         dispatch({ type: '[Analizar-Extracción] findAsigById error', payload: message })
+         noty('error', message)
+         break
+      }
+   } catch (err: any) {
+      dispatch({ type: '[Analizar-Extracción] findAsigById error', payload: err?.message })
       dispatch({ type: '[http-status] Response status', payload: err?.response?.status })
    }
 }

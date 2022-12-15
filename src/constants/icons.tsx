@@ -1,6 +1,5 @@
 import { CSSProperties } from 'react'
 import {
-   AddBox,
    ArrowUpward,
    Check,
    ChevronLeft,
@@ -65,7 +64,8 @@ import {
    LibraryAddCheckRounded,
    Groups3Rounded,
    KeyboardDoubleArrowDownRounded,
-   NewReleasesRounded
+   NewReleasesRounded,
+   HandshakeRounded
 } from '@mui/icons-material'
 
 const classes: { [key: string]: CSSProperties } = {
@@ -88,7 +88,7 @@ export const elementIcons = {
    Home: <Home fontSize='small' sx={{ color: 'white' }} />,
    Person: <Person fontSize='small' sx={{ color: 'white' }} />,
    SupervisorAccount: <SupervisorAccount fontSize='small' />,
-   AddBox: <AddBox fontSize='small' />,
+   AddBox: <HandshakeRounded fontSize='small' />,
    Settings: <Settings fontSize='small' />,
    LiveHelp: <LiveHelp fontSize='small' />,
    BarChartRounded: <BarChartRounded fontSize='small' />,
@@ -113,6 +113,7 @@ export const elementIcons = {
    StackedLineChartRounded: <StackedLineChartRounded color='action' style={ classes.subModIcon }/>,
    StyleRounded: <StyleRounded color='action' style={ classes.subModIcon }/>,
    KeyboardDoubleArrowDownRounded: <KeyboardDoubleArrowDownRounded color='action' style={ classes.subModIcon }/>,
+   DescriptionRounded: <HandshakeRounded color='action' style={ classes.subModIcon }/>,
 
    Test: <Build />,
    Cloud: <Cloud />,

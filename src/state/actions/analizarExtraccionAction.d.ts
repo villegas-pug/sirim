@@ -16,6 +16,20 @@ interface FindAsigAnalisisByUsrError {
    payload: string | null
 }
 
+interface findAsigByIdLoading {
+   type: '[Analizar-Extracción] findAsigById loading'
+}
+
+interface findAsigByIdSuccess {
+   type: '[Analizar-Extracción] findAsigById success'
+   payload: AsigGrupoCamposAnalisisDto
+}
+
+interface findAsigByIdError {
+   type: '[Analizar-Extracción] findAsigById error'
+   payload: string | null
+}
+
 interface FindTablaDinamicaByRangoFromIdsLoading {
    type: '[Analizar-Extracción] Find tabla dinamica by rango of ids loading'
 }
@@ -87,3 +101,6 @@ export type AnalizarExtraccionAction =
    | DownloadReporteMensualProduccionByParamsLoading
    | DownloadReporteMensualProduccionByParamsSuccess
    | DownloadReporteMensualProduccionByParamsError
+   | findAsigByIdLoading
+   | findAsigByIdSuccess
+   | findAsigByIdError

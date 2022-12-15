@@ -22,19 +22,17 @@ const RptRegistrosAnalizadosSubMod: FC = () => {
 
    return (
       <>
-         <Fade top>
-            <Body>
-               <Box
-                  height='100%'
-                  display='flex'
-                  justifyContent='center'
-                  alignItems='center'
-                  flexDirection='column'
-               >
-                  <FrmDownloadAnalizados />
-               </Box>
-            </Body>
-         </Fade>
+         <Body>
+            <Box
+               height='100%'
+               display='flex'
+               justifyContent='center'
+               alignItems='center'
+               flexDirection='column'
+            >
+               <FrmDownloadAnalizados />
+            </Box>
+         </Body>
 
          {/* ► Modal: Loader ...  */}
          { loadingExtraccionDb && <ModalLoader /> }
@@ -77,30 +75,32 @@ const FrmDownloadAnalizados: FC = () => {
          } }
       >
          {(formikProps) => (
-            <Form>
-               <Paper elevation={ 5 } sx={{ p: 3 }}>
-                  <Stack
+            <Fade top>
+               <Form>
+                  <Paper elevation={ 5 } sx={{ p: 3 }}>
+                     <Stack
 
-                     direction='row'
-                     justifyContent='space-between'
-                     alignItems='flex-start'
-                     gap={ 1 }
-                     divider={ <Divider orientation='vertical' flexItem /> }
-                  >
-                     <MyTextField type='date' name='fecIni' label='Fecha Inicio Analisis' width={ 10 } focused />
-                     <MyTextField type='date' name='fecFin' label='Fecha Fin Analisis' width={ 10 } />
-                     <SimpleAutocomplete name='nombreTabla' label='Nombre de tabla' width={ 30 } opt={ tablaDinamicaOnlyNombres } { ...formikProps } />
-                     <Button
-                        type='submit'
-                        variant='outlined'
-                        color='primary'
-                        disabled={ loadingAsigGrupoCamposAnalisisDb }
+                        direction='row'
+                        justifyContent='space-between'
+                        alignItems='flex-start'
+                        gap={ 1 }
+                        divider={ <Divider orientation='vertical' flexItem /> }
                      >
-                        <DownloadRounded />
-                     </Button>
-                  </Stack>
-               </Paper>
-            </Form>
+                        <MyTextField type='date' name='fecIni' label='Fecha Inicio Analisis' width={ 10 } focused />
+                        <MyTextField type='date' name='fecFin' label='Fecha Fin Analisis' width={ 10 } />
+                        <SimpleAutocomplete name='nombreTabla' label='Nombre de tabla' width={ 30 } opt={ tablaDinamicaOnlyNombres } { ...formikProps } />
+                        <Button
+                           type='submit'
+                           variant='outlined'
+                           color='primary'
+                           disabled={ loadingAsigGrupoCamposAnalisisDb }
+                        >
+                           <DownloadRounded />
+                        </Button>
+                     </Stack>
+                  </Paper>
+               </Form>
+            </Fade>
          )}
       </Formik>
    )

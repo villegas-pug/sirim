@@ -14,7 +14,8 @@ import {
    paisReducer,
    produccionAnalisisReducer,
    tipoLogicoReducer,
-   reportesReducer
+   reportesReducer,
+   LineamientoReducer
 } from 'state/reducers'
 
 export const rootReducer = combineReducers({
@@ -31,5 +32,6 @@ export const rootReducer = combineReducers({
    produccionAnalisis: produccionAnalisisReducer,
    reportes: reportesReducer,
    tipoLogico: tipoLogicoReducer,
-   usuario: authReducer
+   usuario: authReducer,
+   lineamiento: LineamientoReducer
 })

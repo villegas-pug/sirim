@@ -371,6 +371,7 @@ const ListaControlCalidad: FC = () => {
                            <Stack
                               direction='row'
                               gap={ 1 }
+                              alignItems='center'
                               divider={ <Divider orientation='vertical' flexItem /> }
                            >
                               <Typography variant='h5'>
@@ -382,7 +383,7 @@ const ListaControlCalidad: FC = () => {
                               <Typography variant='h5'>
                                  { `Revisados: ${applyCommaThousands(ctrlCal.totalRevisados)}` }
                               </Typography>
-                              <LinearWithValueLabel progress={ avgMetaFieldIdErrorCsv * 100 } width={ '25%' } />
+                              <LinearWithValueLabel progress={ avgMetaFieldIdErrorCsv * 100 } width={ '30%' } label='Margen error:' />
                            </Stack>
                         } />
 

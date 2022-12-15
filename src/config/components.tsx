@@ -9,6 +9,7 @@ type SubModuloType = { name: Submodulo, component: ReactElement }
 /* » MOD'S ...  */
 const HomeMod = lazy(() => import('pages/modulo/HomeMod'))
 const ProcesosMod = lazy(() => import('pages/modulo/ProcesosMod'))
+const LineamientosMod = lazy(() => import('pages/modulo/LineamientosMod'))
 const UtilidadesMod = lazy(() => import('pages/modulo/UtilidadesMod'))
 const PerfilMod = lazy(() => import('pages/modulo/PerfilMod'))
 const GestionTramitesMod = lazy(() => import('pages/modulo/GestionTramitesMod'))
@@ -30,6 +31,7 @@ const RptProduccionHorasLaboralesSubMod = lazy(() => import('pages/submodulo/Rpt
 const RptControlMigratorioSubMod = lazy(() => import('pages/submodulo/RptControlMigratorioSubMod'))
 const RptPasaportesSubMod = lazy(() => import('pages/submodulo/RptPasaportesSubMod'))
 const RptRegistrosAnalizadosSubMod = lazy(() => import('pages/submodulo/RptRegistrosAnalizadosSubMod'))
+const ConveniosSubMod = lazy(() => import('pages/submodulo/ConveniosSubMod'))
 
 /* » ITEM'S */
 const modulo: Array<ModuloType> = [
@@ -42,6 +44,9 @@ const modulo: Array<ModuloType> = [
    }, {
       name: 'PROCESOS',
       component: <ProcesosMod />
+   }, {
+      name: 'LINEAMIENTOS',
+      component: <LineamientosMod />
    }, {
       name: 'GESTIÓN TRÁMITES',
       component: <GestionTramitesMod />
@@ -100,6 +105,9 @@ const subModulo: Array<SubModuloType> = [
    }, {
       name: 'REPORTE REGISTROS ANALIZADOS',
       component: <RptRegistrosAnalizadosSubMod />
+   }, {
+      name: 'CONVENIOS',
+      component: <ConveniosSubMod />
    }
 ]
 

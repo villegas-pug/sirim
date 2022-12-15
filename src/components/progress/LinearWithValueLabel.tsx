@@ -28,12 +28,16 @@ function LinearProgressWithLabel (props: LinearProgressProps & { value: number }
 type Props = {
    progress: number
    width: number | string
+   label?: string
    sx?: SxProps
 }
 
-export const LinearWithValueLabel: FC<Props> = ({ progress, width }) => {
+export const LinearWithValueLabel: FC<Props> = ({ progress, width, label }) => {
    return (
       <Box sx={{ width }}>
+         { label && (
+            <Typography variant='h5' color='text.secondary'>{ label }</Typography>
+         ) }
          <LinearProgressWithLabel value={ progress } />
       </Box>
    )

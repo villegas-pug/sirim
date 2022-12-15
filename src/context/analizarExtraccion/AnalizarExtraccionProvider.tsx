@@ -27,29 +27,17 @@ export const AnalizarExtraccionProvider: FC<{ children: ReactElement | ReactElem
    const [state, dispatch] = useReducer(analizarExtraccionReducer, INITIAL_STATE)
 
    // ► CUSTOM - HOOK'S ...
-   const { tablaAsignadaDb, asigGrupoCamposAnalisisDb, findAsigAnalisisByUsr } = useAnalizarExtraccion()
-
-   // » EFFECT'S ...
-   useEffect(() => { // ► Update `store`: Si store `tablaAsignadaDb` cambia, llama a `findAsigAnalisisByUsr()` ...
-      if (tablaAsignadaDb.length === 0) return
-      findAsigAnalisisByUsr()
-   }, [tablaAsignadaDb])
-
-   useEffect(() => { // ► Update `tmp`: Si store `asigGrupoCamposAnalisisDb` cambia, actualiza `asigGrupoCamposAnalisisTmp` ...
-      if (asigGrupoCamposAnalisisDb.length === 0) return
-      dispatch({
-         type: '[asigGrupoCamposAnalisisTmp] Save grupo asignado de Campos de analisis',
-         payload: asigGrupoCamposAnalisisDb.find(asig => asig.idAsigGrupo === state.asigGrupoCamposAnalisisTmp.idAsigGrupo) || {} as AsigGrupoCamposAnalisisDto
-      })
-   }, [asigGrupoCamposAnalisisDb])
+   const { tablaAsignadaDb, asigGrupoCamposAnalisisDb } = useAnalizarExtraccion()
 
    useEffect(() => { // ► Update `tmp`: Si tmp `asigGrupoCamposAnalisisTmp` cambia, actualiza `tablaAsignadaTmp` ...
+      if (Object.entries(asigGrupoCamposAnalisisDb).length === 0) return
       if (tablaAsignadaDb.length === 0) return
+
       dispatch({
          type: '[tablaAsignadaTmp] Save tabla dinámica asignada',
-         payload: assignPropsToTablaAsignada(state.asigGrupoCamposAnalisisTmp, tablaAsignadaDb)
+         payload: assignPropsToTablaAsignada(asigGrupoCamposAnalisisDb, tablaAsignadaDb)
       })
-   }, [state.asigGrupoCamposAnalisisTmp])
+   }, [asigGrupoCamposAnalisisDb, tablaAsignadaDb])
 
    // ► HANDLER'S ...
    const handleChangePage = (page: AnalizarExtraccionBandeja) => {
@@ -77,13 +65,19 @@ export const AnalizarExtraccionProvider: FC<{ children: ReactElement | ReactElem
 }
 
 /* ► Private - Method's ... */
-type SomeFieldsFromProduccionAnalisis = { [key: number]: Pick<RegistroTablaDinamicaDto, 'fechaAnalisis' | 'analizado'> }
+type SomeFieldsFromProduccionAnalisis = { [key: number]: Pick<RegistroTablaDinamicaDto, 'fechaAnalisis' | 'analizado' | 'hasFieldError' | 'metaFieldIdErrorCsv' | 'observacionesCtrlCal'> }
 const assignPropsToTablaAsignada = (asigGrupoCamposAnalisis: AsigGrupoCamposAnalisisDto, tablaAsignada: RegistroTablaDinamicaDto[]): RegistroTablaDinamicaDto[] => {
    // ► Dep's: ...
    if (Object.entries(asigGrupoCamposAnalisis).length === 0) return []
    const someFieldsFromProduccionAnalisis: SomeFieldsFromProduccionAnalisis =
    asigGrupoCamposAnalisis?.produccionAnalisis.reduce((map, prod) => {
-      map[prod.idRegistroAnalisis] = { analizado: prod.completo, fechaAnalisis: prod.fechaFin || '' }
+      map[prod.idRegistroAnalisis] = {
+         analizado: prod.completo,
+         fechaAnalisis: prod.fechaFin || '',
+         hasFieldError: prod.revisado && Boolean(prod.metaFieldIdErrorCsv),
+         metaFieldIdErrorCsv: prod.metaFieldIdErrorCsv,
+         observacionesCtrlCal: prod.observacionesCtrlCal
+      }
       return map
    }, {} as SomeFieldsFromProduccionAnalisis)
 

@@ -9,23 +9,27 @@ import {
    Paper,
    Stack,
    Switch,
+   TextField,
    Tooltip,
    Typography
 } from '@mui/material'
 import {
    ArrowBackIosNewRounded,
-   CachedRounded,
    CheckCircleRounded,
    CheckRounded,
    ClearRounded,
+   DoneAllRounded,
    DownloadOutlined,
    DownloadRounded,
    FileDownloadRounded,
    QueryStatsRounded,
    RemoveRedEyeRounded,
+   ReportRounded,
    SaveAsRounded,
    SearchOffRounded,
-   UnpublishedRounded
+   SyncProblemRounded,
+   UnpublishedRounded,
+   UpdateRounded
 } from '@mui/icons-material'
 import { GridColDef } from '@mui/x-data-grid'
 import Fade from 'react-reveal/Fade'
@@ -51,7 +55,7 @@ import { AnalizarExtraccionProvider, useAnalizarExtraccionContext } from 'contex
 import { useAnalizarExtraccion, useBreakpoints, useLocalStorage } from 'hooks'
 
 import { applyCommaThousands, parseJsonDateToDate, parseJsonTimestampToStrDate, undecorateMetaFieldName } from 'helpers'
-import { RecordsBetweenDatesDto, AsigGrupoCamposAnalisisDto, PrefixMetaFieldName, RegistroTablaDinamicaDto } from 'interfaces'
+import { RecordsBetweenDatesDto, AsigGrupoCamposAnalisisDto, PrefixMetaFieldName, RegistroTablaDinamicaDto, ProduccionAnalisis } from 'interfaces'
 import { optSelectItemMonthName } from 'constants/calendar'
 import { format } from 'date-fns'
 import { useTipoLogico } from 'hooks/useTipoLogico'
@@ -80,20 +84,27 @@ export const AnalizarExtraccionSubMod: FC = () => {
 
    useEffect(() => { setBandejaAnalisisNroPagina(0) }, [])
 
+   // ► Handler's ...
+   const handleRefresh = async (asigUnfinished: boolean = false): Promise<void> => {
+      await findAsigAnalisisByUsr(asigUnfinished)
+      await findAllTipoLogico()
+      findTablaDinamicaByRangoFromIds({
+         asigGrupo: { idAsigGrupo: asigGrupoCamposAnalisisTmp.idAsigGrupo },
+         regAnalisisIni: asigGrupoCamposAnalisisTmp.regAnalisisIni,
+         regAnalisisFin: asigGrupoCamposAnalisisTmp.regAnalisisFin
+      })
+   }
+
    /* ► DEP'S ... */
    const optSpeedDial = useMemo<SpeedDialActionProps[]>(() => ([
       {
-         name: 'Refrescar_Bandeja',
-         icon: <CachedRounded />,
-         handleClick: async () => {
-            await findAsigAnalisisByUsr()
-            await findAllTipoLogico()
-            findTablaDinamicaByRangoFromIds({
-               asigGrupo: { idAsigGrupo: asigGrupoCamposAnalisisTmp.idAsigGrupo },
-               regAnalisisIni: asigGrupoCamposAnalisisTmp.regAnalisisIni,
-               regAnalisisFin: asigGrupoCamposAnalisisTmp.regAnalisisFin
-            })
-         }
+         name: 'Listar_Todas_Asignaciones',
+         icon: <UpdateRounded />,
+         handleClick: async () => { handleRefresh() }
+      }, {
+         name: 'Listar_Asignaciones_Pendientes',
+         icon: <SyncProblemRounded />,
+         handleClick: async () => { handleRefresh(true) }
       }, {
          name: 'Descargar_Producción_Mensual',
          icon: <DownloadRounded />,
@@ -172,39 +183,89 @@ const commonGridColDef: Partial<GridColDef> = {
    align: 'center'
 }
 
+const hasErrInQC = (asig: AsigGrupoCamposAnalisisDto) => !asig.ctrlCalConforme && asig.produccionAnalisis.some(p => p.revisado && p.metaFieldIdErrorCsv)
+
+type QCResult = { totalRecords: number, totalFields: number, margenErr: number }
+
+const getQCResult = (asig: AsigGrupoCamposAnalisisDto): QCResult => {
+   // ►  Dep's ...
+   const totalFieldsA = asig.grupo.metaFieldsCsv?.split(/[,]/g).length || 0
+   const prodErr: ProduccionAnalisis[] = asig.produccionAnalisis.filter(p => p.revisado && p.metaFieldIdErrorCsv)
+
+   const totalRecords = prodErr.length
+   const totalFields = prodErr.reduce((acc, p) => (acc += p.metaFieldIdErrorCsv.split(/[,]/g).length, acc), 0)
+   const margenErr = ((prodErr.reduce((acc, p) => (acc += p.metaFieldIdErrorCsv.split(/[,]/g).length / totalFieldsA, acc), 0)) / prodErr.length) * 100
+
+   // ► ...
+   return { totalRecords, totalFields, margenErr }
+}
+
 const renderShowResultOfQCAction = (asig: AsigGrupoCamposAnalisisDto) => {
-   // ► Dep's ...
-   const hasErrInQC = useMemo(() => !asig.ctrlCalConforme && asig.produccionAnalisis.some(p => p.metaFieldIdErrorCsv), [asig])
+   // ► Hook's ...
+   const modalQCResult = useRef({} as SimpleModalRefProps)
+   const [qcResult, setQCResult] = useState({} as QCResult)
 
    // ► Conditional render ...
-   if (!hasErrInQC) return <></>
+   if (!hasErrInQC(asig)) return <></>
 
    return (
-      <StandarTooltip title='Ver resultado de Q.C.'>
-         <IconButton>
-            <SearchOffRounded />
-         </IconButton>
-      </StandarTooltip>
+      <>
+         <StandarTooltip title='Ver resultado de Q.C.'>
+            <IconButton
+               onClick={() => {
+                  setQCResult(getQCResult(asig))
+                  modalQCResult.current.setOpen(true)
+               }}
+            >
+               <SearchOffRounded />
+            </IconButton>
+         </StandarTooltip>
+
+         <SimpleModal ref={ modalQCResult }>
+
+            <Stack
+               p={ 1 }
+               direction='row'
+               spacing={ 5 }
+               divider={ <Divider orientation='vertical' flexItem /> }
+            >
+               <Box display='flex' alignItems='center'>
+                  <Typography variant='h4' color='gray'>Registros Observados: </Typography>
+                  <Typography variant='h2' color='red' sx={{ ml: 1 }}>{ qcResult.totalRecords }</Typography>
+               </Box>
+
+               <Box display='flex' alignItems='center'>
+                  <Typography variant='h4' color='gray'>Campos Observados: </Typography>
+                  <Typography variant='h2' color='red' sx={{ ml: 1 }}>{ qcResult.totalFields }</Typography>
+               </Box>
+
+               <Box display='flex' alignItems='center'>
+                  <Typography variant='h4' color='gray'>(%) Margen Error: </Typography>
+                  <Typography variant='h2' color='red' sx={{ ml: 1 }}>{ `${Math.round(qcResult.margenErr)}%` }</Typography>
+               </Box>
+            </Stack>
+
+         </SimpleModal>
+      </>
    )
 }
 
-const hasErrInQC = (asig: AsigGrupoCamposAnalisisDto) => !asig.ctrlCalConforme && asig.produccionAnalisis.some(p => p.metaFieldIdErrorCsv)
-
 const BandejaEntrada: FC = () => {
-   /* ► CONTEXT ... */
+   // ► CONTEXT ...
    const {
       asigGrupoCamposAnalisisTmp,
       handleChangePage,
       handleSaveAsigGrupoCamposAnalisisTmp
    } = useAnalizarExtraccionContext()
 
-   /* ► HOOK'S ... */
+   // ► HOOK'S ...
    const modalDownloadAnalizados = useRef({} as SimpleModalRefProps)
 
-   /* ► CUSTOM - HOOK'S ... */
+   // ► CUSTOM - HOOK'S ...
    const {
-      asigGrupoCamposAnalisisDb,
+      asigsGrupoCamposAnalisisDb,
       findAsigAnalisisByUsr,
+      findAsigById,
       findTablaDinamicaByRangoFromIds,
       downloadAnalisadosByDates
    } = useAnalizarExtraccion()
@@ -212,9 +273,9 @@ const BandejaEntrada: FC = () => {
    const { currentScreen } = useBreakpoints()
 
    // ► EFFECT'S ...
-   useEffect(() => { findAsigAnalisisByUsr() }, [])
+   useEffect(() => { findAsigAnalisisByUsr(true) }, [])
 
-   /* » DEP'S ... */
+   // » DEP'S ...
    const dgColumns = useMemo<GridColDef<AsigGrupoCamposAnalisisDto>[]>(() => [
       {
          field: '>',
@@ -224,6 +285,7 @@ const BandejaEntrada: FC = () => {
             <IconButton
                onClick={ async () => {
                   handleSaveAsigGrupoCamposAnalisisTmp(row)
+                  await findAsigById(row.idAsigGrupo)
                   await findTablaDinamicaByRangoFromIds({
                      asigGrupo: { idAsigGrupo: row.idAsigGrupo },
                      regAnalisisIni: row.regAnalisisIni,
@@ -282,13 +344,15 @@ const BandejaEntrada: FC = () => {
          type: 'boolean',
          width: 80,
          ...commonGridColDef,
+         valueGetter: ({ row }) => row.totalAsignados === row.totalAnalizados,
          renderCell: ({ row }) => row.totalAsignados === row.totalAnalizados ? <CheckCircleRounded color='success' /> : <UnpublishedRounded color='disabled' />
       }, {
          field: 'Estado Q.C.',
          type: 'boolean',
          width: 80,
          ...commonGridColDef,
-         renderCell: ({ row }) => hasErrInQC(row) ? <UnpublishedRounded color='disabled' /> : <CheckCircleRounded color='success' />
+         valueGetter: ({ row }) => hasErrInQC(row),
+         renderCell: ({ row }) => hasErrInQC(row) ? <ReportRounded color='error' /> : <DoneAllRounded color='success' />
       }, {
          field: 'Base',
          minWidth: 250,
@@ -332,7 +396,7 @@ const BandejaEntrada: FC = () => {
          renderCell: ({ row }) => <LinearWithValueLabel progress={ (row.totalAnalizados / row.totalAsignados) * 100 } width={ '100%' } />,
          ...commonGridColDef
       }
-   ], [asigGrupoCamposAnalisisDb])
+   ], [asigsGrupoCamposAnalisisDb])
 
    return (
       <>
@@ -343,7 +407,7 @@ const BandejaEntrada: FC = () => {
          <Zoom>
             <SimpleDataGrid
                columns={ dgColumns }
-               rows={ asigGrupoCamposAnalisisDb }
+               rows={ asigsGrupoCamposAnalisisDb }
                pageSize={ currentScreen === 'desktopLarge'
                   ? 8
                   : currentScreen === 'desktopWide'
@@ -408,7 +472,7 @@ const HeaderBandejaEntrada: FC = () => {
 
    /* ► CUSTOM - HOOK'S ... */
    const {
-      asigGrupoCamposAnalisisDb,
+      asigsGrupoCamposAnalisisDb,
       asigSummaryDb,
       loadingAsigGrupoCamposAnalisisDb
    } = useAnalizarExtraccion()
@@ -416,9 +480,9 @@ const HeaderBandejaEntrada: FC = () => {
    const { currentScreen } = useBreakpoints()
 
    // ► Dep's ...
-   const asigsNoConformeQA = useMemo(() => asigGrupoCamposAnalisisDb.filter(asig => {
+   const asigsNoConformeQA = useMemo(() => asigsGrupoCamposAnalisisDb.filter(asig => {
       return !asig.ctrlCalConforme && asig.produccionAnalisis.some(p => p.revisado && p.metaFieldIdErrorCsv)
-   }).length, [asigGrupoCamposAnalisisDb])
+   }).length, [asigsGrupoCamposAnalisisDb])
 
    // ► RENDER CONDITIONAL ...
    if (currentScreen === 'mobileLandscape') return <></>
@@ -450,17 +514,17 @@ const BandejaAnalisis: FC = () => {
       handleSaveRegistroDinamicoAsignadoTmp
    } = useAnalizarExtraccionContext()
 
-   /* ► HOOK'S ...  */
+   // ► HOOK'S ...
    const modalAnalisis = useRef({} as SimpleModalRefProps)
 
-   /* ► CUSTOM - HOOK'S ... */
+   // ► CUSTOM - HOOK'S ...
    const { currentScreen } = useBreakpoints()
    const { findAllTipoLogico } = useTipoLogico()
 
-   /* ► EFFECT'S ... */
+   // ► EFFECT'S ...
    useEffect(() => { findAllTipoLogico() }, [])
 
-   /* » DEP'S ... */
+   // » DEP'S ...
    const dgColumns = useMemo<Array<GridColDef<RegistroTablaDinamicaDto>>>(() => ([
       {
          field: '>',
@@ -488,6 +552,13 @@ const BandejaAnalisis: FC = () => {
          width: 80,
          type: 'number',
          ...commonGridColDef
+      }, {
+         field: 'hasFieldError',
+         headerName: 'Estado Q.C.',
+         type: 'boolean',
+         width: 150,
+         ...commonGridColDef,
+         renderCell: ({ row }) => row.hasFieldError ? <ReportRounded color='error' /> : <DoneAllRounded color='success' />
       }, {
          field: 'analizado',
          headerName: '¿Analizado?',
@@ -586,20 +657,20 @@ const HeaderBandejaAnalisis: FC = () => {
 }
 
 const AnalizarExtraccion: FC = () => {
-   /* ► CONTEXT ... */
+   // ► CONTEXT ...
    const {
       registroDinamicoAsignadoTmp,
       asigGrupoCamposAnalisisTmp
    } = useAnalizarExtraccionContext()
 
-   /* ► HOOK'S ... */
+   // ► HOOK'S ...
    const refAnalizarExtraccionSubmit = useRef({} as HTMLInputElement)
    const [showDatosExtraccion, setShowDatosExtraccion] = useState(true)
 
-   /* ► CUSTOM - HOOK'S ... */
-   const { loadingAsigGrupoCamposAnalisisDb, saveRecordAssigned } = useAnalizarExtraccion()
+   // ► CUSTOM - HOOK'S ...
+   const { loadingAsigGrupoCamposAnalisisDb, findAsigById, saveRecordAssigned } = useAnalizarExtraccion()
 
-   /* ► HANDLER'S ... */
+   // ► HANDLER'S ...
    const handleShowCamposExtraccion = ({ target: { checked } }: ChangeEvent<HTMLInputElement>) => {
       setShowDatosExtraccion(checked)
    }
@@ -688,7 +759,7 @@ const AnalizarExtraccion: FC = () => {
                      asigGrupo: { idAsigGrupo: asigGrupoCamposAnalisisTmp.idAsigGrupo }
                   })
 
-                  /* findAsigAnalisisByUsr() */
+                  findAsigById(asigGrupoCamposAnalisisTmp.idAsigGrupo)
                } }>
                {(formikprops) => (
                   <Form>
@@ -710,13 +781,28 @@ const AnalizarExtraccion: FC = () => {
                )}
             </Formik>
          </Box>
+
+         {/* ► Observaciones ... */
+            registroDinamicoAsignadoTmp.hasFieldError && (
+               <TextField
+                  type='text'
+                  variant='filled'
+                  label='Observaciones'
+                  value={ registroDinamicoAsignadoTmp.observacionesCtrlCal }
+                  rows={ 3 }
+                  fullWidth
+                  multiline
+                  disabled
+               />
+            )
+         }
       </Box>
    )
 }
 
 const InputAnalisis: FC<{k: string}> = ({ k }) => {
    /* ► CONTEXT ...  */
-   const { asigGrupoCamposAnalisisTmp } = useAnalizarExtraccionContext()
+   const { asigGrupoCamposAnalisisTmp, registroDinamicoAsignadoTmp } = useAnalizarExtraccionContext()
 
    /* ► CUSTOM - HOOK'S ... */
    const { optValoresTiposCurrentGrupoAuth } = useTipoLogico()
@@ -746,6 +832,8 @@ const InputAnalisis: FC<{k: string}> = ({ k }) => {
 
    const label = useMemo(() => undecorateMetaFieldName(k, 'prefix | underscore | suffix'), [k])
 
+   const isFieldError = useMemo(() => registroDinamicoAsignadoTmp.metaFieldIdErrorCsv?.includes(label), [registroDinamicoAsignadoTmp, label])
+
    const restProps = useMemo(() => ({
       name: k,
       label,
@@ -755,7 +843,9 @@ const InputAnalisis: FC<{k: string}> = ({ k }) => {
    }), [label])
 
    return (
-      <>
+      <Box
+         sx={{ background: isFieldError ? 'linear-gradient(15deg, #FF0000, #fff 15%)' : '' }}
+      >
          {
 
             prefix === 's'
@@ -769,7 +859,7 @@ const InputAnalisis: FC<{k: string}> = ({ k }) => {
                         : <></>
 
          }
-      </>
+      </Box>
    )
 }
 
@@ -822,7 +912,6 @@ const getValidationSchemaFromCsv = (metaFieldsNameCsv: string, metaFieldsRequire
 
          if (k.startsWith('d')) {
             schemaValues[k] = Yup.string().matches(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/g, '¡Formato incorrecto!')
-            return
          }
 
          if (metaFieldsRequiredAssigned[k]) {

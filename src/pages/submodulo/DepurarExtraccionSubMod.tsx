@@ -440,23 +440,21 @@ const ListaTablasExtraccion: FC = () => {
          <SimpleModal ref={ modalAddGrupoAnalisis }>
             <Formik
                initialValues={{
-                  nombre: '',
-                  obligatorio: false
+                  nombre: ''
                }}
                validationSchema={Yup.object({
                   nombre: Yup.string().required('¡Campo requerido!')
                      .matches(regex.INPUT_GRUPO_ANALISIS_REGEX, messages.INPUT_GRUPO_ANALISIS_VALIDATION)
                })}
-               onSubmit={ async (grupoCamposAnalisis: Pick<GrupoCamposAnalisis, 'nombre' | 'obligatorio'>, meta): Promise<void> => {
+               onSubmit={ async (grupoCamposAnalisis: Pick<GrupoCamposAnalisis, 'nombre'>, meta): Promise<void> => {
                   await saveGrupoCamposAnalisis({ idTabla: tablaDinamicaDto.idTabla, grupoCamposAnalisis })
-                  meta.setValues({ nombre: '', obligatorio: false })
+                  meta.setValues({ nombre: '' })
                }}
             >
                {() => (
                   <Form>
                      <Box height={ 50 } display='inline-flex' alignItems='flex-start' gap={ 5 }>
                         <MyTextField type='text' name='nombre' label='Nuevo grupo' width={ 25 } focused />
-                        <MyCheckBox name='obligatorio' label='¿Campos son obligatorios?' width={ 12 } />
                         <Button
                            type='submit'
                            variant='contained'

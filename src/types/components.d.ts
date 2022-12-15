@@ -7,6 +7,7 @@ export type Modulo =
    | 'GESTIÓN TRÁMITES'
    | 'REPORTES'
    | 'MANTENIMIENTO'
+   | 'LINEAMIENTOS'
 
 export type Submodulo =
    | 'NUEVO INTERPOL'
@@ -25,3 +26,4 @@ export type Submodulo =
    | 'REPORTE CONTROL MIGRATORIO'
    | 'REPORTE PASAPORTES'
    | 'REPORTE REGISTROS ANALIZADOS'
+   | 'CONVENIOS'
