@@ -65,7 +65,9 @@ import {
    Groups3Rounded,
    KeyboardDoubleArrowDownRounded,
    NewReleasesRounded,
-   HandshakeRounded
+   HandshakeRounded,
+   ReceiptLongRounded,
+   FactCheckRounded
 } from '@mui/icons-material'
 
 const classes: { [key: string]: CSSProperties } = {
@@ -114,6 +116,8 @@ export const elementIcons = {
    StyleRounded: <StyleRounded color='action' style={ classes.subModIcon }/>,
    KeyboardDoubleArrowDownRounded: <KeyboardDoubleArrowDownRounded color='action' style={ classes.subModIcon }/>,
    DescriptionRounded: <HandshakeRounded color='action' style={ classes.subModIcon }/>,
+   ReceiptLongRounded: <ReceiptLongRounded color='action' style={ classes.subModIcon }/>,
+   FactCheckRounded: <FactCheckRounded color='action' style={ classes.subModIcon }/>,
 
    Test: <Build />,
    Cloud: <Cloud />,

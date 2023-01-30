@@ -1,16 +1,20 @@
+import { FC, ReactElement } from 'react'
+
 import {
    Paper,
    Grid,
    Typography,
    Avatar,
-   IconButton
+   IconButton,
+   Stack,
+   Divider
 } from '@mui/material'
 import { Visibility } from '@mui/icons-material'
+import Fade from 'react-reveal/Fade'
 
 import { makeStyles } from '@mui/styles'
 
 import { elementIcons, IconAppTypes } from 'constants/'
-import { FC } from 'react'
 
 const useStyle = makeStyles({
    paper: {
@@ -31,6 +35,28 @@ type Props = {
    title: string
    value: number | string
    handleShowDetail?: () => void
+}
+
+type WrapInfoCardProps = {
+   children: ReactElement | ReactElement[]
+   loading: boolean
+}
+
+export const WrapperInfoCard: FC<WrapInfoCardProps> = ({ children, loading }) => {
+   return (
+      <Fade top>
+         <Fade top when={ !loading }>
+            <Stack
+               mt={ 1 }
+               direction='row'
+               justifyContent='space-around'
+               divider={ <Divider orientation='vertical' flexItem /> }
+            >
+               { children }
+            </Stack>
+         </Fade>
+      </Fade>
+   )
 }
 
 export const InfoCard: FC<Props> = ({ iconName, title, value, handleShowDetail }) => {

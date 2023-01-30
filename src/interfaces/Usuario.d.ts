@@ -22,3 +22,12 @@ export interface Usuario {
    regimenLaboral: string
    foto: string
 }
+
+export interface SimUsuario {
+   login: string
+   nombre: string
+   siglas: string
+   idDependencia: string
+   dni: string
+   idDocumento: string
+}

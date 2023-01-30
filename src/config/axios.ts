@@ -3,7 +3,7 @@ import axios from 'axios'
 import { ENDPOINT } from 'constants/'
 
 export const api = axios.create({
-   baseURL: ENDPOINT.PROD,
+   baseURL: ENDPOINT.DEV,
    headers: {
       'Content-Type': 'application/json'
    },

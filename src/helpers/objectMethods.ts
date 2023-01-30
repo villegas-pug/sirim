@@ -28,3 +28,9 @@ export const convertMetaTypeToSqlType = ({ nombre, tipo, info = '' }: MetaCampoT
       return { nombre, tipo: 'VARCHAR(MAX)', info }
    }
 }
+
+export const resetObjectProps = <T extends { [key: string]: any }>(object: T): T => {
+   const entries = Object.entries(object)
+   entries.forEach(entry => { entry[1] = '' })
+   return Object.fromEntries(entries) as T
+}

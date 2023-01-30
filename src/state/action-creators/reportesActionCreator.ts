@@ -159,7 +159,7 @@ export const getRptPasaportesIndicadores = () => async (dispatch: Dispatch<Repor
       const { usuario: { token } } = getState()
       const { data: { levelLog, data, message } } = await api.request<Response<RptPasaportesIndicadoresDto>>({
          method: 'GET',
-         url: '/microservicio-generic/getRptPasaportesIndicadores',
+         url: '/microservicio-rimsim/getRptPasaportesIndicadores',
          headers: {
             [AUTHORIZATION]: token
          }
@@ -187,7 +187,7 @@ export const getRptPasaportesEntregadosPorAños = () => async (dispatch: Dispatc
       const { usuario: { token } } = getState()
       const { data: { levelLog, data, message } } = await api.request<Response<RptPasaportesPorAñosDto[]>>({
          method: 'GET',
-         url: '/microservicio-generic/getRptPasaportesEntregadosPorAños',
+         url: '/microservicio-rimsim/getRptPasaportesEntregadosPorAños',
          headers: {
             [AUTHORIZATION]: token
          }
@@ -215,7 +215,7 @@ export const getRptPasaportesEntregadosPor12UltimosMeses = () => async (dispatch
       const { usuario: { token } } = getState()
       const { data: { levelLog, data, message } } = await api.request<Response<RptPasaportesPor12UltimosMesesDto[]>>({
          method: 'GET',
-         url: '/microservicio-generic/getRptPasaportesEntregadosPor12UltimosMeses',
+         url: '/microservicio-rimsim/getRptPasaportesEntregadosPor12UltimosMeses',
          headers: {
             [AUTHORIZATION]: token
          }
@@ -243,7 +243,7 @@ export const getRptPasaportesEntregadosPor31UltimosDias = () => async (dispatch:
       const { usuario: { token } } = getState()
       const { data: { levelLog, data, message } } = await api.request<Response<RptPasaportesPor31UltimosDiasDto[]>>({
          method: 'GET',
-         url: '/microservicio-generic/getRptPasaportesEntregadosPor31UltimosDias',
+         url: '/microservicio-rimsim/getRptPasaportesEntregadosPor31UltimosDias',
          headers: {
             [AUTHORIZATION]: token
          }

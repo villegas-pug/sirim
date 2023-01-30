@@ -30,16 +30,16 @@ export const SimpleAutocomplete: FC<SimpleAutocompleteProps> = ({ label, width, 
          noOptionsText='¡No hay registros!'
          loadingText='Cargando...'
          value={ values[name] }
-         style={{ width: `${width}rem` }}
+         sx={{ width: `${width}rem` }}
          renderInput={(params: any) => (
             <TextField
-               { ...rest.muiProps }
                { ...params }
                label={ label }
                variant='outlined'
                error={Boolean(err)}
                size='small'
                helperText={ err }
+               { ...rest.muiProps }
             />
          )}
          onChange={ handleChange }

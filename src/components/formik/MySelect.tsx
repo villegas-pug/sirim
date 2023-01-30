@@ -28,7 +28,7 @@ export const MySelect: FC<Props> = ({ label, width, opt, muiProps, ...rest }) =>
    const err = (meta.error && meta.touched) ? meta.error : ''
 
    return (
-      <FormControl error={Boolean(err)}>
+      <FormControl error={ Boolean(err)} >
          <InputLabel htmlFor={ idSelect }>{ label }</InputLabel>
          <Select
             labelId={ idSelect }

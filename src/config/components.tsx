@@ -32,6 +32,8 @@ const RptControlMigratorioSubMod = lazy(() => import('pages/submodulo/RptControl
 const RptPasaportesSubMod = lazy(() => import('pages/submodulo/RptPasaportesSubMod'))
 const RptRegistrosAnalizadosSubMod = lazy(() => import('pages/submodulo/RptRegistrosAnalizadosSubMod'))
 const ConveniosSubMod = lazy(() => import('pages/submodulo/ConveniosSubMod'))
+const RegistrarFormatoAutorizacionSubMod = lazy(() => import('pages/submodulo/RegistrarFormatoAutorizacionSubMod'))
+const ValidarFormatoAutorizacionSubMod = lazy(() => import('pages/submodulo/ValidarFormatoAutorizacionSubMod'))
 
 /* » ITEM'S */
 const modulo: Array<ModuloType> = [
@@ -108,6 +110,12 @@ const subModulo: Array<SubModuloType> = [
    }, {
       name: 'CONVENIOS',
       component: <ConveniosSubMod />
+   }, {
+      name: 'REGISTRAR FORMATO DE AUTORIZACIÓN',
+      component: <RegistrarFormatoAutorizacionSubMod />
+   }, {
+      name: 'VALIDAR PERMISOS O LICENCIAS',
+      component: <ValidarFormatoAutorizacionSubMod />
    }
 ]
 

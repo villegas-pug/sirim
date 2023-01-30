@@ -17,7 +17,7 @@ export const findAllPais = () => async (dispatch: Dispatch<PaisAction>, getStore
       const { usuario: { token } } = getStore()
       const { data: { levelLog, data, message } } = await api.request<Response<Pais[]>>({
          method: 'GET',
-         url: '/microservicio-generic/findAllPais',
+         url: '/microservicio-rimsim/findAllPais',
          headers: {
             [AUTHORIZATION]: token
          }

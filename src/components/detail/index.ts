@@ -1,0 +1,1 @@
+export { SimpleFieldDetail } from './SimpleFieldDetail'

@@ -15,7 +15,7 @@ export const findAllDependencia = () => async (dispatch: Dispatch<DependenciaAct
       const { usuario: { token } } = getState()
       const { data: { levelLog, data, message } } = await api.request<Response<Dependencia[]>>({
          method: 'GET',
-         url: '/microservicio-generic/findAllDependencia',
+         url: '/microservicio-rimsim/findAllDependencia',
          headers: {
             [AUTHORIZATION]: token
          }

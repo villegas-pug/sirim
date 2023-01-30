@@ -15,7 +15,9 @@ import {
    produccionAnalisisReducer,
    tipoLogicoReducer,
    reportesReducer,
-   LineamientoReducer
+   lineamientoReducer,
+   simUsuarioReducer,
+   formatoPermisosReducer
 } from 'state/reducers'
 
 export const rootReducer = combineReducers({
@@ -26,12 +28,14 @@ export const rootReducer = combineReducers({
    etapa: etapaReducer,
    evento: eventoReducer,
    extraccion: extraccionReducer,
+   formatoPermisos: formatoPermisosReducer,
    httpStatus: httpStatusReducer,
    interpol: interpolReducer,
+   lineamiento: lineamientoReducer,
    pais: paisReducer,
    produccionAnalisis: produccionAnalisisReducer,
    reportes: reportesReducer,
+   simUsuario: simUsuarioReducer,
    tipoLogico: tipoLogicoReducer,
-   usuario: authReducer,
-   lineamiento: LineamientoReducer
+   usuario: authReducer
 })

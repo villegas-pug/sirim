@@ -13,7 +13,7 @@ const INITIAL_STATE: LineamientoState = {
    error: null
 }
 
-export const LineamientoReducer = (state: LineamientoState = INITIAL_STATE, action: LineamientoAction): LineamientoState => {
+export const lineamientoReducer = (state: LineamientoState = INITIAL_STATE, action: LineamientoAction): LineamientoState => {
    switch (action.type) {
    case '[Lineamiento] findAllConvenio loading':
       return { ...state, loading: true, error: null }
