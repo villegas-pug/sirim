@@ -36,7 +36,7 @@ export const SimpleAutocomplete: FC<SimpleAutocompleteProps> = ({ label, width, 
                { ...params }
                label={ label }
                variant='outlined'
-               error={Boolean(err)}
+               error={ Boolean(err) }
                size='small'
                helperText={ err }
                { ...rest.muiProps }

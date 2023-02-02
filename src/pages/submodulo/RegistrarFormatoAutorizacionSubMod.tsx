@@ -1,8 +1,37 @@
+import { FC, useRef, useState, useMemo, useEffect, ChangeEvent } from 'react'
 
-import { FC, useRef, useState, useMemo, useEffect } from 'react'
+import {
+   Box,
+   Button,
+   Divider,
+   IconButton,
+   List,
+   ListItemButton,
+   ListItemIcon,
+   ListItemText,
+   ListSubheader,
+   Paper,
+   Stack,
+   Tooltip,
+   Typography,
+   Badge
+} from '@mui/material'
 
-import { Box, Button, IconButton, Paper, Tooltip } from '@mui/material'
-import { CancelRounded, CheckCircleRounded, DeleteForeverRounded, DeleteSweepRounded, DownloadRounded, EditRounded, MoreVertRounded, SaveRounded, SyncRounded } from '@mui/icons-material'
+import {
+   AttachmentRounded,
+   CancelRounded,
+   CheckCircleRounded,
+   DeleteForeverRounded,
+   DeleteSweepRounded,
+   DownloadRounded,
+   EditRounded,
+   FileDownloadRounded,
+   MoreVertRounded,
+   SaveRounded,
+   SyncRounded,
+   UploadRounded,
+   Mail
+} from '@mui/icons-material'
 import { Form, Formik, FormikConfig } from 'formik'
 import * as Yup from 'yup'
 import { GridColDef } from '@mui/x-data-grid'
@@ -24,7 +53,7 @@ import {
 } from 'components'
 
 import { useBreakpoints, useFormatoPermisos, useSimUsuario } from 'hooks'
-import { FormatoPermisos } from 'interfaces'
+import { AttachmentType, FormatoPermisos } from 'interfaces'
 import { jornadaLaboral, regimenLaboral, tipoLicencia } from 'db'
 import { SimpleFieldDetail } from 'components/detail'
 import { resetObjectProps } from 'helpers'
@@ -41,7 +70,10 @@ const RegistrarFormatoAutorizacionSubMod: FC = () => {
    const speedDialActions: SpeedDialActionProps[] = useMemo(() => ([{
       name: 'Refrescar_Bandeja',
       icon: <SyncRounded />,
-      handleClick: () => { findFormatoPermisosByUsrCreador() }
+      handleClick: async (): Promise<void> => {
+         await findFormatoPermisosByUsrCreador()
+         findAllSimUsuario()
+      }
    }]), [])
 
    return (
@@ -71,7 +103,12 @@ const RegistrarFormatoAutorizacion: FC = () => {
 
 const FormatoAutorizacionFrm: FC<{ formatoPermisos?: FormatoPermisos }> = ({ formatoPermisos }) => {
    // » Custom hook's ...
-   const { loadingFormatoPermisosDb, saveFormatoPermisos, findFormatoPermisosByUsrCreador } = useFormatoPermisos()
+   const {
+      loadingFormatoPermisosDb,
+      saveFormatoPermisos,
+      findFormatoPermisosByUsrCreador
+   } = useFormatoPermisos()
+
    const { simUsuarioNombreDb } = useSimUsuario()
 
    const formikProps: FormikConfig<Partial<FormatoPermisos>> = useMemo(() => ({
@@ -96,8 +133,8 @@ const FormatoAutorizacionFrm: FC<{ formatoPermisos?: FormatoPermisos }> = ({ for
          gerencia: Yup.string().required('¡Campo requerido!'),
          subgerencia: Yup.string().required('¡Campo requerido!'),
          tipoLicencia: Yup.string().required('¡Campo requerido!'),
-         desde: Yup.string().required('¡Campo requerido!'),
-         hasta: Yup.string().required('¡Campo requerido!'),
+         desde: Yup.date().required('¡Campo requerido!').max(Yup.ref('hasta'), '¡Debe ser inferior a la fecha y hora máxima!'),
+         hasta: Yup.date().required('¡Campo requerido!').min(Yup.ref('desde'), '¡Debe ser superior a la fecha y hora mínima!'),
          justificacion: Yup.string().required('¡Campo requerido!'),
          fechaFormato: Yup.date().required('¡Campo requerido!')
       }),
@@ -114,20 +151,20 @@ const FormatoAutorizacionFrm: FC<{ formatoPermisos?: FormatoPermisos }> = ({ for
       <Formik { ...formikProps }>
          { (props) => (
             <Form>
-               <Paper elevation={ 1 } sx={ { my: 0.5, mx: 5, p: 1 } }>
+               <Paper elevation={ 1 } sx={ { my: 0.5, mx: 1, p: 1 } }>
                   <Box display='flex' flexWrap='wrap' justifyContent='space-between' alignItems='flex-start' gap={ 0.5 }>
                      <MySelect name='jornadaLaboral' label='Jornada laboral' width={ 12 } opt={ jornadaLaboral } muiProps={{ autoFocus: true, variant: 'standard' }} />
                      <MySelect name='regimenLaboral' label='Régimen laboral' width={ 10 } opt={ regimenLaboral } muiProps={{ variant: 'standard' }}/>
                      <SimpleAutocomplete name='nombres' label='Servidor' width={ 20 } opt={ simUsuarioNombreDb } muiProps={{ variant: 'standard' }} { ...props } />
-                     <MyTextField type='text' name='gerencia' label='Gerencia' width={ 12 } muiProps={{ variant: 'standard' }} />
-                     <MyTextField type='text' name='subgerencia' label='Subgerencia' width={ 12 } muiProps={{ variant: 'standard' }} />
-                     <MyTextField type='text' name='unidad' label='Unidad' width={ 12 } muiProps={{ variant: 'standard' }} />
-                     <MySelect name='tipoLicencia' label='Tipo de licencia/Permiso' width={ 36 } opt={ tipoLicencia } muiProps={{ variant: 'standard' }} />
-                     <MyTextField type='text' name='desde' label='Desde' width={ 17 } muiProps={{ variant: 'standard' }} />
-                     <MyTextField type='text' name='hasta' label='Hasta' width={ 17 } muiProps={{ variant: 'standard' }} />
-                     <MyTextField type='text' name='totalHoras' label='Total horas' width={ 17 } muiProps={{ variant: 'standard' }} />
-                     <MyTextField type='date' name='fechaFormato' label='Fecha formato' width={ 10 } muiProps={{ variant: 'standard' }} />
-                     <MyTextField type='text' name='justificacion' label='Justificación' width={ 55 } muiProps={{ variant: 'standard' }} />
+                     <MyTextField type='text' name='gerencia' label='Gerencia' width={ 11 } muiProps={{ variant: 'standard' }} />
+                     <MyTextField type='text' name='subgerencia' label='Subgerencia' width={ 11 } muiProps={{ variant: 'standard' }} />
+                     <MyTextField type='text' name='unidad' label='Unidad' width={ 11 } muiProps={{ variant: 'standard' }} />
+                     <MySelect name='tipoLicencia' label='Tipo de licencia/Permiso' width={ 34 } opt={ tipoLicencia } muiProps={{ variant: 'standard' }} />
+                     <MyTextField type='datetime-local' name='desde' label='Desde' width={ 8 } muiProps={{ variant: 'standard' }} />
+                     <MyTextField type='datetime-local' name='hasta' label='Hasta' width={ 8 } muiProps={{ variant: 'standard' }} />
+                     <MyTextField type='text' name='totalHoras' label='Total horas' width={ 8 } muiProps={{ variant: 'standard' }} />
+                     <MyTextField type='date' name='fechaFormato' label='Fecha formato' width={ 7 } muiProps={{ variant: 'standard' }} />
+                     <MyTextField type='text' name='justificacion' label='Justificación' width={ 48 } muiProps={{ variant: 'standard' }} />
                      <Button
                         type='submit'
                         variant='outlined'
@@ -159,6 +196,8 @@ const commonGridColDef: Partial<GridColDef> = {
 const RegistrarFormatoAutorizacionBandeja: FC = () => {
    // » Hook's ...
    const modalEditarFormato = useRef({} as SimpleModalRefProps)
+   const modalAttachments = useRef({} as SimpleModalRefProps)
+   const modalObservaciones = useRef({} as SimpleModalRefProps)
    const confirmEliminarFormato = useRef({} as ConfirmDialogRefProps)
    const modalVerDetalle = useRef({} as SimpleModalRefProps)
    const [formatoPermisosTmp, setFormatoPermisosTmp] = useState({} as FormatoPermisos)
@@ -227,6 +266,20 @@ const RegistrarFormatoAutorizacionBandeja: FC = () => {
          field: '>>>>',
          width: 50,
          ...commonGridColDef,
+         renderCell: ({ row }) => <Tooltip title='Adjuntar documentación' placement='top-start' arrow>
+            <IconButton
+               onClick={ () => {
+                  setFormatoPermisosTmp(row)
+                  modalAttachments.current.setOpen(true)
+               } }
+            >
+               <AttachmentRounded />
+            </IconButton>
+         </Tooltip>
+      }, {
+         field: '>>>>>',
+         width: 50,
+         ...commonGridColDef,
          renderCell: ({ row }) => <Tooltip title='Ver detalle' placement='top-start' arrow>
             <IconButton
                onClick={ () => {
@@ -237,10 +290,40 @@ const RegistrarFormatoAutorizacionBandeja: FC = () => {
                <MoreVertRounded />
             </IconButton>
          </Tooltip>
+      }, {
+         field: '>>>>>>',
+         width: 50,
+         ...commonGridColDef,
+         renderCell: ({ row }) => {
+            if (!row.observaciones) return
+            return (
+               <Tooltip title='Ver observaciones' placement='top-start' arrow>
+                  <IconButton
+                     onClick={() => {
+                        setFormatoPermisosTmp(row)
+                        modalObservaciones.current.setOpen(true)
+                     }}
+                  >
+                     <Badge badgeContent={ 1 } color='error'>
+                        <Mail color='action' />
+                     </Badge>
+                  </IconButton>
+               </Tooltip>
+            )
+         }
       },
       { field: 'idFormato', headerName: 'Id', width: 100, ...commonGridColDef },
       { field: 'fechaCreacion', headerName: 'Fecha Registro', type: 'date', width: 150, ...commonGridColDef },
       {
+         field: 'recibido',
+         headerName: '¿Recibido?',
+         type: 'boolean',
+         width: 120,
+         renderCell: ({ row }) => row.recibido
+            ? <CheckCircleRounded fontSize='small' color='success' />
+            : <CancelRounded fontSize='small' color='error' />,
+         ...commonGridColDef
+      }, {
          field: 'atendido',
          headerName: '¿Atendido?',
          type: 'boolean',
@@ -251,7 +334,7 @@ const RegistrarFormatoAutorizacionBandeja: FC = () => {
          ...commonGridColDef
       },
       { field: 'nombres', headerName: 'Servidor', width: 300, ...commonGridColDef },
-      { field: 'tipoLicencia', headerName: 'Tipo Licencia/Permiso', flex: 1, ...commonGridColDef }
+      { field: 'tipoLicencia', headerName: 'Tipo Licencia/Permiso', minWidth: 500, flex: 1, ...commonGridColDef }
    ], [formatoPermisosDb])
 
    return (
@@ -262,10 +345,10 @@ const RegistrarFormatoAutorizacionBandeja: FC = () => {
                   columns={ dgColumns }
                   rows={ formatoPermisosDb }
                   pageSize={ currentScreen === 'desktopLarge'
-                     ? 7
+                     ? 6
                      : currentScreen === 'desktopWide'
-                        ? 9
-                        : 2
+                        ? 8
+                        : 3
                   }
                   getRowId={ row => row.idFormato }
                   localStoragePageKey='REGISTRAR_FORMATO_AUTORIZACION_BANDEJA_NROPAG'
@@ -299,6 +382,101 @@ const RegistrarFormatoAutorizacionBandeja: FC = () => {
                <SimpleFieldDetail record={ formatoPermisosTmp } title='Fecha Formato' prop='fechaFormato' />
             </Box>
          </SimpleModal>
+
+         {/* » Modal: Attachment's ...  */}
+         <SimpleModal ref={ modalAttachments }>
+            <Attachments permiso={ formatoPermisosTmp } />
+         </SimpleModal>
+
+         {/* » Modal: Observaciones ...  */}
+         <SimpleModal ref={ modalObservaciones }>
+            <Box width={ 500 } px={ 1 } display='flex' flexDirection='column' gap={ 1 }>
+               <Typography variant='h2'>Observaciones:</Typography>
+               <Typography variant='h4'>{ formatoPermisosTmp.observaciones }</Typography>
+            </Box>
+         </SimpleModal>
+      </>
+   )
+}
+
+const Attachments: FC<{permiso: FormatoPermisos}> = ({ permiso }) => {
+   // » Hook's ...
+   const inputFile = useRef({} as HTMLInputElement)
+   const attachmentType = useRef<AttachmentType>()
+
+   // » Custom hook's ...
+   const { handleUploadAttachment, downlodAttachment } = useFormatoPermisos()
+
+   // » Handler's ...
+   const handleChangeInputFile = ({ target: { files } }: ChangeEvent<HTMLInputElement>) => {
+      handleUploadAttachment(files!, attachmentType.current!, permiso.idFormato)
+      inputFile.current.value = ''
+   }
+
+   return (
+      <>
+         <Stack direction='row' spacing={ 1 } divider={ <Divider orientation='vertical' flexItem /> }>
+
+            <List
+               subheader={ <ListSubheader><Typography variant='h3'>░ Formato</Typography></ListSubheader> }
+            >
+
+               <ListItemButton
+                  onClick={ () => {
+                     attachmentType.current = 'FORMATO'
+                     inputFile.current.click()
+                  } }
+               >
+                  <ListItemIcon><UploadRounded /></ListItemIcon>
+                  <ListItemText primary={ <Typography variant='h5'>Subir formato</Typography> } />
+               </ListItemButton>
+
+               <ListItemButton
+                  onClick={ () => {
+                     attachmentType.current = 'FORMATO'
+                     downlodAttachment('FORMATO', permiso.idFormato)
+                  } }
+               >
+                  <ListItemIcon><FileDownloadRounded /></ListItemIcon>
+                  <ListItemText primary={ <Typography variant='h5'>Descargar formato</Typography> } />
+               </ListItemButton>
+            </List>
+
+            <List
+               subheader={ <ListSubheader><Typography variant='h3'>░ Sustento</Typography></ListSubheader> }
+            >
+
+               <ListItemButton
+                  onClick={ () => {
+                     attachmentType.current = 'SUSTENTO'
+                     inputFile.current.click()
+                  } }
+               >
+                  <ListItemIcon><UploadRounded /></ListItemIcon>
+                  <ListItemText primary={ <Typography variant='h5'>Subir sustento</Typography> } />
+               </ListItemButton>
+
+               <ListItemButton
+                  onClick={ () => {
+                     attachmentType.current = 'SUSTENTO'
+                     downlodAttachment('SUSTENTO', permiso.idFormato)
+                  } }
+               >
+                  <ListItemIcon><FileDownloadRounded /></ListItemIcon>
+                  <ListItemText primary={ <Typography variant='h5'>Descargar sustento</Typography> } />
+               </ListItemButton>
+            </List>
+
+         </Stack>
+
+         {/* » Aux input file ...  */}
+         <input
+            ref={ inputFile }
+            type='file'
+            accept='.pdf'
+            hidden
+            onChange={ handleChangeInputFile }
+         />
       </>
    )
 }

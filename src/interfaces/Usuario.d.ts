@@ -24,10 +24,6 @@ export interface Usuario {
 }
 
 export interface SimUsuario {
-   login: string
+   idUsuario: number
    nombre: string
-   siglas: string
-   idDependencia: string
-   dni: string
-   idDocumento: string
 }

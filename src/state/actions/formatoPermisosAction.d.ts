@@ -1,4 +1,4 @@
-import { FormatoPermisos } from 'interfaces'
+import { ControlPermisosDto, FormatoPermisos } from 'interfaces'
 import { ResponseHttpStatusType } from 'state/actions/httpStatusAction'
 
 interface SaveFormatoPermisosLoading {
@@ -81,6 +81,101 @@ interface ValidateFormatoPermisosError {
    payload: string | null
 }
 
+interface UploadControlAsistenciaLoading {
+   type: '[formatoPermisos] uploadControlAsistencia loading'
+}
+
+interface UploadControlAsistenciaSuccess {
+   type: '[formatoPermisos] uploadControlAsistencia success'
+   payload: number
+}
+
+interface UploadControlAsistenciaError {
+   type: '[formatoPermisos] uploadControlAsistencia error'
+   payload: string | null
+}
+
+interface DeleteAllControlAsistenciaLoading {
+   type: '[formatoPermisos] deleteAllControlAsistencia loading'
+}
+
+interface DeleteAllControlAsistenciaSuccess {
+   type: '[formatoPermisos] deleteAllControlAsistencia success'
+   payload: number
+}
+
+interface DeleteAllControlAsistenciaError {
+   type: '[formatoPermisos] deleteAllControlAsistencia error'
+   payload: string | null
+}
+
+interface CountControlAsistenciasLoading {
+   type: '[formatoPermisos] countControlAsistencias loading'
+}
+
+interface CountControlAsistenciasSuccess {
+   type: '[formatoPermisos] countControlAsistencias success'
+   payload: number
+}
+
+interface CountControlAsistenciasError {
+   type: '[formatoPermisos] countControlAsistencias error'
+   payload: string | null
+}
+
+interface FindControlPermisosByServidorLoading {
+   type: '[formatoPermisos] findControlPermisosByServidor loading'
+}
+
+interface FindControlPermisosByServidorSuccess {
+   type: '[formatoPermisos] findControlPermisosByServidor success'
+   payload: Array<ControlPermisosDto>
+}
+
+interface FindControlPermisosByServidorError {
+   type: '[formatoPermisos] findControlPermisosByServidor error'
+   payload: string | null
+}
+
+interface UploadAttachmentLoading {
+   type: '[formatoPermisos] uploadAttachment loading'
+}
+
+interface UploadAttachmentSuccess {
+   type: '[formatoPermisos] uploadAttachment success'
+}
+
+interface UploadAttachmentError {
+   type: '[formatoPermisos] uploadAttachment error'
+   payload: string | null
+}
+
+interface DownlodAttachmentLoading {
+   type: '[formatoPermisos] downlodAttachment loading'
+}
+
+interface DownlodAttachmentSuccess {
+   type: '[formatoPermisos] downlodAttachment success'
+}
+
+interface DownlodAttachmentError {
+   type: '[formatoPermisos] downlodAttachment error'
+   payload: string | null
+}
+
+interface SaveObservacionesFormatoPermisosLoading {
+   type: '[formatoPermisos] saveObservacionesFormatoPermisos loading'
+}
+
+interface SaveObservacionesFormatoPermisosSuccess {
+   type: '[formatoPermisos] saveObservacionesFormatoPermisos success'
+}
+
+interface SaveObservacionesFormatoPermisosError {
+   type: '[formatoPermisos] saveObservacionesFormatoPermisos error'
+   payload: string | null
+}
+
 export type FormatoPermisosAction =
    | ResponseHttpStatusType
    | SaveFormatoPermisosLoading
@@ -101,3 +196,24 @@ export type FormatoPermisosAction =
    | ValidateFormatoPermisosLoading
    | ValidateFormatoPermisosSuccess
    | ValidateFormatoPermisosError
+   | UploadControlAsistenciaLoading
+   | UploadControlAsistenciaSuccess
+   | UploadControlAsistenciaError
+   | DeleteAllControlAsistenciaLoading
+   | DeleteAllControlAsistenciaSuccess
+   | DeleteAllControlAsistenciaError
+   | CountControlAsistenciasLoading
+   | CountControlAsistenciasSuccess
+   | CountControlAsistenciasError
+   | FindControlPermisosByServidorLoading
+   | FindControlPermisosByServidorSuccess
+   | FindControlPermisosByServidorError
+   | UploadAttachmentLoading
+   | UploadAttachmentSuccess
+   | UploadAttachmentError
+   | DownlodAttachmentLoading
+   | DownlodAttachmentSuccess
+   | DownlodAttachmentError
+   | SaveObservacionesFormatoPermisosLoading
+   | SaveObservacionesFormatoPermisosSuccess
+   | SaveObservacionesFormatoPermisosError

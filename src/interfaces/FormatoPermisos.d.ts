@@ -17,5 +17,11 @@ export interface FormatoPermisos {
    fechaFormato: string;
    fechaCreacion: null | string;
    atendido: boolean
+   recibido: boolean
+   observaciones: string
    activo: boolean;
 }
+
+export type AttachmentType = 'FORMATO' | 'SUSTENTO'
+
+export type ValidateType = 'ATENDIDO' | 'RECIBIDO'

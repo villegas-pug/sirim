@@ -1,27 +1,76 @@
 import { ChangeEvent, FC, useEffect, useMemo, useRef, useState } from 'react'
 
-import { Box, Button, ButtonGroup, IconButton, Paper, Tooltip, Typography } from '@mui/material'
-import { CancelRounded, CheckCircleRounded, CleaningServicesRounded, FileDownloadRounded, MoreVertRounded, RuleRounded, StorageRounded, SyncRounded } from '@mui/icons-material'
+import {
+   Box,
+   Button,
+   ButtonGroup,
+   IconButton,
+   Paper,
+   Tooltip,
+   Typography,
+   Stack,
+   List,
+   ListItemButton,
+   ListItemIcon,
+   ListItemText,
+   Divider,
+   ListSubheader
+} from '@mui/material'
+import {
+   CancelRounded,
+   CheckCircleRounded,
+   CleaningServicesRounded,
+   FileDownloadRounded,
+   MoreVertRounded,
+   PlagiarismRounded,
+   RuleRounded,
+   SendAndArchiveRounded,
+   StorageRounded,
+   SyncRounded,
+   SaveRounded,
+   CommentRounded
+} from '@mui/icons-material'
 import { GridColDef } from '@mui/x-data-grid'
 import Zoom from 'react-reveal/Zoom'
+import { Formik, Form, FormikConfig } from 'formik'
+import * as Yup from 'yup'
 
-import { BandejaProcesos, InfoCard, ModalLoader, SimpleDataGrid, SimpleModal, SimpleModalRefProps, SpeedDialActionProps, SpeedDialBackdrop, WrapperInfoCard } from 'components'
+import {
+   SimpleFieldDetail,
+   BandejaProcesos,
+   ExportToExcel,
+   ExportToExcelRefProps,
+   InfoCard,
+   ModalLoader,
+   SimpleDataGrid,
+   SimpleModal,
+   SimpleModalRefProps,
+   SpeedDialActionProps,
+   SpeedDialBackdrop,
+   WrapperInfoCard,
+   MyTextField
+} from 'components'
 
+import { AttachmentType, FormatoPermisos } from 'interfaces'
 import { useBreakpoints, useFormatoPermisos } from 'hooks'
-import { SimpleFieldDetail } from 'components/detail'
-import { FormatoPermisos } from 'interfaces'
+import { resetObjectProps } from 'helpers'
 
 export const ValidarFormatoAutorizacionSubMod = () => {
    // » Custom hook's ...
-   const { loadingFormatoPermisosDb, findAllFormatoPermisos } = useFormatoPermisos()
+   const { loadingFormatoPermisosDb, findAllFormatoPermisos, countControlAsistencias } = useFormatoPermisos()
 
    // » Effect's ...
+   useEffect(() => { findAllFormatoPermisos() }, [])
+   useEffect(() => { countControlAsistencias() }, [])
 
    // » Dep's ...
    const speedDialActions: SpeedDialActionProps[] = useMemo(() => ([{
       name: 'Refrescar_Bandeja',
       icon: <SyncRounded />,
-      handleClick: () => { findAllFormatoPermisos() }
+      handleClick: () => {
+         findAllFormatoPermisos()
+         countControlAsistencias()
+      }
    }]), [])
 
    return (
@@ -49,11 +98,13 @@ const ValidarFormatoAutorizacionInfoCards: FC = () => {
       totalFormatoPermisosDb,
       totalAttendedFormatoPermisosDb,
       totalNotAttendedFormatoPermisosDb,
-      loadingFormatoPermisosDb
+      loadingFormatoPermisosDb,
+      totalRecordsCtrlAsistenciaDb
    } = useFormatoPermisos()
 
    return (
       <WrapperInfoCard loading={ loadingFormatoPermisosDb }>
+         <InfoCard iconName='Records' title='Base Marcación' value={ totalRecordsCtrlAsistenciaDb } />
          <InfoCard iconName='Assignment' title='Total Permisos' value={ totalFormatoPermisosDb } />
          <InfoCard iconName='AssignmentComplete' title='Permisos Atendidos' value={ totalAttendedFormatoPermisosDb } />
          <InfoCard iconName='AssignmentPendent' title='Permisos Pendientes' value={ totalNotAttendedFormatoPermisosDb } />
@@ -64,16 +115,18 @@ const ValidarFormatoAutorizacionInfoCards: FC = () => {
 const ValidarFormatoAutorizacionActions: FC = () => {
    // » Hook's ...
    const inputFile = useRef({} as HTMLInputElement)
-   const [file, setFile] = useState({} as File)
+
+   // » Custom hook's ...
+   const { handleUploadControlCalidad, deleteAllControlAsistencia } = useFormatoPermisos()
 
    // » Effect's ...
-   useEffect(() => { console.log({ file }) }, [file])
 
    // » Handler's ...
    const handleClickFile = () => { inputFile.current.click() }
 
    const handleChangeFile = ({ target: { files } }: ChangeEvent<HTMLInputElement>) => {
-      setFile(files![0])
+      handleUploadControlCalidad(files!)
+      inputFile.current.value = ''
    }
 
    return (
@@ -82,22 +135,17 @@ const ValidarFormatoAutorizacionActions: FC = () => {
             <ButtonGroup variant='contained'>
 
                <Button
-                  onClick={ handleClickFile }
                   startIcon={ <StorageRounded fontSize='medium' /> }
+                  onClick={ handleClickFile }
                >
                   <Typography variant='h5'>Subir asistencias</Typography>
                </Button>
 
                <Button
                   startIcon={ <CleaningServicesRounded fontSize='medium' /> }
+                  onClick={ () => deleteAllControlAsistencia() }
                >
                   <Typography variant='h5'>Eliminar asistencias</Typography>
-               </Button>
-
-               <Button
-                  startIcon={ <FileDownloadRounded fontSize='medium' /> }
-               >
-                  <Typography variant='h5'>Descargar asistencias</Typography>
                </Button>
 
             </ButtonGroup>
@@ -121,20 +169,31 @@ const commonGridColDef: Partial<GridColDef> = {
 
 const ValidarFormatoAutorizacionBandeja: FC = () => {
    // » Hook's ...
+   const isMounted = useRef(false)
    const modalVerDetalle = useRef({} as SimpleModalRefProps)
+   const modalAttachments = useRef({} as SimpleModalRefProps)
+   const modalObservaciones = useRef({} as SimpleModalRefProps)
+   const modalValidaciones = useRef({} as SimpleModalRefProps)
+   const controlAsistenciasRpt = useRef({} as ExportToExcelRefProps)
    const [formatoPermisosTmp, setFormatoPermisosTmp] = useState({} as FormatoPermisos)
 
    // » Custom hook's ...
    const {
       formatoPermisosDb,
-      findAllFormatoPermisos,
-      validateFormatoPermisos
+      controlPermisosDb,
+      findControlPermisosByServidor
    } = useFormatoPermisos()
 
    const { currentScreen } = useBreakpoints()
 
    // » Effect's ...
-   useEffect(() => { findAllFormatoPermisos() }, [])
+   useEffect(() => {
+      if (controlPermisosDb.length === 0) return
+      if (!isMounted.current) return
+      controlAsistenciasRpt.current.handleExportToExcel()
+   }, [controlPermisosDb])
+
+   useEffect(() => { isMounted.current = true }, [])
 
    // » Dep's ...
    const dgColumns = useMemo<GridColDef<FormatoPermisos>[]>(() => [
@@ -156,14 +215,53 @@ const ValidarFormatoAutorizacionBandeja: FC = () => {
          field: '>>',
          width: 50,
          ...commonGridColDef,
-         renderCell: ({ row }) => <Tooltip title='Atender formato' placement='top-start' arrow>
+         renderCell: ({ row }) => <Tooltip title='Validar formato' placement='top-start' arrow>
             <IconButton
-               onClick={ async (): Promise<void> => {
-                  await validateFormatoPermisos(row.idFormato)
-                  findAllFormatoPermisos()
+               onClick={ () => {
+                  setFormatoPermisosTmp(row)
+                  modalValidaciones.current.setOpen(true)
                } }
             >
                <RuleRounded />
+            </IconButton>
+         </Tooltip>
+      }, {
+         field: '>>>',
+         width: 50,
+         ...commonGridColDef,
+         renderCell: ({ row }) => <Tooltip title='Descargar vinculaciones' placement='top-start' arrow>
+            <IconButton
+               onClick={ () => { findControlPermisosByServidor(row.nombres) } }
+            >
+               <SendAndArchiveRounded />
+            </IconButton>
+         </Tooltip>
+      }, {
+         field: '>>>>',
+         width: 50,
+         ...commonGridColDef,
+         renderCell: ({ row }) => <Tooltip title='Ver documentación adjunta' placement='top-start' arrow>
+            <IconButton
+               onClick={ () => {
+                  setFormatoPermisosTmp(row)
+                  modalAttachments.current.setOpen(true)
+               } }
+            >
+               <PlagiarismRounded />
+            </IconButton>
+         </Tooltip>
+      }, {
+         field: '>>>>>',
+         width: 50,
+         ...commonGridColDef,
+         renderCell: ({ row }) => <Tooltip title='Registrar observaciones' placement='top-start' arrow>
+            <IconButton
+               onClick={ () => {
+                  setFormatoPermisosTmp(row)
+                  modalObservaciones.current.setOpen(true)
+               } }
+            >
+               <CommentRounded />
             </IconButton>
          </Tooltip>
       },
@@ -175,6 +273,15 @@ const ValidarFormatoAutorizacionBandeja: FC = () => {
          type: 'boolean',
          width: 120,
          renderCell: ({ row }) => row.atendido
+            ? <CheckCircleRounded fontSize='small' color='success' />
+            : <CancelRounded fontSize='small' color='error' />,
+         ...commonGridColDef
+      }, {
+         field: 'recibido',
+         headerName: '¿Validado?',
+         type: 'boolean',
+         width: 120,
+         renderCell: ({ row }) => row.recibido
             ? <CheckCircleRounded fontSize='small' color='success' />
             : <CancelRounded fontSize='small' color='error' />,
          ...commonGridColDef
@@ -193,10 +300,10 @@ const ValidarFormatoAutorizacionBandeja: FC = () => {
                   columns={ dgColumns }
                   rows={ formatoPermisosDb }
                   pageSize={ currentScreen === 'desktopLarge'
-                     ? 7
+                     ? 6
                      : currentScreen === 'desktopWide'
-                        ? 9
-                        : 2
+                        ? 8
+                        : 4
                   }
                   getRowId={ row => row.idFormato }
                   localStoragePageKey='VALIDAR_FORMATO_AUTORIZACION_BANDEJA_NROPAG'
@@ -222,7 +329,190 @@ const ValidarFormatoAutorizacionBandeja: FC = () => {
                <SimpleFieldDetail record={ formatoPermisosTmp } title='Fecha Formato' prop='fechaFormato' />
             </Box>
          </SimpleModal>
+
+         {/* » Modal: Attachment's ...  */}
+         <SimpleModal ref={ modalAttachments }>
+            <Attachments permiso={ formatoPermisosTmp } />
+         </SimpleModal>
+
+         {/* » Modal: Observaciones ...  */}
+         <SimpleModal ref={ modalObservaciones }>
+            <ObservacionesFrm formatoPermisos={ formatoPermisosTmp } />
+         </SimpleModal>
+
+         {/* » Modal: Validaciones ...  */}
+         <SimpleModal ref={ modalValidaciones }>
+            <ValidacionesActions formatoPermiso={ formatoPermisosTmp } />
+         </SimpleModal>
+
+         {/* » Modal: `Rpt` ... */}
+         <ExportToExcel ref={ controlAsistenciasRpt } data={ controlPermisosDb } />
       </>
+   )
+}
+
+const Attachments: FC<{permiso: FormatoPermisos}> = ({ permiso }) => {
+   // » Hook's ...
+   const inputFile = useRef({} as HTMLInputElement)
+   const attachmentType = useRef<AttachmentType>()
+
+   // » Custom hook's ...
+   const { handleUploadAttachment, downlodAttachment } = useFormatoPermisos()
+
+   // » Handler's ...
+   const handleChangeInputFile = ({ target: { files } }: ChangeEvent<HTMLInputElement>) => {
+      handleUploadAttachment(files!, attachmentType.current!, permiso.idFormato)
+      inputFile.current.value = ''
+   }
+
+   return (
+      <>
+         <Stack direction='row' spacing={ 1 } divider={ <Divider orientation='vertical' flexItem /> }>
+
+            <List
+               subheader={ <ListSubheader><Typography variant='h3'>░ Formato</Typography></ListSubheader> }
+            >
+
+               <ListItemButton
+                  onClick={ () => {
+                     attachmentType.current = 'FORMATO'
+                     downlodAttachment('FORMATO', permiso.idFormato)
+                  } }
+               >
+                  <ListItemIcon><FileDownloadRounded /></ListItemIcon>
+                  <ListItemText primary={ <Typography variant='h5'>Descargar formato</Typography> } />
+               </ListItemButton>
+            </List>
+
+            <List
+               subheader={ <ListSubheader><Typography variant='h3'>░ Sustento</Typography></ListSubheader> }
+            >
+
+               <ListItemButton
+                  onClick={ () => {
+                     attachmentType.current = 'SUSTENTO'
+                     downlodAttachment('SUSTENTO', permiso.idFormato)
+                  } }
+               >
+                  <ListItemIcon><FileDownloadRounded /></ListItemIcon>
+                  <ListItemText primary={ <Typography variant='h5'>Descargar sustento</Typography> } />
+               </ListItemButton>
+            </List>
+
+         </Stack>
+
+         {/* » Aux input file ...  */}
+         <input
+            ref={ inputFile }
+            type='file'
+            accept='.pdf'
+            hidden
+            onChange={ handleChangeInputFile }
+         />
+      </>
+   )
+}
+
+const ObservacionesFrm: FC<{ formatoPermisos: FormatoPermisos }> = ({ formatoPermisos }) => {
+   // » Custom hook's ...
+   const {
+      loadingFormatoPermisosDb,
+      saveObservacionesFormatoPermisos,
+      findAllFormatoPermisos
+   } = useFormatoPermisos()
+
+   // » Dep's ...
+   const formikProps: FormikConfig<Partial<FormatoPermisos>> = useMemo(() => ({
+      initialValues: {
+         observaciones: formatoPermisos?.observaciones || ''
+      },
+      validationSchema: Yup.object({
+         observaciones: Yup.string().required('¡Campo requerido!')
+      }),
+      onSubmit: async (values, meta): Promise<void> => {
+         await saveObservacionesFormatoPermisos(formatoPermisos?.idFormato!, values.observaciones || '')
+         await findAllFormatoPermisos()
+         meta.resetForm()
+         meta.setValues(resetObjectProps(formatoPermisos!))
+      }
+   }), [formatoPermisos])
+
+   return (
+      <Formik { ...formikProps }>
+         { (props) => (
+            <Form>
+               <Box display='flex' flexDirection='column' gap={ 1 }>
+                  <MyTextField
+                     type='text'
+                     name='observaciones'
+                     label='Observaciones'
+                     width={ 40 }
+                     muiProps={{ variant: 'standard', multiline: true, rows: 4, autoFocus: true }}
+                  />
+                  <Button
+                     type='submit'
+                     variant='outlined'
+                     color='primary'
+                     disabled={ loadingFormatoPermisosDb }
+                     fullWidth
+                  >
+                     <SaveRounded />
+                  </Button>
+               </Box>
+            </Form>
+         ) }
+      </Formik>
+   )
+}
+
+const ValidacionesActions: FC<{ formatoPermiso: FormatoPermisos }> = ({ formatoPermiso }) => {
+   // » Custom hook's ...
+   const {
+      formatoPermisosDb,
+      validateFormatoPermisos,
+      findAllFormatoPermisos
+   } = useFormatoPermisos()
+
+   const isAtendido = useMemo(() => {
+      return formatoPermisosDb.find(({ idFormato }) => idFormato === formatoPermiso.idFormato)?.atendido
+   }, [formatoPermisosDb])
+
+   const isValidado = useMemo(() => {
+      return formatoPermisosDb.find(({ idFormato }) => idFormato === formatoPermiso.idFormato)?.recibido
+   }, [formatoPermisosDb])
+
+   const renderIcon = (isTrue: boolean) => {
+      return isTrue
+         ? <CheckCircleRounded fontSize='small' color='success' />
+         : <CancelRounded fontSize='small' color='error' />
+   }
+
+   return (
+      <Box mx={ 1 }>
+         <ButtonGroup variant='outlined'>
+
+            <Button
+               startIcon={ renderIcon(isAtendido!) }
+               onClick={ async (): Promise<void> => {
+                  await validateFormatoPermisos(formatoPermiso.idFormato, 'ATENDIDO')
+                  findAllFormatoPermisos()
+               } }
+            >
+               <Typography variant='h5'>{ isAtendido ? 'Denegar' : 'Atender' }</Typography>
+            </Button>
+
+            <Button
+               endIcon={ renderIcon(isValidado!) }
+               onClick={ async (): Promise<void> => {
+                  await validateFormatoPermisos(formatoPermiso.idFormato, 'RECIBIDO')
+                  findAllFormatoPermisos()
+               } }
+            >
+               <Typography variant='h5'>{ isValidado ? 'Invalidar' : 'validar' }</Typography>
+            </Button>
+
+         </ButtonGroup>
+      </Box>
    )
 }
 

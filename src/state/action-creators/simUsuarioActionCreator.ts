@@ -16,7 +16,7 @@ export const findAllSimUsuario = () => async (dispatch: Dispatch<SimUsuarioActio
       const { usuario: { token } } = getState()
       const { data: { levelLog, data, message } } = await api.request<Response<SimUsuario[]>>({
          method: 'GET',
-         url: '/microservicio-rimsim/findAllSimUsuario',
+         url: '/microservicio-rrhh/findAllControlAsistenciaUsrs',
          headers: {
             [AUTHORIZATION]: token
          }

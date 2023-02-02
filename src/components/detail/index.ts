@@ -1,1 +1,1 @@
-export { SimpleFieldDetail } from './SimpleFieldDetail'
+export * from './SimpleFieldDetail'

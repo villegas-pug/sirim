@@ -67,7 +67,8 @@ import {
    NewReleasesRounded,
    HandshakeRounded,
    ReceiptLongRounded,
-   FactCheckRounded
+   FactCheckRounded,
+   LowPriorityRounded
 } from '@mui/icons-material'
 
 const classes: { [key: string]: CSSProperties } = {
@@ -146,7 +147,8 @@ export const elementIcons = {
    Passport: <StyleRounded fontSize='large' />,
    PassportValid: <LibraryAddCheckRounded fontSize='large' />,
    Persons: <Groups3Rounded fontSize='large' />,
-   ErrQC: <NewReleasesRounded fontSize='large' />
+   ErrQC: <NewReleasesRounded fontSize='large' />,
+   Records: <LowPriorityRounded fontSize='large' />
 
 }
 

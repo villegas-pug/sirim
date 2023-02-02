@@ -1,12 +1,16 @@
 import { useMemo } from 'react'
 
 import { useAppSelector, useAppActions } from 'hooks'
+import { AttachmentType } from 'interfaces'
 
 export const useFormatoPermisos = () => {
    // » Store hook's ...
    const {
       data: formatoPermisosDb,
-      loading: loadingFormatoPermisosDb
+      loading: loadingFormatoPermisosDb,
+      totalRecordsCtrlAsistenciaDb,
+      controlPermisosDb,
+      error: errorFormatoPermisosDb
    } = useAppSelector(store => store.formatoPermisos)
 
    const {
@@ -15,7 +19,14 @@ export const useFormatoPermisos = () => {
       findFormatoPermisosByUsrCreador,
       downloadFormatoLicenciaById,
       deleteFormatoPermisosById,
-      validateFormatoPermisos
+      validateFormatoPermisos,
+      uploadControlAsistencia,
+      deleteAllControlAsistencia,
+      countControlAsistencias,
+      findControlPermisosByServidor,
+      uploadAttachment,
+      downlodAttachment,
+      saveObservacionesFormatoPermisos
    } = useAppActions()
 
    // » Dep's ...
@@ -29,18 +40,42 @@ export const useFormatoPermisos = () => {
       return formatoPermisosDb.filter(({ atendido }) => atendido).length
    }, [formatoPermisosDb])
 
+   // » Handler's ...
+   const handleUploadControlCalidad = (file: FileList) => {
+      const frmData = new FormData()
+      frmData.append('file', file[0])
+      uploadControlAsistencia(frmData)
+   }
+
+   const handleUploadAttachment = (file: FileList, type: AttachmentType, idFormato: number) => {
+      const frmData = new FormData()
+      frmData.append('file', file[0])
+      uploadAttachment(frmData, type, idFormato)
+   }
+
    return {
       formatoPermisosDb,
       loadingFormatoPermisosDb,
       totalFormatoPermisosDb,
       totalNotAttendedFormatoPermisosDb,
       totalAttendedFormatoPermisosDb,
+      totalRecordsCtrlAsistenciaDb,
+      controlPermisosDb,
+
+      errorFormatoPermisosDb,
 
       saveFormatoPermisos,
       findAllFormatoPermisos,
       findFormatoPermisosByUsrCreador,
       downloadFormatoLicenciaById,
       deleteFormatoPermisosById,
-      validateFormatoPermisos
+      validateFormatoPermisos,
+      handleUploadControlCalidad,
+      deleteAllControlAsistencia,
+      countControlAsistencias,
+      findControlPermisosByServidor,
+      handleUploadAttachment,
+      downlodAttachment,
+      saveObservacionesFormatoPermisos
    }
 }

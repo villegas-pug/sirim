@@ -6,7 +6,7 @@ import { FormatoPermisosAction } from 'state/actions'
 
 import { noty } from 'helpers'
 import { localStorage } from 'constants/'
-import { Response, FormatoPermisos, LevelLog } from 'interfaces'
+import { Response, FormatoPermisos, LevelLog, ControlPermisosDto, AttachmentType, ValidateType } from 'interfaces'
 import fileDownload from 'js-file-download'
 
 const { AUTHORIZATION } = localStorage
@@ -164,14 +164,14 @@ export const deleteFormatoPermisosById = (idFormato: number) => async (dispatch:
    }
 }
 
-export const validateFormatoPermisos = (idFormato: number) => async (dispatch: Dispatch<FormatoPermisosAction>, getState: () => any): Promise<void> => {
+export const validateFormatoPermisos = (idFormato: number, type: ValidateType) => async (dispatch: Dispatch<FormatoPermisosAction>, getState: () => any): Promise<void> => {
    dispatch({ type: '[formatoPermisos] validateFormatoPermisos loading' })
    try {
       const { usuario: { token } } = getState()
       const { data: { levelLog, message } } = await api.request<Response<[]>>({
-         method: 'DELETE',
+         method: 'PUT',
          url: '/microservicio-rrhh/validateFormatoPermisos',
-         params: { idFormato },
+         params: { idFormato, type },
          headers: {
             [AUTHORIZATION]: token
          }
@@ -190,6 +190,217 @@ export const validateFormatoPermisos = (idFormato: number) => async (dispatch: D
       }
    } catch (err: any) {
       dispatch({ type: '[formatoPermisos] validateFormatoPermisos error', payload: err?.message })
+      dispatch({ type: '[http-status] Response status', payload: err?.response?.status })
+   }
+}
+
+export const uploadControlAsistencia = (frmData: FormData) => async (dispatch: Dispatch<FormatoPermisosAction>, getState: () => any): Promise<void> => {
+   dispatch({ type: '[formatoPermisos] uploadControlAsistencia loading' })
+   try {
+      const { usuario: { token } } = getState()
+      const { data: { levelLog, data, message } } = await api.request<Response<number>>({
+         method: 'POST',
+         url: '/microservicio-rrhh/uploadControlAsistencia',
+         data: frmData,
+         headers: {
+            [AUTHORIZATION]: token
+         }
+      })
+
+      switch (levelLog) {
+      case 'SUCCESS':
+         dispatch({ type: '[formatoPermisos] uploadControlAsistencia success', payload: data })
+         noty('success', message)
+         break
+      case 'WARNING':
+      case 'ERROR':
+         dispatch({ type: '[formatoPermisos] uploadControlAsistencia error', payload: message })
+         noty('error', message)
+         break
+      }
+   } catch (err: any) {
+      dispatch({ type: '[formatoPermisos] uploadControlAsistencia error', payload: err?.message })
+      dispatch({ type: '[http-status] Response status', payload: err?.response?.status })
+   }
+}
+
+export const deleteAllControlAsistencia = () => async (dispatch: Dispatch<FormatoPermisosAction>, getState: () => any): Promise<void> => {
+   dispatch({ type: '[formatoPermisos] deleteAllControlAsistencia loading' })
+   try {
+      const { usuario: { token } } = getState()
+      const { data: { levelLog, data, message } } = await api.request<Response<number>>({
+         method: 'DELETE',
+         url: '/microservicio-rrhh/deleteAllControlAsistencia',
+         headers: {
+            [AUTHORIZATION]: token
+         }
+      })
+
+      switch (levelLog) {
+      case 'SUCCESS':
+         dispatch({ type: '[formatoPermisos] deleteAllControlAsistencia success', payload: data })
+         noty('success', message)
+         break
+      case 'WARNING':
+      case 'ERROR':
+         dispatch({ type: '[formatoPermisos] deleteAllControlAsistencia error', payload: message })
+         noty('error', message)
+         break
+      }
+   } catch (err: any) {
+      dispatch({ type: '[formatoPermisos] deleteAllControlAsistencia error', payload: err?.message })
+      dispatch({ type: '[http-status] Response status', payload: err?.response?.status })
+   }
+}
+
+export const countControlAsistencias = () => async (dispatch: Dispatch<FormatoPermisosAction>, getState: () => any): Promise<void> => {
+   dispatch({ type: '[formatoPermisos] countControlAsistencias loading' })
+   try {
+      const { usuario: { token } } = getState()
+      const { data: { levelLog, data, message } } = await api.request<Response<number>>({
+         method: 'GET',
+         url: '/microservicio-rrhh/countControlAsistencias',
+         headers: {
+            [AUTHORIZATION]: token
+         }
+      })
+
+      switch (levelLog) {
+      case 'SUCCESS':
+         dispatch({ type: '[formatoPermisos] countControlAsistencias success', payload: data })
+         break
+      case 'WARNING':
+      case 'ERROR':
+         dispatch({ type: '[formatoPermisos] countControlAsistencias error', payload: message })
+         noty('error', message)
+         break
+      }
+   } catch (err: any) {
+      dispatch({ type: '[formatoPermisos] deleteAllControlAsistencia error', payload: err?.message })
+      dispatch({ type: '[http-status] Response status', payload: err?.response?.status })
+   }
+}
+
+export const findControlPermisosByServidor = (servidor: string) => async (dispatch: Dispatch<FormatoPermisosAction>, getState: () => any): Promise<void> => {
+   dispatch({ type: '[formatoPermisos] findControlPermisosByServidor loading' })
+   try {
+      const { usuario: { token } } = getState()
+      const { data: { levelLog, data, message } } = await api.request<Response<ControlPermisosDto[]>>({
+         method: 'GET',
+         url: '/microservicio-rrhh/findControlPermisosByServidor',
+         params: { servidor },
+         headers: {
+            [AUTHORIZATION]: token
+         }
+      })
+
+      switch (levelLog) {
+      case 'SUCCESS':
+         dispatch({ type: '[formatoPermisos] findControlPermisosByServidor success', payload: data })
+         noty('success', message)
+         break
+      case 'WARNING':
+      case 'ERROR':
+         dispatch({ type: '[formatoPermisos] findControlPermisosByServidor error', payload: message })
+         noty('error', message)
+         break
+      }
+   } catch (err: any) {
+      dispatch({ type: '[formatoPermisos] deleteAllControlAsistencia error', payload: err?.message })
+      dispatch({ type: '[http-status] Response status', payload: err?.response?.status })
+   }
+}
+
+export const uploadAttachment = (frmData: FormData, type: AttachmentType, idFormato: number) => async (dispatch: Dispatch<FormatoPermisosAction>, getState: () => any): Promise<void> => {
+   dispatch({ type: '[formatoPermisos] uploadAttachment loading' })
+   try {
+      const { usuario: { token } } = getState()
+      const { data: { levelLog, message } } = await api.request<Response<[]>>({
+         method: 'PUT',
+         url: `/microservicio-rrhh/uploadAttachment/${idFormato}/${type}`,
+         data: frmData,
+         headers: {
+            [AUTHORIZATION]: token
+         }
+      })
+
+      switch (levelLog) {
+      case 'SUCCESS':
+         dispatch({ type: '[formatoPermisos] uploadAttachment success' })
+         noty('success', message)
+         break
+      case 'WARNING':
+      case 'ERROR':
+         dispatch({ type: '[formatoPermisos] uploadAttachment error', payload: message })
+         noty('error', message)
+         break
+      }
+   } catch (err: any) {
+      dispatch({ type: '[formatoPermisos] deleteAllControlAsistencia error', payload: err?.message })
+      dispatch({ type: '[http-status] Response status', payload: err?.response?.status })
+   }
+}
+
+export const downlodAttachment = (type: AttachmentType, idFormato: number) => async (dispatch: Dispatch<FormatoPermisosAction>, getState: () => any): Promise<void> => {
+   dispatch({ type: '[formatoPermisos] downlodAttachment loading' })
+   try {
+      const { usuario: { token } } = getState()
+      const { data, headers } = await api({
+         method: 'GET',
+         url: `/microservicio-rrhh/downlodAttachment/${idFormato}/${type}`,
+         responseType: 'blob',
+         headers: {
+            [AUTHORIZATION]: token
+         }
+      })
+
+      const levelLog = headers['response-status'] as LevelLog
+      const fileName = headers['content-disposition']?.split('=')[1]
+
+      switch (levelLog) {
+      case 'SUCCESS':
+         dispatch({ type: '[formatoPermisos] downlodAttachment success' })
+         fileDownload(data, fileName)
+         noty('success', headers.message)
+         break
+      case 'WARNING':
+      case 'ERROR':
+         dispatch({ type: '[formatoPermisos] downlodAttachment error', payload: headers.message })
+         noty('error', headers.message)
+         break
+      }
+   } catch (err: any) {
+      dispatch({ type: '[formatoPermisos] deleteAllControlAsistencia error', payload: err?.message })
+      dispatch({ type: '[http-status] Response status', payload: err?.response?.status })
+   }
+}
+
+export const saveObservacionesFormatoPermisos = (idFormato: number, observaciones: string) => async (dispatch: Dispatch<FormatoPermisosAction>, getState: () => any): Promise<void> => {
+   dispatch({ type: '[formatoPermisos] saveObservacionesFormatoPermisos loading' })
+   try {
+      const { usuario: { token } } = getState()
+      const { data: { levelLog, message } } = await api.request<Response<[]>>({
+         method: 'PUT',
+         url: '/microservicio-rrhh/saveObservacionesFormatoPermisos',
+         params: { idFormato, observaciones },
+         headers: {
+            [AUTHORIZATION]: token
+         }
+      })
+
+      switch (levelLog) {
+      case 'SUCCESS':
+         dispatch({ type: '[formatoPermisos] saveObservacionesFormatoPermisos success' })
+         noty('success', message)
+         break
+      case 'WARNING':
+      case 'ERROR':
+         dispatch({ type: '[formatoPermisos] saveObservacionesFormatoPermisos error', payload: message })
+         noty('error', message)
+         break
+      }
+   } catch (err: any) {
+      dispatch({ type: '[formatoPermisos] deleteAllControlAsistencia error', payload: err?.message })
       dispatch({ type: '[http-status] Response status', payload: err?.response?.status })
    }
 }

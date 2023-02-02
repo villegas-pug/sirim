@@ -15,11 +15,7 @@ export const useSimUsuario = () => {
 
    // » Dep's ...
    const simUsuarioNombreDb = useMemo(() => {
-      const simUsuarioNombreDb = simUsuarioDb
-         .filter(({ idDependencia }) => idDependencia.trim() === '25')
-         .map(({ nombre }) => nombre.trim())
-
-      return Array.from(new Set(simUsuarioNombreDb))
+      return simUsuarioDb.map(({ nombre }) => nombre.trim())
    }, [simUsuarioDb])
 
    return {
