@@ -1,1 +1,1 @@
-export type Action = 'SAVE' | 'ADD' | 'REMOVE' | 'RESET' | 'DELETE' | 'UPDATE'
+export type Action = 'SAVE' | 'ADD' | 'REMOVE' | 'RESET' | 'DELETE' | 'UPDATE' | 'FILTER'

@@ -5,6 +5,7 @@ import { analizarExtraccionReducer } from './analizarExtraccionReducer'
 
 import { RegistroTablaDinamicaDto, AsigGrupoCamposAnalisisDto } from 'interfaces'
 import { useAnalizarExtraccion } from 'hooks'
+import { Action } from 'types'
 
 export type AnalizarExtraccionBandeja = 'ENTRADA' | 'ANALISIS'
 
@@ -26,7 +27,7 @@ export const AnalizarExtraccionProvider: FC<{ children: ReactElement | ReactElem
    // ► Hook's ...
    const [state, dispatch] = useReducer(analizarExtraccionReducer, INITIAL_STATE)
 
-   // ► CUSTOM - HOOK'S ...
+   // ► Custom Hook's ...
    const { tablaAsignadaDb, asigGrupoCamposAnalisisDb } = useAnalizarExtraccion()
 
    useEffect(() => { // ► Update `tmp`: Si tmp `asigGrupoCamposAnalisisTmp` cambia, actualiza `tablaAsignadaTmp` ...
@@ -39,7 +40,7 @@ export const AnalizarExtraccionProvider: FC<{ children: ReactElement | ReactElem
       })
    }, [asigGrupoCamposAnalisisDb, tablaAsignadaDb])
 
-   // ► HANDLER'S ...
+   // ► Handler's ...
    const handleChangePage = (page: AnalizarExtraccionBandeja) => {
       dispatch({ type: '[Bandeja] Change page', payload: page })
    }
@@ -48,8 +49,18 @@ export const AnalizarExtraccionProvider: FC<{ children: ReactElement | ReactElem
       dispatch({ type: '[asigGrupoCamposAnalisisTmp] Save grupo asignado de Campos de analisis', payload: asigGrupoCamposAnalisis })
    }
 
-   const handleSaveRegistroDinamicoAsignadoTmp = (registroDinamicoAsignadoTmp: RegistroTablaDinamicaDto) => {
-      dispatch({ type: '[registroDinamicoAsignadoTmp] Save registro dinámico asignado', payload: registroDinamicoAsignadoTmp })
+   const handleActionRegistroDinamicoAsignadoTmp = (action: Action, registroDinamicoAsignadoTmp?: RegistroTablaDinamicaDto, filterId?: number) => {
+      let payload = {} as RegistroTablaDinamicaDto
+      switch (action) {
+      case 'SAVE':
+         payload = registroDinamicoAsignadoTmp!
+         break
+      case 'FILTER':
+         payload = tablaAsignadaDb.find(({ nId }) => nId === filterId) || {} as RegistroTablaDinamicaDto
+         break
+      }
+
+      dispatch({ type: '[registroDinamicoAsignadoTmp] Save registro dinámico asignado', payload })
    }
 
    return (
@@ -57,7 +68,7 @@ export const AnalizarExtraccionProvider: FC<{ children: ReactElement | ReactElem
          ...state,
          handleChangePage,
          handleSaveAsigGrupoCamposAnalisisTmp,
-         handleSaveRegistroDinamicoAsignadoTmp
+         handleActionRegistroDinamicoAsignadoTmp
       } }>
          { children }
       </AnalizarExtraccionContext.Provider>

@@ -28,6 +28,7 @@ import {
    SaveAsRounded,
    SearchOffRounded,
    SyncProblemRounded,
+   Undo,
    UnpublishedRounded,
    UpdateRounded
 } from '@mui/icons-material'
@@ -62,16 +63,16 @@ import { useTipoLogico } from 'hooks/useTipoLogico'
 import { messages, regex } from 'constants/'
 
 export const AnalizarExtraccionSubMod: FC = () => {
-   /* ► CONTEXT ... */
+   // ► Context ...
    const {
       bandeja,
       asigGrupoCamposAnalisisTmp
    } = useAnalizarExtraccionContext()
 
-   /* ► HOOK'S ... */
+   // ► Hook's ...
    const modalDownloadRptMensual = useRef({} as SimpleModalRefProps)
 
-   /* ► CUSTOM - HOOK'S ...  */
+   // ► Custom hook's ...
    const {
       loadingAsigGrupoCamposAnalisisDb,
       findAsigAnalisisByUsr,
@@ -82,6 +83,7 @@ export const AnalizarExtraccionSubMod: FC = () => {
 
    const [, setBandejaAnalisisNroPagina] = useLocalStorage('ANALIZAR_EXTRACCION_BANDEJA_ANALISIS_NRO_PAGINA')
 
+   // » Effect's ...
    useEffect(() => { setBandejaAnalisisNroPagina(0) }, [])
 
    // ► Handler's ...
@@ -95,7 +97,7 @@ export const AnalizarExtraccionSubMod: FC = () => {
       })
    }
 
-   /* ► DEP'S ... */
+   // ► Dep's ...
    const optSpeedDial = useMemo<SpeedDialActionProps[]>(() => ([
       {
          name: 'Listar_Todas_Asignaciones',
@@ -507,24 +509,24 @@ const HeaderBandejaEntrada: FC = () => {
 }
 
 const BandejaAnalisis: FC = () => {
-   /* ► CONTEXT ... */
+   // ► Context ...
    const {
       tablaAsignadaTmp,
       handleChangePage,
-      handleSaveRegistroDinamicoAsignadoTmp
+      handleActionRegistroDinamicoAsignadoTmp
    } = useAnalizarExtraccionContext()
 
-   // ► HOOK'S ...
+   // ► Hook's ...
    const modalAnalisis = useRef({} as SimpleModalRefProps)
 
-   // ► CUSTOM - HOOK'S ...
+   // ► Custom hook's ...
    const { currentScreen } = useBreakpoints()
    const { findAllTipoLogico } = useTipoLogico()
 
-   // ► EFFECT'S ...
+   // ► Effect's ...
    useEffect(() => { findAllTipoLogico() }, [])
 
-   // » DEP'S ...
+   // » Dep's ...
    const dgColumns = useMemo<Array<GridColDef<RegistroTablaDinamicaDto>>>(() => ([
       {
          field: '>',
@@ -533,7 +535,7 @@ const BandejaAnalisis: FC = () => {
          renderCell: ({ row }) => <Tooltip title='Analizar' placement='left-start' arrow>
             <IconButton
                onClick={ () => {
-                  handleSaveRegistroDinamicoAsignadoTmp(row)
+                  handleActionRegistroDinamicoAsignadoTmp('SAVE', row)
                   modalAnalisis.current.setOpen(true)
                } }
             >
@@ -657,25 +659,27 @@ const HeaderBandejaAnalisis: FC = () => {
 }
 
 const AnalizarExtraccion: FC = () => {
-   // ► CONTEXT ...
+   // ► Context ...
    const {
       registroDinamicoAsignadoTmp,
-      asigGrupoCamposAnalisisTmp
+      asigGrupoCamposAnalisisTmp,
+      handleActionRegistroDinamicoAsignadoTmp
    } = useAnalizarExtraccionContext()
 
-   // ► HOOK'S ...
+   // ► Hook's ...
    const refAnalizarExtraccionSubmit = useRef({} as HTMLInputElement)
    const [showDatosExtraccion, setShowDatosExtraccion] = useState(true)
 
-   // ► CUSTOM - HOOK'S ...
+   // ► Custom hook's ...
    const { loadingAsigGrupoCamposAnalisisDb, findAsigById, saveRecordAssigned } = useAnalizarExtraccion()
+   const [prevIdRecordAssigned, setPrevIdRecordAssigned] = useLocalStorage('REGISTRO_DINAMICO_ASIGNADO_PREV_ID')
 
-   // ► HANDLER'S ...
+   // ► Handler's ...
    const handleShowCamposExtraccion = ({ target: { checked } }: ChangeEvent<HTMLInputElement>) => {
       setShowDatosExtraccion(checked)
    }
 
-   // ► DEP'S ...
+   // ► Dep's ...
    const metaFieldsNameAssigned = useMemo(() => (asigGrupoCamposAnalisisTmp.grupo.metaFieldsCsv?.split(',')
       .map(i => i.trim())
       .map(i => i.split('|')[0].trim())
@@ -701,7 +705,7 @@ const AnalizarExtraccion: FC = () => {
          display='flex'
          flexDirection='column'
       >
-         {/* ► HEADER ... */}
+         {/* ► Header's ... */}
          <Typography variant='h4' color='GrayText' gutterBottom>DATOS DE EXTRACCIÓN</Typography>
          <Switch size='small' checked={ showDatosExtraccion } onChange={ handleShowCamposExtraccion } />
          {
@@ -738,6 +742,16 @@ const AnalizarExtraccion: FC = () => {
          <Typography variant='h4' color='GrayText' sx={{ mt: 2 }} gutterBottom>DATOS DE ANALISIS</Typography>
          <Button
             variant='outlined'
+            color='secondary'
+            startIcon={ <Undo /> }
+            disabled={ loadingAsigGrupoCamposAnalisisDb }
+            sx={{ ml: 'auto', mb: 2, width: 120 }}
+            onClick={ () => { handleActionRegistroDinamicoAsignadoTmp('FILTER', {} as RegistroTablaDinamicaDto, prevIdRecordAssigned) } }
+         >
+            <Typography variant='h4'>Registro anterior</Typography>
+         </Button>
+         <Button
+            variant='outlined'
             startIcon={ loadingAsigGrupoCamposAnalisisDb ? <CircularProgress size={ 20 } /> : <SaveAsRounded /> }
             disabled={ loadingAsigGrupoCamposAnalisisDb }
             sx={{ ml: 'auto', mb: 2, width: 120 }}
@@ -759,7 +773,8 @@ const AnalizarExtraccion: FC = () => {
                      asigGrupo: { idAsigGrupo: asigGrupoCamposAnalisisTmp.idAsigGrupo }
                   })
 
-                  findAsigById(asigGrupoCamposAnalisisTmp.idAsigGrupo)
+                  await findAsigById(asigGrupoCamposAnalisisTmp.idAsigGrupo)
+                  setPrevIdRecordAssigned(registroDinamicoAsignadoTmp.nId)
                } }>
                {(formikprops) => (
                   <Form>
@@ -882,7 +897,7 @@ const getGridColDefByTablaDinamicaAsignada = (tablaDinamicaAsignada: RegistroTab
 }
 
 const getInitialValuesFromCsv = (metaFieldsNameCsv: string, registroDinamicoAsignado: any): {} => {
-   const initialValues: { [k: string]: string } = {}
+   const initialValues: Record<string, string> = {}
    metaFieldsNameCsv
       .split(',')
       .map(k => k.trim())

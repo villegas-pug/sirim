@@ -7,6 +7,7 @@ import Fade from 'react-reveal/Fade'
 import Zoom from 'react-reveal/Zoom'
 
 import { Body, CustomTooltip, CustomValueTooltip, InfoCard, ModalLoader, MySelect, SimpleAutocomplete, SimpleBarChart, SimpleLineChart, SimpleRadarChart, VerticalChart } from 'components'
+
 import { añosControlMigratorio } from 'db'
 import { useBreakpoints, useExtraccion, usePais, useReportes } from 'hooks'
 import { applyCommaThousands } from 'helpers'
