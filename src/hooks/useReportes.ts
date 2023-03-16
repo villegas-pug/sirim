@@ -11,7 +11,8 @@ export const useReportes = () => {
       rptPasaportesIndicadores: rptPasaportesIndicadoresDb,
       rptPasaportesEntregadosPorAños: rptPasaportesEntregadosPorAñosDb,
       rptPasaportesEntregadosPor12UltimosMeses: rptPasaportesEntregadosPor12UltimosMesesDb,
-      rptPasaportesEntregadosPor31UltimosDias: rptPasaportesEntregadosPor31UltimosDiasDb
+      rptPasaportesEntregadosPor31UltimosDias: rptPasaportesEntregadosPor31UltimosDiasDb,
+      rptProyeccionAnalisis: rptProyeccionAnalisisDb
    } = useAppSelector(store => store.reportes)
 
    const {
@@ -23,7 +24,8 @@ export const useReportes = () => {
       getRptPasaportesIndicadores,
       getRptPasaportesEntregadosPorAños,
       getRptPasaportesEntregadosPor12UltimosMeses,
-      getRptPasaportesEntregadosPor31UltimosDias
+      getRptPasaportesEntregadosPor31UltimosDias,
+      getRptProyeccionAnalisis
    } = useAppActions()
 
    return {
@@ -37,6 +39,7 @@ export const useReportes = () => {
       rptPasaportesEntregadosPorAñosDb,
       rptPasaportesEntregadosPor12UltimosMesesDb,
       rptPasaportesEntregadosPor31UltimosDiasDb,
+      rptProyeccionAnalisisDb,
 
       getRptControlMigratorio,
       getRptAñosControlMigratorio,
@@ -46,7 +49,7 @@ export const useReportes = () => {
       getRptPasaportesIndicadores,
       getRptPasaportesEntregadosPorAños,
       getRptPasaportesEntregadosPor12UltimosMeses,
-      getRptPasaportesEntregadosPor31UltimosDias
-
+      getRptPasaportesEntregadosPor31UltimosDias,
+      getRptProyeccionAnalisis
    }
 }

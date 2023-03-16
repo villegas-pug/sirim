@@ -4,7 +4,7 @@ import { ReportesAction } from 'state/actions'
 
 import { api } from 'config'
 import { localStorage } from 'constants/'
-import { Response, RptAñosControlMigratorioDto, RptDependenciaControlMigratorioDto, RptEdadesControlMigratorioDto, RptNacionalidadControlMigratorioDto, RptPasaportesIndicadoresDto, RptPasaportesPor12UltimosMesesDto, RptPasaportesPor31UltimosDiasDto, RptPasaportesPorAñosDto, RptProduccionDiariaDto } from 'interfaces'
+import { Response, RptAñosControlMigratorioDto, RptDependenciaControlMigratorioDto, RptEdadesControlMigratorioDto, RptNacionalidadControlMigratorioDto, RptPasaportesIndicadoresDto, RptPasaportesPor12UltimosMesesDto, RptPasaportesPor31UltimosDiasDto, RptPasaportesPorAñosDto, RptProduccionDiariaDto, RptProyeccionAnalisis } from 'interfaces'
 import { noty } from 'helpers'
 
 const { AUTHORIZATION } = localStorage
@@ -261,6 +261,35 @@ export const getRptPasaportesEntregadosPor31UltimosDias = () => async (dispatch:
       }
    } catch (err: any) {
       dispatch({ type: '[Reportes] getRptPasaportesEntregadosPor31UltimosDias error', payload: err?.message })
+      dispatch({ type: '[http-status] Response status', payload: err?.response?.status })
+   }
+}
+
+export const getRptProyeccionAnalisis = (año: number) => async (dispatch: Dispatch<ReportesAction>, getState: () => any): Promise<void> => {
+   dispatch({ type: '[Reportes] getRptProyeccionAnalisis loading' })
+   try {
+      const { usuario: { token } } = getState()
+      const { data: { levelLog, data, message } } = await api.request<Response<RptProyeccionAnalisis[]>>({
+         method: 'GET',
+         url: '/microservicio-rimreportes/getRptProyeccionAnalisis',
+         params: { año },
+         headers: {
+            [AUTHORIZATION]: token
+         }
+      })
+
+      switch (levelLog) {
+      case 'SUCCESS':
+         dispatch({ type: '[Reportes] getRptProyeccionAnalisis success', payload: data })
+         break
+      case 'WARNING':
+      case 'ERROR':
+         dispatch({ type: '[Reportes] getRptProyeccionAnalisis error', payload: message })
+         noty('error', message)
+         break
+      }
+   } catch (err: any) {
+      dispatch({ type: '[Reportes] getRptProyeccionAnalisis error', payload: err?.message })
       dispatch({ type: '[http-status] Response status', payload: err?.response?.status })
    }
 }

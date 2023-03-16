@@ -15,6 +15,7 @@ import {
 } from '@mui/material'
 import {
    ArrowBackIosNewRounded,
+   CachedRounded,
    CheckCircleRounded,
    CheckRounded,
    ClearRounded,
@@ -28,7 +29,6 @@ import {
    SaveAsRounded,
    SearchOffRounded,
    SyncProblemRounded,
-   Undo,
    UnpublishedRounded,
    UpdateRounded
 } from '@mui/icons-material'
@@ -660,19 +660,15 @@ const HeaderBandejaAnalisis: FC = () => {
 
 const AnalizarExtraccion: FC = () => {
    // ► Context ...
-   const {
-      registroDinamicoAsignadoTmp,
-      asigGrupoCamposAnalisisTmp,
-      handleActionRegistroDinamicoAsignadoTmp
-   } = useAnalizarExtraccionContext()
+   const { registroDinamicoAsignadoTmp } = useAnalizarExtraccionContext()
 
    // ► Hook's ...
-   const refAnalizarExtraccionSubmit = useRef({} as HTMLInputElement)
    const [showDatosExtraccion, setShowDatosExtraccion] = useState(true)
 
    // ► Custom hook's ...
-   const { loadingAsigGrupoCamposAnalisisDb, findAsigById, saveRecordAssigned } = useAnalizarExtraccion()
-   const [prevIdRecordAssigned, setPrevIdRecordAssigned] = useLocalStorage('REGISTRO_DINAMICO_ASIGNADO_PREV_ID')
+   const registroDinamicoAsignadoTmpFirstRender = useRef(registroDinamicoAsignadoTmp)
+
+   // » Effect's ...
 
    // ► Handler's ...
    const handleShowCamposExtraccion = ({ target: { checked } }: ChangeEvent<HTMLInputElement>) => {
@@ -680,23 +676,6 @@ const AnalizarExtraccion: FC = () => {
    }
 
    // ► Dep's ...
-   const metaFieldsNameAssigned = useMemo(() => (asigGrupoCamposAnalisisTmp.grupo.metaFieldsCsv?.split(',')
-      .map(i => i.trim())
-      .map(i => i.split('|')[0].trim())
-      .join(',')
-   ), [asigGrupoCamposAnalisisTmp])
-
-   const metaFieldsRequiredAssigned = useMemo(() => {
-      const metaFieldsRequired: { [k: string]: boolean } = {}
-
-      asigGrupoCamposAnalisisTmp.grupo.metaFieldsCsv?.split(',')
-         .map(i => i.trim())
-         .forEach(i => {
-            metaFieldsRequired[i.split('|')[0].trim()] = i.split('|')[3]?.trim() === 'true'
-         })
-
-      return metaFieldsRequired
-   }, [asigGrupoCamposAnalisisTmp])
 
    return (
       <Box
@@ -720,7 +699,7 @@ const AnalizarExtraccion: FC = () => {
                      divider={ <Divider orientation='vertical' flexItem /> }
                   >
                      {
-                        Object.entries(registroDinamicoAsignadoTmp).filter(([k]) => k.endsWith('_e')).map(([k, v]) => (
+                        Object.entries(registroDinamicoAsignadoTmpFirstRender.current).filter(([k]) => k.endsWith('_e')).map(([k, v]) => (
                            <Box
                               key={ v }
                               display='flex'
@@ -740,62 +719,8 @@ const AnalizarExtraccion: FC = () => {
 
          {/* ► BODY ... */}
          <Typography variant='h4' color='GrayText' sx={{ mt: 2 }} gutterBottom>DATOS DE ANALISIS</Typography>
-         <Button
-            variant='outlined'
-            color='secondary'
-            startIcon={ <Undo /> }
-            disabled={ loadingAsigGrupoCamposAnalisisDb }
-            sx={{ ml: 'auto', mb: 2, width: 120 }}
-            onClick={ () => { handleActionRegistroDinamicoAsignadoTmp('FILTER', {} as RegistroTablaDinamicaDto, prevIdRecordAssigned) } }
-         >
-            <Typography variant='h4'>Registro anterior</Typography>
-         </Button>
-         <Button
-            variant='outlined'
-            startIcon={ loadingAsigGrupoCamposAnalisisDb ? <CircularProgress size={ 20 } /> : <SaveAsRounded /> }
-            disabled={ loadingAsigGrupoCamposAnalisisDb }
-            sx={{ ml: 'auto', mb: 2, width: 120 }}
-            onClick={ () => { refAnalizarExtraccionSubmit.current.click() } }
-         >
-            <Typography variant='h4'>Guardar</Typography>
-         </Button>
-         <Box overflow='auto'>
-            <Formik
-               initialValues={ { ...getInitialValuesFromCsv(metaFieldsNameAssigned!, registroDinamicoAsignadoTmp) } }
-               validationSchema={ Yup.object({ ...getValidationSchemaFromCsv(metaFieldsNameAssigned!, metaFieldsRequiredAssigned) }) }
-               onSubmit={ async (values: any, meta): Promise<void> => {
-                  await saveRecordAssigned({
-                     nombreTabla: asigGrupoCamposAnalisisTmp.grupo.tablaDinamica?.nombre,
-                     id: registroDinamicoAsignadoTmp.nId,
-                     values: JSON.stringify(values),
-                     regAnalisisIni: asigGrupoCamposAnalisisTmp.regAnalisisIni,
-                     regAnalisisFin: asigGrupoCamposAnalisisTmp.regAnalisisFin,
-                     asigGrupo: { idAsigGrupo: asigGrupoCamposAnalisisTmp.idAsigGrupo }
-                  })
 
-                  await findAsigById(asigGrupoCamposAnalisisTmp.idAsigGrupo)
-                  setPrevIdRecordAssigned(registroDinamicoAsignadoTmp.nId)
-               } }>
-               {(formikprops) => (
-                  <Form>
-                     <Box
-                        p={ 1 }
-                        display='flex'
-                        flexWrap='wrap'
-                        justifyContent='space-between'
-                        gap={ 2 }
-                     >
-                        {
-                           Object.entries(registroDinamicoAsignadoTmp).filter(([k]) => metaFieldsNameAssigned?.includes(k)).map(([k, v]) => (
-                              <InputAnalisis key={ k } k={ k } />
-                           ))
-                        }
-                     </Box>
-                     <input type='submit' ref={ refAnalizarExtraccionSubmit } hidden />
-                  </Form>
-               )}
-            </Formik>
-         </Box>
+         <FrmAnalizarExtraccion registroDinamicoAsignadoTmpFirstRender={ registroDinamicoAsignadoTmpFirstRender.current } />
 
          {/* ► Observaciones ... */
             registroDinamicoAsignadoTmp.hasFieldError && (
@@ -803,7 +728,7 @@ const AnalizarExtraccion: FC = () => {
                   type='text'
                   variant='filled'
                   label='Observaciones'
-                  value={ registroDinamicoAsignadoTmp.observacionesCtrlCal }
+                  value={ registroDinamicoAsignadoTmpFirstRender.current.observacionesCtrlCal }
                   rows={ 3 }
                   fullWidth
                   multiline
@@ -812,6 +737,120 @@ const AnalizarExtraccion: FC = () => {
             )
          }
       </Box>
+   )
+}
+
+const FrmAnalizarExtraccion: FC<{ registroDinamicoAsignadoTmpFirstRender: RegistroTablaDinamicaDto }> = ({ registroDinamicoAsignadoTmpFirstRender }) => {
+   // ► Context ...
+   const { asigGrupoCamposAnalisisTmp, registroDinamicoAsignadoTmp, handleActionRegistroDinamicoAsignadoTmp } = useAnalizarExtraccionContext()
+
+   // ► Hook's ...
+   const refAnalizarExtraccionSubmit = useRef({} as HTMLInputElement)
+   const [toRenderFrmAnalizarExtraccion, setToRenderFrmAnalizarExtraccion] = useState(true)
+
+   // ► Custom hook's ...
+   const { loadingAsigGrupoCamposAnalisisDb, findAsigById, saveRecordAssigned } = useAnalizarExtraccion()
+   const [prevIdRecordAssigned, setPrevIdRecordAssigned] = useLocalStorage('REGISTRO_DINAMICO_ASIGNADO_PREV_ID')
+
+   // » Handler's ...
+   const handlePrevAnalisis = () => {
+      setToRenderFrmAnalizarExtraccion(false)
+      handleActionRegistroDinamicoAsignadoTmp('FILTER', {} as RegistroTablaDinamicaDto, prevIdRecordAssigned)
+      setTimeout(() => {
+         setToRenderFrmAnalizarExtraccion(true)
+      }, 0)
+   }
+
+   // » Dep's ...
+   const metaFieldsNameAssigned = useMemo(() => (asigGrupoCamposAnalisisTmp.grupo.metaFieldsCsv?.split(',')
+      .map(i => i.trim())
+      .map(i => i.split('|')[0].trim())
+      .join(',')
+   ), [asigGrupoCamposAnalisisTmp])
+
+   const metaFieldsRequiredAssigned = useMemo(() => {
+      const metaFieldsRequired: { [k: string]: boolean } = {}
+
+      asigGrupoCamposAnalisisTmp.grupo.metaFieldsCsv?.split(',')
+         .map(i => i.trim())
+         .forEach(i => {
+            metaFieldsRequired[i.split('|')[0].trim()] = i.split('|')[3]?.trim() === 'true'
+         })
+
+      return metaFieldsRequired
+   }, [asigGrupoCamposAnalisisTmp])
+
+   // ► Render conditional ...
+   if (!toRenderFrmAnalizarExtraccion) return <></>
+
+   return (
+      <>
+
+         <Box mb={ 2 } display='flex' justifyContent='flex-end' gap={ 1 }>
+
+            <Button
+               variant='outlined'
+               color='warning'
+               startIcon={ <CachedRounded /> }
+               disabled={ loadingAsigGrupoCamposAnalisisDb }
+               onClick={ handlePrevAnalisis }
+            >
+               <Typography variant='h4'>Analisis Anterior</Typography>
+            </Button>
+
+            <Button
+               variant='outlined'
+               startIcon={ loadingAsigGrupoCamposAnalisisDb ? <CircularProgress size={ 20 } /> : <SaveAsRounded /> }
+               disabled={ loadingAsigGrupoCamposAnalisisDb }
+               onClick={ () => { refAnalizarExtraccionSubmit.current.click() } }
+            >
+               <Typography variant='h4'>Guardar Analisis</Typography>
+            </Button>
+
+         </Box>
+
+         <Box overflow='auto'>
+            <Fade duration={ 1250 }>
+               <Formik
+                  initialValues={ { ...getInitialValuesFromCsv(metaFieldsNameAssigned!, registroDinamicoAsignadoTmp) } }
+                  validationSchema={ Yup.object({ ...getValidationSchemaFromCsv(metaFieldsNameAssigned!, metaFieldsRequiredAssigned) }) }
+                  onSubmit={ async (values: any, meta): Promise<void> => {
+                     await saveRecordAssigned({
+                        nombreTabla: asigGrupoCamposAnalisisTmp.grupo.tablaDinamica?.nombre,
+                        id: registroDinamicoAsignadoTmpFirstRender.nId,
+                        values: JSON.stringify(values),
+                        regAnalisisIni: asigGrupoCamposAnalisisTmp.regAnalisisIni,
+                        regAnalisisFin: asigGrupoCamposAnalisisTmp.regAnalisisFin,
+                        asigGrupo: { idAsigGrupo: asigGrupoCamposAnalisisTmp.idAsigGrupo }
+                     })
+
+                     await findAsigById(asigGrupoCamposAnalisisTmp.idAsigGrupo)
+                     setPrevIdRecordAssigned(registroDinamicoAsignadoTmpFirstRender.nId)
+                  } }>
+                  {(formikprops) => (
+                     <Form>
+                        <Box
+                           p={ 1 }
+                           display='flex'
+                           flexWrap='wrap'
+                           justifyContent='space-between'
+                           gap={ 2 }
+                        >
+                           {
+                              Object.entries(registroDinamicoAsignadoTmp).filter(([k]) => metaFieldsNameAssigned?.includes(k)).map(([k, v]) => (
+                                 <InputAnalisis key={ k } k={ k } />
+                              ))
+                           }
+                        </Box>
+                        <input type='submit' ref={ refAnalizarExtraccionSubmit } hidden />
+                     </Form>
+                  )}
+               </Formik>
+            </Fade>
+         </Box>
+
+      </>
+
    )
 }
 

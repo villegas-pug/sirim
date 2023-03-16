@@ -45,3 +45,10 @@ export const parseJsonTimestampToDate = (value: string): Date => {
 export const removeFlagTFromDateTimeStr = (dateTime: string): string => {
    return dateTime.replace(/T/g, ' ')
 }
+
+export const getMonthName = (month: number): string => {
+   const date = new Date()
+   date.setMonth(month - 1)
+
+   return date.toLocaleString('es-PE', { month: 'long' })
+}

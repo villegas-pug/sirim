@@ -34,6 +34,7 @@ const RptRegistrosAnalizadosSubMod = lazy(() => import('pages/submodulo/RptRegis
 const ConveniosSubMod = lazy(() => import('pages/submodulo/ConveniosSubMod'))
 const RegistrarFormatoAutorizacionSubMod = lazy(() => import('pages/submodulo/RegistrarFormatoAutorizacionSubMod'))
 const ValidarFormatoAutorizacionSubMod = lazy(() => import('pages/submodulo/ValidarFormatoAutorizacionSubMod'))
+const RptProyeccionAnalisisSubMod = lazy(() => import('pages/submodulo/RptProyeccionAnalisisSubMod'))
 
 /* » ITEM'S */
 const modulo: Array<ModuloType> = [
@@ -116,6 +117,9 @@ const subModulo: Array<SubModuloType> = [
    }, {
       name: 'VALIDAR PERMISOS O LICENCIAS',
       component: <ValidarFormatoAutorizacionSubMod />
+   }, {
+      name: 'REPORTE PROYECCIÓN ANALISIS',
+      component: <RptProyeccionAnalisisSubMod />
    }
 ]
 

@@ -1,6 +1,6 @@
 import { ReportesAction } from 'state/actions'
 
-import { RptAñosControlMigratorioDto, RptDependenciaControlMigratorioDto, RptEdadesControlMigratorioDto, RptNacionalidadControlMigratorioDto, RptPasaportesIndicadoresDto, RptPasaportesPor12UltimosMesesDto, RptPasaportesPor31UltimosDiasDto, RptPasaportesPorAñosDto, RptProduccionDiariaDto } from 'interfaces'
+import { RptAñosControlMigratorioDto, RptDependenciaControlMigratorioDto, RptEdadesControlMigratorioDto, RptNacionalidadControlMigratorioDto, RptPasaportesIndicadoresDto, RptPasaportesPor12UltimosMesesDto, RptPasaportesPor31UltimosDiasDto, RptPasaportesPorAñosDto, RptProduccionDiariaDto, RptProyeccionAnalisis } from 'interfaces'
 
 type ReportesState = {
    loading: boolean
@@ -13,6 +13,7 @@ type ReportesState = {
    rptPasaportesEntregadosPorAños: RptPasaportesPorAñosDto[]
    rptPasaportesEntregadosPor12UltimosMeses: RptPasaportesPor12UltimosMesesDto[]
    rptPasaportesEntregadosPor31UltimosDias: RptPasaportesPor31UltimosDiasDto[]
+   rptProyeccionAnalisis: RptProyeccionAnalisis[]
    error: string | null
 }
 
@@ -27,6 +28,7 @@ const INITIAL_STATE: ReportesState = {
    rptPasaportesEntregadosPorAños: [],
    rptPasaportesEntregadosPor12UltimosMeses: [],
    rptPasaportesEntregadosPor31UltimosDias: [],
+   rptProyeccionAnalisis: [],
    error: null
 }
 
@@ -86,6 +88,12 @@ export const reportesReducer = (state: ReportesState = INITIAL_STATE, action: Re
       return { ...state, loading: false, rptPasaportesEntregadosPor31UltimosDias: action.payload, error: null }
    case '[Reportes] getRptPasaportesEntregadosPor31UltimosDias error':
       return { ...state, loading: false, rptPasaportesEntregadosPor31UltimosDias: [], error: action.payload }
+   case '[Reportes] getRptProyeccionAnalisis loading':
+      return { ...state, loading: true, rptProyeccionAnalisis: [] }
+   case '[Reportes] getRptProyeccionAnalisis success':
+      return { ...state, loading: false, rptProyeccionAnalisis: action.payload }
+   case '[Reportes] getRptProyeccionAnalisis error':
+      return { ...state, loading: false, error: action.payload }
    default:
       return state
    }

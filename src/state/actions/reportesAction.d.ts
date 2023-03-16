@@ -1,6 +1,6 @@
 import { ResponseHttpStatusType } from 'state/actions/httpStatusAction'
 
-import { RptAñosControlMigratorioDto, RptDependenciaControlMigratorioDto, RptEdadesControlMigratorioDto, RptNacionalidadControlMigratorioDto, RptPasaportesIndicadoresDto, RptPasaportesPor12UltimosMesesDto, RptPasaportesPor31UltimosDiasDto, RptPasaportesPorAñosDto, RptProduccionDiariaDto } from 'interfaces'
+import { RptAñosControlMigratorioDto, RptDependenciaControlMigratorioDto, RptEdadesControlMigratorioDto, RptNacionalidadControlMigratorioDto, RptPasaportesIndicadoresDto, RptPasaportesPor12UltimosMesesDto, RptPasaportesPor31UltimosDiasDto, RptPasaportesPorAñosDto, RptProduccionDiariaDto, RptProyeccionAnalisis } from 'interfaces'
 
 interface GetRptAñosControlMigratorioLoading {
    type: '[Reportes] getRptAñosControlMigratorio loading'
@@ -128,6 +128,20 @@ interface GetRptPasaportesEntregadosPor31UltimosDiasError {
    payload: string | null
 }
 
+interface GetRptProyeccionAnalisisLoading {
+   type: '[Reportes] getRptProyeccionAnalisis loading'
+}
+
+interface GetRptProyeccionAnalisisSuccess {
+   type: '[Reportes] getRptProyeccionAnalisis success'
+   payload: Array<RptProyeccionAnalisis>
+}
+
+interface GetRptProyeccionAnalisisError {
+   type: '[Reportes] getRptProyeccionAnalisis error'
+   payload: string | null
+}
+
 export type ReportesAction =
    | ResponseHttpStatusType
    | GetRptAñosControlMigratorioLoading
@@ -157,3 +171,6 @@ export type ReportesAction =
    | GetRptPasaportesEntregadosPor31UltimosDiasLoading
    | GetRptPasaportesEntregadosPor31UltimosDiasSuccess
    | GetRptPasaportesEntregadosPor31UltimosDiasError
+   | GetRptProyeccionAnalisisLoading
+   | GetRptProyeccionAnalisisSuccess
+   | GetRptProyeccionAnalisisError

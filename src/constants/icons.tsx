@@ -68,7 +68,8 @@ import {
    HandshakeRounded,
    ReceiptLongRounded,
    FactCheckRounded,
-   LowPriorityRounded
+   LowPriorityRounded,
+   MultilineChartRounded
 } from '@mui/icons-material'
 
 const classes: { [key: string]: CSSProperties } = {
@@ -119,6 +120,7 @@ export const elementIcons = {
    DescriptionRounded: <HandshakeRounded color='action' style={ classes.subModIcon }/>,
    ReceiptLongRounded: <ReceiptLongRounded color='action' style={ classes.subModIcon }/>,
    FactCheckRounded: <FactCheckRounded color='action' style={ classes.subModIcon }/>,
+   MultilineChartRounded: <MultilineChartRounded color='action' style={ classes.subModIcon }/>,
 
    Test: <Build />,
    Cloud: <Cloud />,
