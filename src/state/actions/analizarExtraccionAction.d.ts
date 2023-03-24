@@ -84,6 +84,19 @@ interface DownloadReporteMensualProduccionByParamsError {
    payload: string | null
 }
 
+interface SetTerminadoProduccionAnalisisLoading {
+   type: '[Analizar-Extracción] setTerminadoProduccionAnalisis loading'
+}
+
+interface SetTerminadoProduccionAnalisisSuccess {
+   type: '[Analizar-Extracción] setTerminadoProduccionAnalisis success'
+}
+
+interface SetTerminadoProduccionAnalisisError {
+   type: '[Analizar-Extracción] setTerminadoProduccionAnalisis error'
+   payload: string | null
+}
+
 export type AnalizarExtraccionAction =
    | ResponseHttpStatusType
    | FindAsigAnalisisByUsrLoading
@@ -104,3 +117,6 @@ export type AnalizarExtraccionAction =
    | findAsigByIdLoading
    | findAsigByIdSuccess
    | findAsigByIdError
+   | SetTerminadoProduccionAnalisisLoading
+   | SetTerminadoProduccionAnalisisSuccess
+   | SetTerminadoProduccionAnalisisError

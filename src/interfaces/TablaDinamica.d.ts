@@ -49,8 +49,10 @@ export interface RegistroTablaDinamicaDto {
    dFecha_Creacion: Date
 
    // ► Aux-1 ...
+   idProdAnalisis: number
    fechaAnalisis: string
    analizado: boolean
+   terminado: boolean
    revisado: boolean
    observacionesCtrlCal: string
    hasFieldError: boolean

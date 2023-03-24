@@ -3,7 +3,7 @@ import { AsigGrupoCamposAnalisisDto } from 'interfaces'
 import { useMemo } from 'react'
 
 export const useAnalizarExtraccion = () => {
-   /* ► HOOK'S REDUX ... */
+   // ► Store hook's ...
    const {
       loading: loadingAsigGrupoCamposAnalisisDb,
       asigs: asigsGrupoCamposAnalisisDb,
@@ -17,10 +17,11 @@ export const useAnalizarExtraccion = () => {
       findTablaDinamicaByRangoFromIds,
       saveRecordAssigned,
       downloadAnalisadosByDates,
-      downloadReporteMensualProduccionByParams
+      downloadReporteMensualProduccionByParams,
+      setTerminadoProduccionAnalisis
    } = useAppActions()
 
-   /* ► DEP'S ... */
+   // ► Dep's ...
    const asigSummaryDb = useMemo<Pick<AsigGrupoCamposAnalisisDto, 'totalAnalizados' | 'totalAsignados' | 'totalPendientes'>>(() => (
       asigsGrupoCamposAnalisisDb.reduce((summary, next) => {
          summary.totalAsignados += next.totalAsignados
@@ -42,6 +43,7 @@ export const useAnalizarExtraccion = () => {
       findTablaDinamicaByRangoFromIds,
       saveRecordAssigned,
       downloadAnalisadosByDates,
-      downloadReporteMensualProduccionByParams
+      downloadReporteMensualProduccionByParams,
+      setTerminadoProduccionAnalisis
    }
 }

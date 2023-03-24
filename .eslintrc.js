@@ -27,6 +27,7 @@ module.exports = {
    ],
    rules: {
       indent: ['error', 3],
+      'no-use-before-define': 'off',
       'react/react-in-jsx-scope': RULES.OFF,
       'no-return-assign': RULES.OFF,
       'no-sequences': RULES.OFF,

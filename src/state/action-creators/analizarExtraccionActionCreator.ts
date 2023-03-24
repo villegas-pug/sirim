@@ -134,7 +134,7 @@ export const downloadAnalisadosByDates = (recordAssigned: Partial<RecordsBetween
       const { usuario: { token, userCredentials } } = getState()
       const { data, headers } = await api({
          method: 'POST',
-         url: '/microservicio-rimanalisis/downloadAnalisadosByDates',
+         url: '/microservicio-rimanalisisdev/downloadAnalisadosByDates',
          data: { ...recordAssigned, usr: userCredentials },
          responseType: 'blob',
          headers: {
@@ -194,6 +194,34 @@ export const downloadReporteMensualProduccionByParams = (month: number, year: nu
       }
    } catch (err: any) {
       dispatch({ type: '[Analizar-Extracción] Download reporte mensual de producción error', payload: err?.message })
+      dispatch({ type: '[http-status] Response status', payload: err?.response?.status })
+   }
+}
+
+export const setTerminadoProduccionAnalisis = (idProdAnalisis: number) => async (dispatch: Dispatch<AnalizarExtraccionAction>, getState: () => any): Promise<void> => {
+   dispatch({ type: '[Analizar-Extracción] setTerminadoProduccionAnalisis loading' })
+   try {
+      const { usuario: { token } } = getState()
+      const { data: { levelLog, message } } = await api.request<Response<[]>>({
+         method: 'PUT',
+         url: `/microservicio-rimanalisisdev/setTerminadoProduccionAnalisis/${idProdAnalisis}`,
+         headers: {
+            [AUTHORIZATION]: token
+         }
+      })
+
+      switch (levelLog) {
+      case 'SUCCESS':
+         dispatch({ type: '[Analizar-Extracción] setTerminadoProduccionAnalisis success' })
+         break
+      case 'WARNING':
+      case 'ERROR':
+         dispatch({ type: '[Analizar-Extracción] setTerminadoProduccionAnalisis error', payload: message })
+         noty('error', message)
+         break
+      }
+   } catch (err: any) {
+      dispatch({ type: '[Analizar-Extracción] setTerminadoProduccionAnalisis error', payload: err?.message })
       dispatch({ type: '[http-status] Response status', payload: err?.response?.status })
    }
 }

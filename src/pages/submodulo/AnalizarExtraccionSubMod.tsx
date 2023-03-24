@@ -11,7 +11,8 @@ import {
    Switch,
    TextField,
    Tooltip,
-   Typography
+   Typography,
+   Checkbox
 } from '@mui/material'
 import {
    ArrowBackIosNewRounded,
@@ -522,6 +523,7 @@ const BandejaAnalisis: FC = () => {
    // ► Custom hook's ...
    const { currentScreen } = useBreakpoints()
    const { findAllTipoLogico } = useTipoLogico()
+   const { setTerminadoProduccionAnalisis } = useAnalizarExtraccion()
 
    // ► Effect's ...
    useEffect(() => { findAllTipoLogico() }, [])
@@ -542,6 +544,20 @@ const BandejaAnalisis: FC = () => {
                <QueryStatsRounded />
             </IconButton>
          </Tooltip>
+      }, {
+         field: '¿Terminado?',
+         type: 'boolean',
+         width: 90,
+         ...commonGridColDef,
+         renderCell: ({ row }) => (
+            <Checkbox
+               disabled={ !row.analizado }
+               checked={ row.terminado }
+               onClick={ () => {
+                  setTerminadoProduccionAnalisis(row.idProdAnalisis)
+               } }
+            />
+         )
       }, {
          field: 'nro',
          headerName: 'Nro',

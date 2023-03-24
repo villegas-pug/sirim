@@ -76,15 +76,17 @@ export const AnalizarExtraccionProvider: FC<{ children: ReactElement | ReactElem
 }
 
 /* ► Private - Method's ... */
-type SomeFieldsFromProduccionAnalisis = { [key: number]: Pick<RegistroTablaDinamicaDto, 'fechaAnalisis' | 'analizado' | 'hasFieldError' | 'metaFieldIdErrorCsv' | 'observacionesCtrlCal'> }
+type SomeFieldsFromProduccionAnalisis = { [key: number]: Pick<RegistroTablaDinamicaDto, 'idProdAnalisis' | 'fechaAnalisis' | 'analizado' | 'terminado' | 'hasFieldError' | 'metaFieldIdErrorCsv' | 'observacionesCtrlCal'> }
 const assignPropsToTablaAsignada = (asigGrupoCamposAnalisis: AsigGrupoCamposAnalisisDto, tablaAsignada: RegistroTablaDinamicaDto[]): RegistroTablaDinamicaDto[] => {
    // ► Dep's: ...
    if (Object.entries(asigGrupoCamposAnalisis).length === 0) return []
    const someFieldsFromProduccionAnalisis: SomeFieldsFromProduccionAnalisis =
    asigGrupoCamposAnalisis?.produccionAnalisis.reduce((map, prod) => {
       map[prod.idRegistroAnalisis] = {
-         analizado: prod.completo,
+         idProdAnalisis: prod.idProdAnalisis,
          fechaAnalisis: prod.fechaFin || '',
+         analizado: prod.completo,
+         terminado: prod.terminado,
          hasFieldError: prod.revisado && Boolean(prod.metaFieldIdErrorCsv),
          metaFieldIdErrorCsv: prod.metaFieldIdErrorCsv,
          observacionesCtrlCal: prod.observacionesCtrlCal

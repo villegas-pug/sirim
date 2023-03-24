@@ -5,6 +5,7 @@ export interface ProduccionAnalisis {
    asigGrupo: AsigGrupoCamposAnalisis
    idRegistroAnalisis: number
    completo: boolean
+   terminado: boolean
    revisado: boolean
    observacionesCtrlCal: string
    metaFieldIdErrorCsv: string

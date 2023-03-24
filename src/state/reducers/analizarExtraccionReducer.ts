@@ -50,6 +50,12 @@ export const analizarExtraccionReducer = (state: AnalizarExtraccionState = INITI
    case '[Analizar-Extracción] Download analisados by dates error':
    case '[Analizar-Extracción] Download reporte mensual de producción error':
       return { ...state, loading: false, error: action.payload }
+   case '[Analizar-Extracción] setTerminadoProduccionAnalisis loading':
+      return { ...state, loading: true }
+   case '[Analizar-Extracción] setTerminadoProduccionAnalisis success':
+      return { ...state, loading: false }
+   case '[Analizar-Extracción] setTerminadoProduccionAnalisis error':
+      return { ...state, loading: false, error: action.payload }
    default:
       return state
    }
