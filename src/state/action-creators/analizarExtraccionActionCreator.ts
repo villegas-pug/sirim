@@ -134,7 +134,7 @@ export const downloadAnalisadosByDates = (recordAssigned: Partial<RecordsBetween
       const { usuario: { token, userCredentials } } = getState()
       const { data, headers } = await api({
          method: 'POST',
-         url: '/microservicio-rimanalisisdev/downloadAnalisadosByDates',
+         url: '/microservicio-rimanalisis/downloadAnalisadosByDates',
          data: { ...recordAssigned, usr: userCredentials },
          responseType: 'blob',
          headers: {
@@ -204,7 +204,7 @@ export const setTerminadoProduccionAnalisis = (idProdAnalisis: number) => async 
       const { usuario: { token } } = getState()
       const { data: { levelLog, message } } = await api.request<Response<[]>>({
          method: 'PUT',
-         url: `/microservicio-rimanalisisdev/setTerminadoProduccionAnalisis/${idProdAnalisis}`,
+         url: `/microservicio-rimanalisis/setTerminadoProduccionAnalisis/${idProdAnalisis}`,
          headers: {
             [AUTHORIZATION]: token
          }

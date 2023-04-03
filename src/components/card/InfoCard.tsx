@@ -78,7 +78,7 @@ export const InfoCard: FC<Props> = ({ iconName, title, value, handleShowDetail }
                      <Typography variant='h4' color='textSecondary'>{ title }</Typography>
                   </Grid>
                   <Grid item container xs={7} alignItems='center' justifyContent='center'>
-                     <Typography variant='h1' color='primary'>{ applyCommaThousands(parseInt(value.toString())) }</Typography>
+                     <Typography variant='h1' color='primary'>{ applyCommaThousands(+value.toString()) }</Typography>
                   </Grid>
                   <Grid item container xs={5} alignItems='center' justifyContent='center'>
                      <IconButton

@@ -34,3 +34,9 @@ export const resetObjectProps = <T extends { [key: string]: any }>(object: T): T
    entries.forEach(entry => { entry[1] = '' })
    return Object.fromEntries(entries) as T
 }
+
+export const setDefaultValuesInObjectProps = <T extends { [key: string]: any }>(object: T, defaultValue: any): T => {
+   const entries = Object.entries(object)
+   entries.forEach(entry => { entry[1] = defaultValue })
+   return Object.fromEntries(entries) as T
+}

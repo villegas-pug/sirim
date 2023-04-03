@@ -12,7 +12,8 @@ import {
    TextField,
    Tooltip,
    Typography,
-   Checkbox
+   Checkbox,
+   FormControlLabel
 } from '@mui/material'
 import {
    ArrowBackIosNewRounded,
@@ -20,6 +21,7 @@ import {
    CheckCircleRounded,
    CheckRounded,
    ClearRounded,
+   CopyAllRounded,
    DoneAllRounded,
    DownloadOutlined,
    DownloadRounded,
@@ -56,7 +58,7 @@ import {
 import { AnalizarExtraccionProvider, useAnalizarExtraccionContext } from 'context'
 import { useAnalizarExtraccion, useBreakpoints, useLocalStorage } from 'hooks'
 
-import { applyCommaThousands, parseJsonDateToDate, parseJsonTimestampToStrDate, undecorateMetaFieldName } from 'helpers'
+import { applyCommaThousands, noty, parseJsonDateToDate, parseJsonTimestampToStrDate, undecorateMetaFieldName } from 'helpers'
 import { RecordsBetweenDatesDto, AsigGrupoCamposAnalisisDto, PrefixMetaFieldName, RegistroTablaDinamicaDto, ProduccionAnalisis } from 'interfaces'
 import { optSelectItemMonthName } from 'constants/calendar'
 import { format } from 'date-fns'
@@ -470,10 +472,10 @@ const BandejaEntrada: FC = () => {
 }
 
 const HeaderBandejaEntrada: FC = () => {
-   /* ► CONTEXT ... */
-   /* ► HOOK'S ... */
+   // ► Context ...
+   // ► Hook's ...
 
-   /* ► CUSTOM - HOOK'S ... */
+   // ► Custom hook's ...
    const {
       asigsGrupoCamposAnalisisDb,
       asigSummaryDb,
@@ -481,6 +483,8 @@ const HeaderBandejaEntrada: FC = () => {
    } = useAnalizarExtraccion()
 
    const { currentScreen } = useBreakpoints()
+
+   // Effect's ...
 
    // ► Dep's ...
    const asigsNoConformeQA = useMemo(() => asigsGrupoCamposAnalisisDb.filter(asig => {
@@ -499,10 +503,10 @@ const HeaderBandejaEntrada: FC = () => {
                justifyContent='space-around'
                divider={ <Divider orientation='vertical' flexItem /> }
             >
-               <InfoCard iconName='Assignment' title='Total Asignados' value={ applyCommaThousands(asigSummaryDb.totalAsignados) } />
-               <InfoCard iconName='AssignmentComplete' title='Total Analizados' value={ applyCommaThousands(asigSummaryDb.totalAnalizados) } />
-               <InfoCard iconName='AssignmentPendent' title='Total Pendientes' value={ applyCommaThousands(asigSummaryDb.totalPendientes) } />
-               <InfoCard iconName='ErrQC' title='Total Observados en Q.C.' value={ applyCommaThousands(asigsNoConformeQA) } />
+               <InfoCard iconName='Assignment' title='Total Asignados' value={ asigSummaryDb.totalAsignados } />
+               <InfoCard iconName='AssignmentComplete' title='Total Analizados' value={ asigSummaryDb.totalAnalizados } />
+               <InfoCard iconName='AssignmentPendent' title='Total Pendientes' value={ asigSummaryDb.totalPendientes } />
+               <InfoCard iconName='ErrQC' title='Total Observados en Q.C.' value={ asigsNoConformeQA } />
             </Stack>
          </Fade>
       </Fade>
@@ -679,12 +683,15 @@ const AnalizarExtraccion: FC = () => {
    const { registroDinamicoAsignadoTmp } = useAnalizarExtraccionContext()
 
    // ► Hook's ...
+   const firstRender = useRef(false)
    const [showDatosExtraccion, setShowDatosExtraccion] = useState(true)
+   /* const [isFieldAOptional, setFieldAOptional] = useState() */
 
    // ► Custom hook's ...
    const registroDinamicoAsignadoTmpFirstRender = useRef(registroDinamicoAsignadoTmp)
 
    // » Effect's ...
+   useEffect(() => { firstRender.current = true }, [])
 
    // ► Handler's ...
    const handleShowCamposExtraccion = ({ target: { checked } }: ChangeEvent<HTMLInputElement>) => {
@@ -733,8 +740,10 @@ const AnalizarExtraccion: FC = () => {
             )
          }
 
-         {/* ► BODY ... */}
+         {/* ► Body ... */}
          <Typography variant='h4' color='GrayText' sx={{ mt: 2 }} gutterBottom>DATOS DE ANALISIS</Typography>
+
+         <FormControlLabel control={ <Switch /> } label='Campos opcionales' />
 
          <FrmAnalizarExtraccion registroDinamicoAsignadoTmpFirstRender={ registroDinamicoAsignadoTmpFirstRender.current } />
 
@@ -758,23 +767,51 @@ const AnalizarExtraccion: FC = () => {
 
 const FrmAnalizarExtraccion: FC<{ registroDinamicoAsignadoTmpFirstRender: RegistroTablaDinamicaDto }> = ({ registroDinamicoAsignadoTmpFirstRender }) => {
    // ► Context ...
-   const { asigGrupoCamposAnalisisTmp, registroDinamicoAsignadoTmp, handleActionRegistroDinamicoAsignadoTmp } = useAnalizarExtraccionContext()
+   const { asigGrupoCamposAnalisisTmp, registroDinamicoAsignadoTmp, tablaAsignadaTmp, handleActionRegistroDinamicoAsignadoTmp } = useAnalizarExtraccionContext()
 
    // ► Hook's ...
    const refAnalizarExtraccionSubmit = useRef({} as HTMLInputElement)
+   const templateIdRecordAssigned = useRef<number>()
    const [toRenderFrmAnalizarExtraccion, setToRenderFrmAnalizarExtraccion] = useState(true)
 
    // ► Custom hook's ...
    const { loadingAsigGrupoCamposAnalisisDb, findAsigById, saveRecordAssigned } = useAnalizarExtraccion()
    const [prevIdRecordAssigned, setPrevIdRecordAssigned] = useLocalStorage('REGISTRO_DINAMICO_ASIGNADO_PREV_ID')
+   const [recordAssignedTemplate, setRecordAssignedTemplate] = useLocalStorage('REGISTRO_DINAMICO_ASIGNADO_TEMPLATE')
+
+   // » Effect's ...
+   useEffect(() => { // ...
+      if (tablaAsignadaTmp.length === 0) return
+      if (!templateIdRecordAssigned.current) return
+
+      setRecordAssignedTemplate(tablaAsignadaTmp.find(t => t.nId === templateIdRecordAssigned.current))
+      templateIdRecordAssigned.current = 0 // Cleanup ...
+   }, [tablaAsignadaTmp])
 
    // » Handler's ...
-   const handlePrevAnalisis = () => {
+   const handleSaveRegistroDinamicoAsignadoTmp = (type: 'SAVE' | 'FILTER') => {
       setToRenderFrmAnalizarExtraccion(false)
-      handleActionRegistroDinamicoAsignadoTmp('FILTER', {} as RegistroTablaDinamicaDto, prevIdRecordAssigned)
-      setTimeout(() => {
-         setToRenderFrmAnalizarExtraccion(true)
-      }, 0)
+
+      switch (type) {
+      case 'FILTER':
+         handleActionRegistroDinamicoAsignadoTmp('FILTER', {} as RegistroTablaDinamicaDto, prevIdRecordAssigned)
+         break
+      case 'SAVE':
+         if (!recordAssignedTemplate) {
+            noty('error', '¡No existe una plantilla!')
+            break
+         }
+
+         handleActionRegistroDinamicoAsignadoTmp('SAVE', recordAssignedTemplate as RegistroTablaDinamicaDto)
+         break
+      }
+
+      setTimeout(() => { setToRenderFrmAnalizarExtraccion(true) }, 0)
+   }
+
+   const handleSubmitAndIdRecordAssignedToTemplate = () => {
+      refAnalizarExtraccionSubmit.current.click()
+      templateIdRecordAssigned.current = registroDinamicoAsignadoTmpFirstRender.nId
    }
 
    // » Dep's ...
@@ -802,25 +839,44 @@ const FrmAnalizarExtraccion: FC<{ registroDinamicoAsignadoTmpFirstRender: Regist
    return (
       <>
 
-         <Box mb={ 2 } display='flex' justifyContent='flex-end' gap={ 1 }>
+         <Box mb={ 2 } display='flex' justifyContent='flex-end' gap={ 0.5 }>
 
             <Button
                variant='outlined'
-               color='warning'
+               color='info'
+               startIcon={ <CopyAllRounded /> }
+               disabled={ loadingAsigGrupoCamposAnalisisDb }
+               onClick={ () => { handleSaveRegistroDinamicoAsignadoTmp('SAVE') } }
+            >
+               <Typography variant='h4'>Cargar plantilla</Typography>
+            </Button>
+
+            <Button
+               variant='outlined'
                startIcon={ <CachedRounded /> }
                disabled={ loadingAsigGrupoCamposAnalisisDb }
-               onClick={ handlePrevAnalisis }
+               onClick={ () => { handleSaveRegistroDinamicoAsignadoTmp('FILTER') } }
             >
                <Typography variant='h4'>Analisis Anterior</Typography>
             </Button>
 
             <Button
-               variant='outlined'
+               variant='contained'
+               color='info'
+               startIcon={ loadingAsigGrupoCamposAnalisisDb ? <CircularProgress size={ 20 } /> : <SaveAsRounded /> }
+               disabled={ loadingAsigGrupoCamposAnalisisDb }
+               onClick={ () => { handleSubmitAndIdRecordAssignedToTemplate() } }
+            >
+               <Typography variant='h4'>Guardar como plantilla</Typography>
+            </Button>
+
+            <Button
+               variant='contained'
                startIcon={ loadingAsigGrupoCamposAnalisisDb ? <CircularProgress size={ 20 } /> : <SaveAsRounded /> }
                disabled={ loadingAsigGrupoCamposAnalisisDb }
                onClick={ () => { refAnalizarExtraccionSubmit.current.click() } }
             >
-               <Typography variant='h4'>Guardar Analisis</Typography>
+               <Typography variant='h4'>Guardar</Typography>
             </Button>
 
          </Box>

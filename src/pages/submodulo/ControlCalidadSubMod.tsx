@@ -24,6 +24,7 @@ import {
    ClearRounded,
    DeleteForeverRounded,
    DoneAllRounded,
+   Download,
    HistoryToggleOffRounded,
    PersonOutlineRounded,
    PlaylistAddCheckCircleRounded,
@@ -42,7 +43,7 @@ import { ControlCalidadProvider, useControlCalidadContext } from 'context'
 
 import { BandejaProcesos, BootstrapTooltip, LinearWithValueLabel, ListItemFade, ModalLoader, MySelect, MySelectItem, MyTextField, Scrollbar, SimpleDataGrid, SimpleModal, SimpleModalRefProps, StandarTooltip } from 'components'
 
-import { useAuth, useControlCalidad, useExtraccion, useTipoLogico } from 'hooks'
+import { useAnalizarExtraccion, useAuth, useControlCalidad, useExtraccion, useTipoLogico } from 'hooks'
 import { applyCommaThousands, undecorateMetaFieldName } from 'helpers'
 import { AsigGrupoCamposAnalisis, AsigGrupoCamposAnalisisDto, PrefixMetaFieldName, RegistroTablaDinamicaDto } from 'interfaces'
 import { GridColDef } from '@mui/x-data-grid'
@@ -55,6 +56,7 @@ const ControlCalidadSubMod: FC = () => {
    // ► CUSTOM-HOOK'S ...
    const { loadingExtraccionDb, findTablaDinamicaByUsrCreador } = useExtraccion()
    const { loadingControlCalidadDb } = useControlCalidad()
+   const { loadingAsigGrupoCamposAnalisisDb } = useAnalizarExtraccion()
    const { findAllUser, authLoading } = useAuth()
 
    // ► EFFECT'S ...
@@ -96,6 +98,7 @@ const ControlCalidadSubMod: FC = () => {
          {/* » MODAL: Loading ...  */}
          { loadingControlCalidadDb && <ModalLoader /> }
          { loadingExtraccionDb && <ModalLoader /> }
+         { loadingAsigGrupoCamposAnalisisDb && <ModalLoader /> }
          { authLoading && <ModalLoader /> }
       </>
    )
@@ -140,27 +143,28 @@ const ListaUsuarios: FC = () => {
 }
 
 const ListaAsignaciones: FC = () => {
-   // ► CONTEXT-HOOK'S ...
+   // ► Context ...
    const {
       filteredAsigsGrupoCamposAnalisisTmp,
       handleActionAsigGrupoCamposAnalisisTmp,
       handleActionCtrlsCalCamposAnalisisTmp
    } = useControlCalidadContext()
 
-   // ► HOOK'S ...
+   // ► Hook's ...
    const [selectedItem, setSelectedItem] = useState(-1)
 
-   // ► CUSTOM-HOOK'S ...
+   // ► Custom hook's ...
    const { findTablaDinamicaByUsrCreador } = useExtraccion()
+   const { downloadAnalisadosByDates } = useAnalizarExtraccion()
 
    const { saveCtrlCalCamposAnalisis, setValidationResultOfCtrlCal } = useControlCalidad()
 
-   // ► EFFECT'S ...
+   // ► Effect's ...
    useEffect(() => { // ► Clean-up: When `filteredAsigsGrupoCamposAnalisisTmp` change, selectItem is updated ...
       if (filteredAsigsGrupoCamposAnalisisTmp.length === 0) setSelectedItem(-1)
    }, [filteredAsigsGrupoCamposAnalisisTmp])
 
-   // ► HANDLER'S ...
+   // ► Handler's ...
    const handleGenerateRecordsToCtrlCal = async (idAsigGrupo: number): Promise<void> => {
       await saveCtrlCalCamposAnalisis(idAsigGrupo)
       findTablaDinamicaByUsrCreador()
@@ -177,6 +181,7 @@ const ListaAsignaciones: FC = () => {
       findTablaDinamicaByUsrCreador()
    }
 
+   // » Dep's ...
    const isDisabledBtnGenerarRegistros = (asig: AsigGrupoCamposAnalisisDto) => asig.totalPendientes > 0 || asig.ctrlsCalCamposAnalisis.length > 0
 
    return (
@@ -224,9 +229,24 @@ const ListaAsignaciones: FC = () => {
 
                         {/* ► Action's ...  */}
                         <ListItemSecondaryAction>
+
+                           <StandarTooltip title='Descargar analizados'>
+                              <IconButton
+                                 size='small'
+                                 onClick={ () => downloadAnalisadosByDates({
+                                    idAsigGrupo: asig.idAsigGrupo,
+                                    fecIni: '1900-01-01',
+                                    fecFin: '1900-01-01',
+                                    isAssignedTemplate: false
+                                 }) }
+                              >
+                                 <Download fontSize='small' />
+                              </IconButton>
+                           </StandarTooltip>
+
                            <StandarTooltip title={ `Generar el ${asig.grupo.tablaDinamica?.porcentajeQC}% de registros, para Q.C.` }>
                               <IconButton
-                                 size='large'
+                                 size='small'
                                  disabled={ isDisabledBtnGenerarRegistros(asig) }
                                  onClick={ () => handleGenerateRecordsToCtrlCal(asig.idAsigGrupo) }
                               >
@@ -239,9 +259,10 @@ const ListaAsignaciones: FC = () => {
                                  </Typography>
                               </IconButton>
                            </StandarTooltip>
+
                            <StandarTooltip title='Calidad conforme'>
                               <IconButton
-                                 size='large'
+                                 size='small'
                                  disabled={
                                     asig.totalPendientes > 0 ||
                                     asig.ctrlsCalCamposAnalisis.length === 0 ||
@@ -250,9 +271,10 @@ const ListaAsignaciones: FC = () => {
                                  }
                                  onClick={ () => handleSetValidationResultOfCtrlCal(asig) }
                               >
-                                 <VerifiedRounded />
+                                 <VerifiedRounded fontSize='small' />
                               </IconButton>
                            </StandarTooltip>
+
                         </ListItemSecondaryAction>
                      </ListItemButton>
                   </ListItemFade>
@@ -339,14 +361,15 @@ const ListaControlCalidad: FC = () => {
    const avgMetaFieldIdErrorCsv = useMemo(() => {
       if (Object.entries(asigGrupoCamposAnalisisTmp).length === 0) return 0
 
-      const failedProd = asigGrupoCamposAnalisisTmp.produccionAnalisis.filter(({ revisado, metaFieldIdErrorCsv }) => revisado && metaFieldIdErrorCsv)
-      if (!failedProd.length) return 0
+      const recordsErrInQC = asigGrupoCamposAnalisisTmp.produccionAnalisis.filter(({ revisado, metaFieldIdErrorCsv }) => revisado && metaFieldIdErrorCsv)
+      if (!recordsErrInQC.length) return 0
 
-      const totalFailedProd = failedProd.reduce((totalErr, prodErr) => {
+      const percentageErrInQC = recordsErrInQC.reduce((totalErr, prodErr) => {
          totalErr += prodErr.metaFieldIdErrorCsv.split(/[,]/g).length / totalCamposAnalisis
          return totalErr
       }, 0)
-      return totalFailedProd / failedProd.length
+
+      return percentageErrInQC / asigGrupoCamposAnalisisTmp.ctrlsCalCamposAnalisis[0].totalRegistros
    }, [asigGrupoCamposAnalisisTmp, totalCamposAnalisis])
 
    return (

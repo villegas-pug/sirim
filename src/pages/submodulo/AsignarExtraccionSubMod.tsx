@@ -22,6 +22,7 @@ import {
    ArrowUpwardRounded,
    DeleteForeverRounded,
    DoneRounded,
+   Download,
    GroupAddRounded,
    GroupWorkRounded,
    HighlightOffRounded,
@@ -55,7 +56,7 @@ import {
    SimpleModalRefProps
 } from 'components'
 
-import { useAsignarExtraccion, useAuth } from 'hooks'
+import { useAnalizarExtraccion, useAsignarExtraccion, useAuth } from 'hooks'
 
 import {
    AsignarExtraccionProvider,
@@ -77,11 +78,12 @@ const delayFadeTop: number = 200
 const durationFadeTop: number = 500
 
 const AsignarExtraccionSubMod: FC = () => {
-   /* » CUSTOM-HOOK'S ... */
+   /* » Custom hook's ... */
    const { loadingExtraccion, loadingTablaDinamicaDb, findTablaDinamicaByUsrCreador } = useAsignarExtraccion()
+   const { loadingAsigGrupoCamposAnalisisDb } = useAnalizarExtraccion()
    const { findAllUser } = useAuth()
 
-   /* ► EFFECT'S ...  */
+   /* ► Effect's ...  */
    useEffect(() => { findTablaDinamicaByUsrCreador() }, [])
    useEffect(() => { findAllUser() }, [])
 
@@ -117,6 +119,7 @@ const AsignarExtraccionSubMod: FC = () => {
          {/* » MODAL: Loading ...  */}
          { loadingExtraccion && <ModalLoader /> }
          { loadingTablaDinamicaDb && <ModalLoader /> }
+         { loadingAsigGrupoCamposAnalisisDb && <ModalLoader /> }
       </>
    )
 }
@@ -488,21 +491,21 @@ const FrmAsign: FC<FrmAsignProps> = ({ rangoAsignacion, index = 0 }) => {
 }
 
 const ListaAsignacionesGrupo: FC = () => {
-   /* ► CONTEXT-HOOK ... */
+   // ► Context ...
    const {
       grupoCamposAnalisisTmp,
       filteredAsigsAnalisisTmp,
       totalAsigsByGrupoTmp
    } = useAsignarExtraccionContext()
 
-   /* ► HOOK'S ... */
+   // ► Hook's ...
    const confirmEliminarAsign = useRef({} as ConfirmDialogRefProps)
    const modalReasignacion = useRef({} as SimpleModalRefProps)
    const [selectedItem, setSelectedItem] = useState(-1)
    const [isConfirmEliminarAsign, setIsConfirmEliminarAsign] = useState(false)
    const [selectedAsign, setSelectedAsign] = useState({} as AsigGrupoCamposAnalisisDto)
 
-   /* ► CUSTOM-HOOk'S ... */
+   // ► Custom hook's ...
    const {
       totalRegistrosTablaDinamica,
       findTablaDinamicaByUsrCreador,
@@ -511,8 +514,9 @@ const ListaAsignacionesGrupo: FC = () => {
    } = useAsignarExtraccion()
 
    const { userscurrentGroupDb } = useAuth()
+   const { downloadAnalisadosByDates } = useAnalizarExtraccion()
 
-   /* » EFFECT'S ... */
+   // » Effect's ...
    useEffect(() => { /* ► Si acepta eliminar los rangos asignados ... */
       if (!isConfirmEliminarAsign) return
       (async () => {
@@ -593,9 +597,8 @@ const ListaAsignacionesGrupo: FC = () => {
                                  <Stack
                                     width={ '92%' }
                                     direction='row'
-                                    justifyContent='space-between'
                                     overflow='auto'
-                                    spacing={ 1 }
+                                    spacing={ 3 }
                                     divider={ <Divider orientation='vertical' flexItem /> }
                                  >
                                     <Typography variant='h5'>{ format(parseISO(asign.fechaAsignacion), 'dd-MM-yyyy') }</Typography>
@@ -611,10 +614,23 @@ const ListaAsignacionesGrupo: FC = () => {
 
                            <ListItemSecondaryAction>
 
+                              <Tooltip title='Descargar asignados' placement='top-start' arrow>
+                                 <IconButton
+                                    size='small'
+                                    onClick={ () => {
+                                       downloadAnalisadosByDates({
+                                          idAsigGrupo: asign.idAsigGrupo,
+                                          isAssignedTemplate: true
+                                       })
+                                    } }
+                                 >
+                                    <Download fontSize='small' />
+                                 </IconButton>
+                              </Tooltip>
+
                               <Tooltip title='Eliminar asignación' placement='top-start' arrow>
                                  <IconButton
                                     size='small'
-                                    disabled={ asign.totalAsignados === asign.totalAnalizados }
                                     onClick={ () => {
                                        setSelectedAsign(asign)
                                        confirmEliminarAsign.current.setIsOpen(true)

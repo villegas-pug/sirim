@@ -1,3 +1,3 @@
 export const applyCommaThousands = (payload: number): string => {
-   return Intl.NumberFormat('es-PE').format(payload)
+   return Intl.NumberFormat('es-PE').format(+payload.toString().replace(/[.,]/g, ''))
 }
