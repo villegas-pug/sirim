@@ -21,6 +21,7 @@ export interface Usuario {
    dni: string
    regimenLaboral: string
    foto: string
+   activo: boolean
 }
 
 export interface SimUsuario {

@@ -22,7 +22,6 @@ import {
 import {
    CheckRounded,
    ClearRounded,
-   DeleteForeverRounded,
    DoneAllRounded,
    Download,
    HistoryToggleOffRounded,
@@ -38,6 +37,7 @@ import { styled } from '@mui/styles'
 import { Form, Formik } from 'formik'
 import { format, parseISO } from 'date-fns'
 import Zoom from 'react-reveal/Zoom'
+import * as Yup from 'yup'
 
 import { ControlCalidadProvider, useControlCalidadContext } from 'context'
 
@@ -53,13 +53,13 @@ const MainPaper = styled(Paper)({
 })
 
 const ControlCalidadSubMod: FC = () => {
-   // ► CUSTOM-HOOK'S ...
+   // ► Custom hook's ...
    const { loadingExtraccionDb, findTablaDinamicaByUsrCreador } = useExtraccion()
    const { loadingControlCalidadDb } = useControlCalidad()
    const { loadingAsigGrupoCamposAnalisisDb } = useAnalizarExtraccion()
    const { findAllUser, authLoading } = useAuth()
 
-   // ► EFFECT'S ...
+   // ► Effect's ...
    useEffect(() => { findTablaDinamicaByUsrCreador() }, [])
    useEffect(() => { findAllUser() }, [])
 
@@ -68,7 +68,7 @@ const ControlCalidadSubMod: FC = () => {
          <BandejaProcesos>
 
             {/* ► Lista: Analistas ... */}
-            <Grid item xs={ 3 }>
+            <Grid item xs={ 12 } lg={ 3 }>
                <MainPaper variant='outlined'>
                   <Scrollbar>
                      <ListaUsuarios />
@@ -77,7 +77,7 @@ const ControlCalidadSubMod: FC = () => {
             </Grid>
 
             {/* ► Lista: Asignaciones ... */}
-            <Grid item xs={ 5 }>
+            <Grid item xs={ 12 } lg={ 5 }>
                <MainPaper variant='outlined'>
                   <Scrollbar>
                      <ListaAsignaciones />
@@ -86,7 +86,7 @@ const ControlCalidadSubMod: FC = () => {
             </Grid>
 
             {/* ► Lista: Grupo de registros para Control-Calidad ... */}
-            <Grid item xs={ 4 }>
+            <Grid item xs={ 12 } lg={ 4 }>
                <MainPaper variant='outlined'>
                   <Scrollbar>
                      <ListaControlCalidad />
@@ -291,7 +291,7 @@ const optCtrlCal: MySelectItem[] = [
 ]
 
 const FrmFilterListaAsignaciones: FC = () => {
-   /* ► CONTEXT ... */
+   // ► Context ...
    const {
       handleActionFilteredAsigsGrupoCamposAnalisisTmp,
       handleActionFilterListAsigsTmp
@@ -300,11 +300,17 @@ const FrmFilterListaAsignaciones: FC = () => {
    return (
       <Formik
          initialValues={{
-            fechaAsignacion: '',
-            ctrlCalConforme: ''
+            fecIniAsignacion: format(new Date(), 'yyyy-MM-dd'),
+            fecFinAsignacion: format(new Date(), 'yyyy-MM-dd'),
+            ctrlCalConforme: 0
          }}
-         onSubmit={ (values: { fechaAsignacion: string, ctrlCalConforme: any }, meta): void => {
-            handleActionFilterListAsigsTmp('SAVE', values as Pick<AsigGrupoCamposAnalisis, 'fechaAsignacion' | 'ctrlCalConforme'>)
+         validationSchema={ Yup.object({
+            fecIniAsignacion: Yup.date().max(Yup.ref('fecFinAsignacion'), '¡Debe ser menor o igual a la fecha final!').required('¡Campo requerido!'),
+            fecFinAsignacion: Yup.date().min(Yup.ref('fecIniAsignacion'), '¡Debe ser mayor o igual a la fecha inicial!').required('¡Campo requerido!'),
+            ctrlCalConforme: Yup.bool().required('¡Campo Requerido!')
+         })}
+         onSubmit={ (values: { fecIniAsignacion: string, fecFinAsignacion: string, ctrlCalConforme: any }, meta): void => {
+            handleActionFilterListAsigsTmp('SAVE', values as Pick<AsigGrupoCamposAnalisis, 'fecIniAsignacion' | 'fecFinAsignacion' | 'ctrlCalConforme'>)
             handleActionFilteredAsigsGrupoCamposAnalisisTmp('SAVE', values)
          } }
          onReset={() => {
@@ -320,14 +326,12 @@ const FrmFilterListaAsignaciones: FC = () => {
                   alignItems='center'
                   divider={ <Divider orientation='vertical' flexItem /> }
                >
-                  <MyTextField type='date' name='fechaAsignacion' label='Fecha asignación' width={ 8 } focused />
+                  <MyTextField type='date' name='fecIniAsignacion' label='Fecha inicio asignación' width={ 8 } focused />
+                  <MyTextField type='date' name='fecFinAsignacion' label='Fecha fin asignación' width={ 8 } />
                   <MySelect name='ctrlCalConforme' label='Estado' width={ 8 } opt={ optCtrlCal } />
                   <Box display='flex' flexDirection='column' gap={ 0.5 }>
                      <Button size='small' type='submit' variant='contained'>
                         <SearchRounded fontSize='small' />
-                     </Button>
-                     <Button size='small' type='reset' variant='outlined' color='warning'>
-                        <DeleteForeverRounded fontSize='small' />
                      </Button>
                   </Box>
                </Stack>

@@ -15,6 +15,10 @@ export interface AsigGrupoCamposAnalisis {
    regAnalisisFin: number
    ctrlCalConforme: boolean
    fechaAsignacion: string
+
+   // ► Aux ...
+   fecIniAsignacion: string
+   fecFinAsignacion: string
 }
 
 export interface AsigGrupoCamposAnalisisDto extends AsigGrupoCamposAnalisis {

@@ -9,7 +9,7 @@ type AsignarExtraccionAction =
    | { type: '[Add] GrupoCamposAnalisisTmp', payload: GrupoCamposAnalisis }
    | { type: '[Add] asigsGrupoCamposAnalisisTmp', payload: Array<AsigGrupoCamposAnalisisDto> }
    | { type: '[Add] filteredAsigsAnalisisTmp', payload: AsigGrupoCamposAnalisisDto[] }
-   | { type: '[Add] filterListAsigsAnalisisTmp', payload: Pick<AsigGrupoCamposAnalisisDto, 'fechaAsignacion' | 'completo'> }
+   | { type: '[Add] filterListAsigsAnalisisTmp', payload: Pick<AsigGrupoCamposAnalisisDto, 'fecIniAsignacion' | 'fecFinAsignacion' | 'completo'> }
    | { type: '[Add] totalAsigsByGrupoTmp', payload: number }
    | { type: '[Add] paramsToAsigMasivaTmp', payload: { totalAnalistas: number, regPorAnalista: number } }
    | { type: '[Add] rangosToAssignMasivaTmp', payload: Pick<AsigGrupoCamposAnalisis, 'regAnalisisIni' | 'regAnalisisFin'>[] }

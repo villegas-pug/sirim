@@ -17,7 +17,7 @@ export interface AsignarExtraccionState {
    grupoCamposAnalisisTmp: GrupoCamposAnalisis
    asigsGrupoCamposAnalisisTmp: Array<AsigGrupoCamposAnalisisDto>
    filteredAsigsAnalisisTmp: Array<AsigGrupoCamposAnalisisDto>
-   filterListAsigsAnalisisTmp: Pick<AsigGrupoCamposAnalisisDto, 'fechaAsignacion' | 'completo'>
+   filterListAsigsAnalisisTmp: Pick<AsigGrupoCamposAnalisisDto, 'fecIniAsignacion' | 'fecFinAsignacion' | 'completo'>
    totalAsigsByGrupoTmp: number
    paramsToAsigMasivaTmp: { totalAnalistas: number, regPorAnalista: number }
    rangosToAssignMasivaTmp: Pick<AsigGrupoCamposAnalisis, 'regAnalisisIni' | 'regAnalisisFin'>[]
@@ -30,7 +30,11 @@ const INITIAL_STATE: AsignarExtraccionState = {
    grupoCamposAnalisisTmp: {} as GrupoCamposAnalisis,
    asigsGrupoCamposAnalisisTmp: [],
    filteredAsigsAnalisisTmp: [],
-   filterListAsigsAnalisisTmp: { fechaAsignacion: format(new Date(), 'yyyy-MM-dd'), completo: false } as Pick<AsigGrupoCamposAnalisisDto, 'fechaAsignacion' | 'completo'>,
+   filterListAsigsAnalisisTmp: {
+      fecIniAsignacion: format(new Date(), 'yyyy-MM-dd'),
+      fecFinAsignacion: format(new Date(), 'yyyy-MM-dd'),
+      completo: false
+   } as Pick<AsigGrupoCamposAnalisisDto, 'fecIniAsignacion' | 'fecFinAsignacion' | 'completo'>,
    totalAsigsByGrupoTmp: 0,
    paramsToAsigMasivaTmp: { totalAnalistas: 0, regPorAnalista: 0 } as { totalAnalistas: number, regPorAnalista: number },
    rangosToAssignMasivaTmp: [],
@@ -42,24 +46,24 @@ type ProviderProps = {
 }
 
 export const AsignarExtraccionProvider: FC<ProviderProps> = ({ children }) => {
-   /* ► HOOK'S ... */
+   // ► Hook's ...
    const [state, dispatch] = useReducer(asignarExtraccionReducer, INITIAL_STATE)
 
-   /* ► CUSTOM - HOOK'S ... */
+   // ► Custom hook's ...
    const {
       tablasDinamicasDb,
-      errorTablaDinamicaDb,
+      /* errorTablaDinamicaDb, */
       totalRegistrosTablaDinamica:
-      totalRegistrosTD,
-      findTablaDinamicaByUsrCreador
+      totalRegistrosTD
+      /* findTablaDinamicaByUsrCreador */
    } = useAsignarExtraccion()
 
-   useEffect(() => { // ► When request error, call `action-creator` ...
+   /* useEffect(() => { // ► When request error, call `action-creator` ...
       Boolean(errorTablaDinamicaDb) && findTablaDinamicaByUsrCreador()
-   }, [errorTablaDinamicaDb])
+   }, [errorTablaDinamicaDb]) */
 
-   /* ► EFFECT'S ... */
-   useEffect(() => { /* ► Actualizar: `tmp` ... */
+   // ► Effect's ...
+   useEffect(() => { // ► Actualizar: `tmp` ...
       if (tablasDinamicasDb.length === 0) return
       dispatch({
          type: '[Add] GruposCamposAnalisisTmp',
@@ -67,7 +71,7 @@ export const AsignarExtraccionProvider: FC<ProviderProps> = ({ children }) => {
       })
    }, [tablasDinamicasDb])
 
-   useEffect(() => { /* ► Actualizar: `tmp` ... */
+   useEffect(() => { // ► Actualizar: `tmp` ...
       if (Object.entries(state.tablaDinamicaTmp).length === 0) return
       dispatch({
          type: '[Add] GruposCamposAnalisisTmp',
@@ -75,7 +79,7 @@ export const AsignarExtraccionProvider: FC<ProviderProps> = ({ children }) => {
       })
    }, [state.tablaDinamicaTmp])
 
-   useEffect(() => { /* ► Actualizar: `tmp` ... */
+   useEffect(() => { // ► Actualizar: `tmp` ...
       if (state.gruposCamposAnalisisTmp.length === 0) return
       dispatch({
          type: '[Add] GrupoCamposAnalisisTmp',
@@ -83,7 +87,7 @@ export const AsignarExtraccionProvider: FC<ProviderProps> = ({ children }) => {
       })
    }, [state.gruposCamposAnalisisTmp])
 
-   useEffect(() => { /* ► Actualizar: `tmp` ... */
+   useEffect(() => { // ► Actualizar: `tmp` ...
       if (state.gruposCamposAnalisisTmp.length === 0) return
       dispatch({
          type: '[Add] asigsGrupoCamposAnalisisTmp',
@@ -191,17 +195,17 @@ export const AsignarExtraccionProvider: FC<ProviderProps> = ({ children }) => {
       }
    }
 
-   const handleActionFilterListAsigsTmp = (action: Action, params?: Pick<AsigGrupoCamposAnalisisDto, 'fechaAsignacion' | 'completo'>): void => {
+   const handleActionFilterListAsigsTmp = (action: Action, params?: Pick<AsigGrupoCamposAnalisisDto, 'fecIniAsignacion' | 'fecFinAsignacion' | 'completo'>): void => {
       switch (action) {
       case 'SAVE':
          dispatch({ type: '[Add] filterListAsigsAnalisisTmp', payload: params! })
          break
       case 'RESET':
-         dispatch({ type: '[Add] filterListAsigsAnalisisTmp', payload: {} as Pick<AsigGrupoCamposAnalisisDto, 'fechaAsignacion' | 'completo'> })
+         dispatch({ type: '[Add] filterListAsigsAnalisisTmp', payload: {} as Pick<AsigGrupoCamposAnalisisDto, 'fecIniAsignacion' | 'fecFinAsignacion' | 'completo'> })
       }
    }
 
-   const handleActionFilteredAsigsGrupoCamposAnalisisTmp = (action: Action, filtro?: Pick<AsigGrupoCamposAnalisisDto, 'fechaAsignacion' | 'completo'>) => {
+   const handleActionFilteredAsigsGrupoCamposAnalisisTmp = (action: Action, filtro?: Pick<AsigGrupoCamposAnalisisDto, 'fecIniAsignacion' | 'fecFinAsignacion' | 'completo'>) => {
       switch (action) {
       case 'SAVE':
          dispatch({ type: '[Add] filteredAsigsAnalisisTmp', payload: findAsigsGrupoCamposAnalisisByParams(state.asigsGrupoCamposAnalisisTmp, filtro!) })
@@ -292,26 +296,17 @@ const getAvailableRangesFromGroup = ({ asigGrupoCamposAnalisis }: Partial<GrupoC
       .map(rg => ({ regAnalisisIni: rg.at(0)!, regAnalisisFin: rg.at(-1)! }))
 }
 
-type ParamsFiltro = Pick<AsigGrupoCamposAnalisisDto, 'fechaAsignacion' | 'completo'>
-const findAsigsGrupoCamposAnalisisByParams = (asigs: AsigGrupoCamposAnalisisDto[], filtro: Partial<ParamsFiltro>): AsigGrupoCamposAnalisisDto[] => {
+type ParamsFiltro = Pick<AsigGrupoCamposAnalisisDto, 'fecIniAsignacion' | 'fecFinAsignacion' | 'completo'>
+const findAsigsGrupoCamposAnalisisByParams = (asigs: AsigGrupoCamposAnalisisDto[], filtro: ParamsFiltro): AsigGrupoCamposAnalisisDto[] => {
    // ► Si recibe filtros vacios ...
-   if (!filtro.fechaAsignacion && String(filtro.completo) === '') return asigs
+   if (!filtro.fecIniAsignacion && !filtro.fecFinAsignacion && String(filtro.completo) === '') return asigs
 
    const asigsGrupoCamposAnalisis = asigs
       .filter(({ fechaAsignacion, totalAnalizados, totalAsignados }) => {
-         // ► Si únicamente recibe filtro `fechaAsignacion` ...
-         if (filtro.fechaAsignacion && String(filtro.completo) === '') { // ► El `initialValue` es: '' ...
-            return fechaAsignacion === filtro.fechaAsignacion
-         // ► Si únicamente recibe filtro `completo` ...
-         } else if (!filtro.fechaAsignacion && String(filtro.completo) !== '') {
-            if (filtro.completo) return totalAnalizados === totalAsignados
-            else return totalAnalizados < totalAsignados
-         }
-
          if (filtro.completo) {
-            return fechaAsignacion === filtro.fechaAsignacion && totalAnalizados === totalAsignados
+            return fechaAsignacion >= filtro.fecIniAsignacion && fechaAsignacion <= filtro.fecFinAsignacion && totalAnalizados === totalAsignados
          } else {
-            return fechaAsignacion === filtro.fechaAsignacion && totalAnalizados < totalAsignados
+            return fechaAsignacion >= filtro.fecIniAsignacion && fechaAsignacion <= filtro.fecFinAsignacion && totalAnalizados < totalAsignados
          }
       })
 

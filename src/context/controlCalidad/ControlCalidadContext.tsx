@@ -6,10 +6,10 @@ import { Action, ControlCalidadProviderState } from './ControlCalidadProvider'
 interface ControlCalidadContextProps extends ControlCalidadProviderState {
    handleActionAsigsGrupoCamposAnalisisTmp: (action: Action, usrAnalista?: Usuario) => void
    handleActionAsigGrupoCamposAnalisisTmp: (action: Action, asig?: AsigGrupoCamposAnalisisDto) => void
-   handleActionFilteredAsigsGrupoCamposAnalisisTmp: (action: Action, filtro?: Pick<AsigGrupoCamposAnalisis, 'fechaAsignacion' | 'ctrlCalConforme'>) => void
+   handleActionFilteredAsigsGrupoCamposAnalisisTmp: (action: Action, filtro?: Pick<AsigGrupoCamposAnalisis, 'fecIniAsignacion' | 'fecFinAsignacion' | 'ctrlCalConforme'>) => void
    handleActionCtrlsCalCamposAnalisisTmp: (action: Action, ctrlsCal?: CtrlCalCamposAnalisis[]) => void
    handleActionCtrlCalCamposAnalisisTmp: (action: Action, ctrlCal?: CtrlCalCamposAnalisis) => void
-   handleActionFilterListAsigsTmp: (action: Action, params?: Pick<AsigGrupoCamposAnalisis, 'fechaAsignacion' | 'ctrlCalConforme'>) => void
+   handleActionFilterListAsigsTmp: (action: Action, params?: Pick<AsigGrupoCamposAnalisis, 'fecIniAsignacion' | 'fecFinAsignacion' | 'ctrlCalConforme'>) => void
    handleActionRegistroCtrlCalidadTmp: (action: Action, registroCtrlCalidad?: RegistroTablaDinamicaDto) => void
 }
 

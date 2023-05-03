@@ -18,7 +18,7 @@ export interface ControlCalidadProviderState {
    asigsGrupoCamposAnalisisTmp: AsigGrupoCamposAnalisisDto[]
    asigGrupoCamposAnalisisTmp: AsigGrupoCamposAnalisisDto
    filteredAsigsGrupoCamposAnalisisTmp: AsigGrupoCamposAnalisisDto[]
-   filterListAsigsTmp: Pick<AsigGrupoCamposAnalisis, 'fechaAsignacion' | 'ctrlCalConforme'>
+   filterListAsigsTmp: Pick<AsigGrupoCamposAnalisis, 'fecIniAsignacion' | 'fecFinAsignacion' | 'ctrlCalConforme'>
    ctrlsCalCamposAnalisisTmp: CtrlCalCamposAnalisis[]
    ctrlCalCamposAnalisisTmp: CtrlCalCamposAnalisis
    tablaCtrlCalidadTmp: RegistroTablaDinamicaDto[]
@@ -29,7 +29,11 @@ const INITIAL_STATE: ControlCalidadProviderState = {
    asigsGrupoCamposAnalisisTmp: [],
    asigGrupoCamposAnalisisTmp: {} as AsigGrupoCamposAnalisisDto,
    filteredAsigsGrupoCamposAnalisisTmp: [],
-   filterListAsigsTmp: { fechaAsignacion: format(new Date(), 'yyyy-MM-dd'), ctrlCalConforme: false } as Pick<AsigGrupoCamposAnalisis, 'fechaAsignacion' | 'ctrlCalConforme'>,
+   filterListAsigsTmp: {
+      fecIniAsignacion: format(new Date(), 'yyyy-MM-dd'),
+      fecFinAsignacion: format(new Date(), 'yyyy-MM-dd'),
+      ctrlCalConforme: false
+   } as Pick<AsigGrupoCamposAnalisis, 'fecIniAsignacion' | 'fecFinAsignacion' | 'ctrlCalConforme'>,
    ctrlsCalCamposAnalisisTmp: [],
    ctrlCalCamposAnalisisTmp: {} as CtrlCalCamposAnalisis,
    tablaCtrlCalidadTmp: [],
@@ -129,17 +133,17 @@ export const ControlCalidadProvider: FC<{ children: ReactElement | ReactElement[
       }
    }
 
-   const handleActionFilterListAsigsTmp = (action: Action, params?: Pick<AsigGrupoCamposAnalisis, 'fechaAsignacion' | 'ctrlCalConforme'>): void => {
+   const handleActionFilterListAsigsTmp = (action: Action, params?: Pick<AsigGrupoCamposAnalisis, 'fecIniAsignacion' | 'fecFinAsignacion' | 'ctrlCalConforme'>): void => {
       switch (action) {
       case 'SAVE':
          dispatch({ type: '[filterListAsigsTmp] Save', payload: params! })
          break
       case 'RESET':
-         dispatch({ type: '[filterListAsigsTmp] Save', payload: {} as Pick<AsigGrupoCamposAnalisis, 'fechaAsignacion' | 'ctrlCalConforme'> })
+         dispatch({ type: '[filterListAsigsTmp] Save', payload: {} as Pick<AsigGrupoCamposAnalisis, 'fecIniAsignacion' | 'fecFinAsignacion' | 'ctrlCalConforme'> })
       }
    }
 
-   const handleActionFilteredAsigsGrupoCamposAnalisisTmp = (action: Action, filtro?: Pick<AsigGrupoCamposAnalisis, 'fechaAsignacion' | 'ctrlCalConforme'>) => {
+   const handleActionFilteredAsigsGrupoCamposAnalisisTmp = (action: Action, filtro?: Pick<AsigGrupoCamposAnalisis, 'fecIniAsignacion' | 'fecFinAsignacion' | 'ctrlCalConforme'>) => {
       switch (action) {
       case 'SAVE':
          dispatch({ type: '[filteredAsigsGrupoCamposAnalisisTmp] Save', payload: findAsigsGrupoCamposAnalisisByParams(state.asigsGrupoCamposAnalisisTmp, filtro!) })
@@ -236,22 +240,11 @@ const findAsigsGrupoCamposAnalisisByUsr = (tablaDinamica: TablaDinamicaDto[], us
    return asigsGrupoCamposAnalisis
 }
 
-type ParamsFiltro = Pick<AsigGrupoCamposAnalisis, 'fechaAsignacion' | 'ctrlCalConforme'>
-const findAsigsGrupoCamposAnalisisByParams = (asigs: AsigGrupoCamposAnalisisDto[], filtro: Partial<ParamsFiltro>): AsigGrupoCamposAnalisisDto[] => {
-   // ► Si recibe filtros vacios ...
-   if (!filtro.fechaAsignacion && String(filtro.ctrlCalConforme).trim() === '') return asigs
-
+type ParamsFiltro = Pick<AsigGrupoCamposAnalisis, 'fecIniAsignacion' | 'fecFinAsignacion' | 'ctrlCalConforme'>
+const findAsigsGrupoCamposAnalisisByParams = (asigs: AsigGrupoCamposAnalisisDto[], filtro: ParamsFiltro): AsigGrupoCamposAnalisisDto[] => {
    const asigsGrupoCamposAnalisis = asigs
       .filter(({ fechaAsignacion, ctrlCalConforme }) => {
-         if (filtro.fechaAsignacion && String(filtro.ctrlCalConforme).trim() === '') { // ► Si únicamente recibe filtro `fechaAsignacion` ...
-            return fechaAsignacion === filtro.fechaAsignacion
-         }
-
-         if (!filtro.fechaAsignacion && String(filtro.ctrlCalConforme).trim() !== '') { // ► Si únicamente recibe filtro `ctrlCalConforme` ...
-            return ctrlCalConforme === Boolean(filtro.ctrlCalConforme)
-         }
-
-         return fechaAsignacion === filtro.fechaAsignacion && ctrlCalConforme === Boolean(filtro.ctrlCalConforme)
+         return fechaAsignacion >= filtro.fecIniAsignacion && fechaAsignacion <= filtro.fecFinAsignacion && ctrlCalConforme === Boolean(filtro.ctrlCalConforme)
       })
 
    return asigsGrupoCamposAnalisis

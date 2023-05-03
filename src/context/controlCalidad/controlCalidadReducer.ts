@@ -6,7 +6,7 @@ type ControlcalidadAction =
    | { type: '[asigsGrupoCamposAnalisisTmp] Save', payload: AsigGrupoCamposAnalisisDto[] }
    | { type: '[asigGrupoCamposAnalisisTmp] Save', payload: AsigGrupoCamposAnalisisDto }
    | { type: '[filteredAsigsGrupoCamposAnalisisTmp] Save', payload: AsigGrupoCamposAnalisisDto[] }
-   | { type: '[filterListAsigsTmp] Save', payload: Pick<AsigGrupoCamposAnalisis, 'fechaAsignacion' | 'ctrlCalConforme'> }
+   | { type: '[filterListAsigsTmp] Save', payload: Pick<AsigGrupoCamposAnalisis, 'fecIniAsignacion' | 'fecFinAsignacion' | 'ctrlCalConforme'> }
    | { type: '[ctrlsCalCamposAnalisisTmp] Save', payload: CtrlCalCamposAnalisis[] }
    | { type: '[ctrlCalCamposAnalisisTmp] Save', payload: CtrlCalCamposAnalisis }
    | { type: '[tablaCtrlCalidadTmp] Save', payload: RegistroTablaDinamicaDto[] }

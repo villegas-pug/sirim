@@ -20,7 +20,6 @@ import { styled } from '@mui/styles'
 import {
    ArrowDownwardRounded,
    ArrowUpwardRounded,
-   DeleteForeverRounded,
    DoneRounded,
    Download,
    GroupAddRounded,
@@ -52,6 +51,7 @@ import {
    MySelect,
    MySelectItem,
    MyTextField,
+   Scrollbar,
    SimpleModal,
    SimpleModalRefProps
 } from 'components'
@@ -83,7 +83,7 @@ const AsignarExtraccionSubMod: FC = () => {
    const { loadingAsigGrupoCamposAnalisisDb } = useAnalizarExtraccion()
    const { findAllUser } = useAuth()
 
-   /* ► Effect's ...  */
+   // ► Effect's ...
    useEffect(() => { findTablaDinamicaByUsrCreador() }, [])
    useEffect(() => { findAllUser() }, [])
 
@@ -91,27 +91,29 @@ const AsignarExtraccionSubMod: FC = () => {
       <>
          <BandejaProcesos>
             {/* ► Listas: Tablas Dinámicas y Grupos ... */}
-            <Grid container item xs={ 3 } gap={ 0.5 }>
-               <Grid item xs={ 12 }>
+            <Grid container item xs={ 12 } lg={ 3 } spacing={ 0.5 }>
+               <Grid item xs={ 6 } lg={ 12 }>
                   <MainPaper variant='outlined'>
-                     <Box height='39vh' overflow='auto'>
+                     <Scrollbar>
                         <ListaTablasExtraccion />
-                     </Box>
+                     </Scrollbar>
                   </MainPaper>
                </Grid>
 
-               <Grid item xs={ 12 }>
+               <Grid item xs={ 6 } lg={ 12 }>
                   <MainPaper variant='outlined'>
-                     <Box height='39vh' overflow='auto'>
+                     <Scrollbar>
                         <ListaGruposCamposAnalisis />
-                     </Box>
+                     </Scrollbar>
                   </MainPaper>
                </Grid>
             </Grid>
 
-            <Grid item xs={ 9 }>
+            <Grid item xs={ 12 } lg={ 9 }>
                <MainPaper variant='outlined'>
-                  <ListaAsignacionesGrupo />
+                  <Scrollbar>
+                     <ListaAsignacionesGrupo />
+                  </Scrollbar>
                </MainPaper>
             </Grid>
          </BandejaProcesos>
@@ -142,7 +144,7 @@ const ListaTablasExtraccion: FC = () => {
       >
          {
             tablasDinamicasDb.map((tablaDinamica, i) => (
-               <ListItemFade key={ tablaDinamica.idTabla } i={ i } direction='left'>
+               <ListItemFade key={ tablaDinamica.idTabla } i={ 0 } direction='left'>
                   <ListItemButton
                      selected={ selectedItem === i }
                      onClick={ () => {
@@ -529,7 +531,7 @@ const ListaAsignacionesGrupo: FC = () => {
       })()
    }, [isConfirmEliminarAsign])
 
-   /* ► DEP'S ...  */
+   // ► Dep's ...
    const hasGrupoCamposAnalisisTmp: boolean = Boolean(Object.entries(grupoCamposAnalisisTmp).length)
 
    return (
@@ -571,96 +573,94 @@ const ListaAsignacionesGrupo: FC = () => {
             }
          </Fade>
 
-         {/* ► FILTER: ... */}
+         {/* ► Filter: ... */}
          <FrmFilterListaAsignaciones />
 
-         {/* ► BODY: ... */}
-         <Box height='60vh' overflow='auto'>
-            <List subheader={ <ListSubheader>Rangos asignados</ListSubheader> }>
-               {
-                  filteredAsigsAnalisisTmp.map((asign, i) => (
-                     <ListItemZoom key={asign.idAsigGrupo} i={i}>
-                        <ListItemButton
-                           selected={ i === selectedItem }
-                           onClick={ () => setSelectedItem(i) }
-                        >
+         {/* ► Body: ... */}
+         <List subheader={ <ListSubheader>Rangos asignados</ListSubheader> }>
+            {
+               filteredAsigsAnalisisTmp.map((asign, i) => (
+                  <ListItemZoom key={asign.idAsigGrupo} i={i}>
+                     <ListItemButton
+                        selected={ i === selectedItem }
+                        onClick={ () => setSelectedItem(i) }
+                     >
 
-                           <ListItemIcon>
-                              {
-                                 asign.totalAsignados === asign.totalAnalizados ? <DoneRounded color='success' /> : <PersonRounded color='disabled' />
-                              }
+                        <ListItemIcon>
+                           {
+                              asign.totalAsignados === asign.totalAnalizados ? <DoneRounded color='success' /> : <PersonRounded color='disabled' />
+                           }
 
-                           </ListItemIcon>
+                        </ListItemIcon>
 
-                           <ListItemText
-                              primary={
-                                 <Stack
-                                    width={ '92%' }
-                                    direction='row'
-                                    overflow='auto'
-                                    spacing={ 3 }
-                                    divider={ <Divider orientation='vertical' flexItem /> }
-                                 >
-                                    <Typography variant='h5'>{ format(parseISO(asign.fechaAsignacion), 'dd-MM-yyyy') }</Typography>
-                                    <Typography variant='h5'>{ asign.usrAnalista.nombres }</Typography>
-                                    <Typography variant='h5'>{ `Asignados: ${applyCommaThousands(asign.totalAsignados)}` }</Typography>
-                                    <Typography variant='h5'>{ `Analizados: ${applyCommaThousands(asign.totalAnalizados)}` }</Typography>
-                                    <Typography variant='h5'>{ `Pendientes: ${applyCommaThousands(asign.totalPendientes)}` }</Typography>
-                                    <LinearWithValueLabel progress={ (asign.totalAnalizados / asign.totalAsignados) * 100 } width={ 100 } />
-                                    <Typography variant='h5'>{ `R: ${asign.regAnalisisIni}-${asign.regAnalisisFin}` }</Typography>
-                                 </Stack>
-                              }
-                           />
+                        <ListItemText
+                           primary={
+                              <Stack
+                                 width={ '92%' }
+                                 direction='row'
+                                 overflow='auto'
+                                 spacing={ 1 }
+                                 divider={ <Divider orientation='vertical' flexItem /> }
+                              >
+                                 <Typography variant='h5'>{ format(parseISO(asign.fechaAsignacion), 'dd-MM-yyyy') }</Typography>
+                                 <Typography variant='h5'>{ asign.usrAnalista.nombres }</Typography>
+                                 <Typography variant='h5'>{ `Asignados: ${applyCommaThousands(asign.totalAsignados)}` }</Typography>
+                                 <Typography variant='h5'>{ `Analizados: ${applyCommaThousands(asign.totalAnalizados)}` }</Typography>
+                                 <Typography variant='h5'>{ `Pendientes: ${applyCommaThousands(asign.totalPendientes)}` }</Typography>
+                                 <LinearWithValueLabel progress={ (asign.totalAnalizados / asign.totalAsignados) * 100 } width={ 100 } />
+                                 <Typography variant='h5'>{ `R: ${asign.regAnalisisIni}-${asign.regAnalisisFin}` }</Typography>
+                              </Stack>
+                           }
+                        />
 
-                           <ListItemSecondaryAction>
+                        <ListItemSecondaryAction>
 
-                              <Tooltip title='Descargar asignados' placement='top-start' arrow>
-                                 <IconButton
-                                    size='small'
-                                    onClick={ () => {
-                                       downloadAnalisadosByDates({
-                                          idAsigGrupo: asign.idAsigGrupo,
-                                          isAssignedTemplate: true
-                                       })
-                                    } }
-                                 >
-                                    <Download fontSize='small' />
-                                 </IconButton>
-                              </Tooltip>
+                           <Tooltip title='Descargar asignados' placement='top-start' arrow>
+                              <IconButton
+                                 size='small'
+                                 onClick={ () => {
+                                    downloadAnalisadosByDates({
+                                       idAsigGrupo: asign.idAsigGrupo,
+                                       isAssignedTemplate: true
+                                    })
+                                 } }
+                              >
+                                 <Download fontSize='small' />
+                              </IconButton>
+                           </Tooltip>
 
-                              <Tooltip title='Eliminar asignación' placement='top-start' arrow>
-                                 <IconButton
-                                    size='small'
-                                    onClick={ () => {
-                                       setSelectedAsign(asign)
-                                       confirmEliminarAsign.current.setIsOpen(true)
-                                    } }
-                                 >
-                                    <HighlightOffRounded fontSize='small' />
-                                 </IconButton>
-                              </Tooltip>
+                           <Tooltip title='Eliminar asignación' placement='top-start' arrow>
+                              <IconButton
+                                 size='small'
+                                 onClick={ () => {
+                                    setSelectedAsign(asign)
+                                    confirmEliminarAsign.current.setIsOpen(true)
+                                 } }
+                              >
+                                 <HighlightOffRounded fontSize='small' />
+                              </IconButton>
+                           </Tooltip>
 
-                              <Tooltip title='Reasignar' placement='top-start' arrow>
-                                 <IconButton
-                                    size='small'
-                                    disabled={ asign.totalAsignados === asign.totalAnalizados }
-                                    onClick={ () => {
-                                       setSelectedAsign(asign)
-                                       modalReasignacion.current.setOpen(true)
-                                    } }
-                                 >
-                                    <PersonSearchRounded fontSize='small' />
-                                 </IconButton>
-                              </Tooltip>
+                           <Tooltip title='Reasignar' placement='top-start' arrow>
+                              <IconButton
+                                 size='small'
+                                 disabled={ asign.totalAsignados === asign.totalAnalizados }
+                                 onClick={ () => {
+                                    setSelectedAsign(asign)
+                                    modalReasignacion.current.setOpen(true)
+                                 } }
+                              >
+                                 <PersonSearchRounded fontSize='small' />
+                              </IconButton>
+                           </Tooltip>
 
-                           </ListItemSecondaryAction>
+                        </ListItemSecondaryAction>
 
-                        </ListItemButton>
-                     </ListItemZoom>
-                  ))
-               }
-            </List>
-         </Box>
+                     </ListItemButton>
+                  </ListItemZoom>
+               ))
+            }
+         </List>
 
          {/* » MODAL: Confirm ...  */}
          <ConfirmDialogModal ref={ confirmEliminarAsign } title={'¿Seguro de continuar?'} setIsAccept={ setIsConfirmEliminarAsign } />
@@ -706,7 +706,7 @@ const optEstadoAsig: MySelectItem[] = [
 ]
 
 const FrmFilterListaAsignaciones: FC = () => {
-   /* ► CONTEXT ... */
+   // ► Context ...
    const {
       handleActionFilteredAsigsGrupoCamposAnalisisTmp,
       handleActionFilterListAsigsTmp
@@ -715,11 +715,17 @@ const FrmFilterListaAsignaciones: FC = () => {
    return (
       <Formik
          initialValues={{
-            fechaAsignacion: '',
-            completo: ''
+            fecIniAsignacion: format(new Date(), 'yyyy-MM-dd'),
+            fecFinAsignacion: format(new Date(), 'yyyy-MM-dd'),
+            completo: 1
          }}
-         onSubmit={ (values: { fechaAsignacion: string, completo: any }, meta): void => {
-            handleActionFilterListAsigsTmp('SAVE', values as Pick<AsigGrupoCamposAnalisisDto, 'fechaAsignacion' | 'completo'>)
+         validationSchema={ Yup.object({
+            fecIniAsignacion: Yup.date().max(Yup.ref('fecFinAsignacion'), '¡Debe ser menor o igual a la fecha final!'),
+            fecFinAsignacion: Yup.date().min(Yup.ref('fecIniAsignacion'), '¡Debe ser mayor o igual a la fecha inicial!'),
+            completo: Yup.bool().required('¡Campo Requerido!')
+         })}
+         onSubmit={ (values: { fecIniAsignacion: string, fecFinAsignacion: string, completo: any }, meta): void => {
+            handleActionFilterListAsigsTmp('SAVE', values as Pick<AsigGrupoCamposAnalisisDto, 'fecIniAsignacion' | 'fecFinAsignacion' | 'completo'>)
             handleActionFilteredAsigsGrupoCamposAnalisisTmp('SAVE', values)
          } }
          onReset={() => {
@@ -735,13 +741,11 @@ const FrmFilterListaAsignaciones: FC = () => {
                   spacing={ 1 }
                   divider={ <Divider orientation='vertical' flexItem /> }
                >
-                  <MyTextField type='date' name='fechaAsignacion' label='Fecha asignación' width={ 8 } focused />
+                  <MyTextField type='date' name='fecIniAsignacion' label='Fecha inicio asignación' width={ 8 } focused />
+                  <MyTextField type='date' name='fecFinAsignacion' label='Fecha fin asignación' width={ 8 } />
                   <MySelect name='completo' label='Estado' width={ 8 } opt={ optEstadoAsig } />
                   <Button size='small' type='submit' variant='contained'>
                      <SearchRounded fontSize='small' />
-                  </Button>
-                  <Button size='small' type='reset' variant='outlined' color='warning'>
-                     <DeleteForeverRounded fontSize='small' />
                   </Button>
                </Stack>
             </Form>

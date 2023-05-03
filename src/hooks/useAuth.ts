@@ -90,18 +90,18 @@ export const useAuth = () => {
    // » HANDLER'S ...
 
    // » DEP'S ...
-   const usersAnalisisDb = useMemo(() => usersDb.filter(({ grupo }) => grupo === 'ANALISIS'), [usersDb])
-   const usersDepuracionDb = useMemo(() => usersDb.filter(({ grupo }) => grupo === 'DEPURACION'), [usersDb])
+   /* const usersAnalisisDb = useMemo(() => usersDb.filter(({ grupo, activo }) => grupo === 'ANALISIS' && activo), [usersDb])
+   const usersDepuracionDb = useMemo(() => usersDb.filter(({ grupo, activo }) => grupo === 'DEPURACION' && activo), [usersDb]) */
    const userscurrentGroupDb = useMemo(() => {
       // ► Validación: ...
-      if (usersAnalisisDb.length === 0 && usersDepuracionDb.length === 0) return []
+      if (usersDb.length === 0) return []
 
-      return userCredentials.grupo === 'ANALISIS' ? usersAnalisisDb : usersDepuracionDb
-   }, [usersAnalisisDb, usersDepuracionDb])
+      return usersDb.filter(({ grupo, activo }) => grupo === userCredentials.grupo && activo)
+   }, [usersDb])
 
    return {
       usersDb,
-      isAuthenticated: Boolean(Object.values(userCredentials).length),
+      isAuthenticated: Boolean(Object.entries(userCredentials).length),
       token,
       authLoading,
       userCredentials,
@@ -111,8 +111,6 @@ export const useAuth = () => {
       modAuthenticated,
       submodAuthenticated,
       pathAuthenticated,
-      usersAnalisisDb,
-      usersDepuracionDb,
       userscurrentGroupDb,
 
       findAllUser,

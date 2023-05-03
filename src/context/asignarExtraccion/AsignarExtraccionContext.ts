@@ -11,8 +11,8 @@ interface AsignarExtraccionContextProps extends AsignarExtraccionState {
    handleAddAsigsGrupoCamposAnalisisTmp: (action: Action, asigsGrupoCamposAnalisisTmp?: AsigGrupoCamposAnalisisDto[]) => void
    handleActionParamsToAsigMasivaTmp: (action: Action, paramsToAsigMasiva?: { totalAnalistas: number, regPorAnalista: number }) => void
    handleRangosToAsigMasivaTmp: (action: Action, rangos?: Pick<AsigGrupoCamposAnalisis, 'regAnalisisIni' | 'regAnalisisFin'>[]) => void
-   handleActionFilterListAsigsTmp: (action: Action, params?: Pick<AsigGrupoCamposAnalisisDto, 'fechaAsignacion' | 'completo'>) => void
-   handleActionFilteredAsigsGrupoCamposAnalisisTmp: (action: Action, filtro?: Pick<AsigGrupoCamposAnalisisDto, 'fechaAsignacion' | 'completo'>) => void
+   handleActionFilterListAsigsTmp: (action: Action, params?: Pick<AsigGrupoCamposAnalisisDto, 'fecIniAsignacion' | 'fecFinAsignacion' | 'completo'>) => void
+   handleActionFilteredAsigsGrupoCamposAnalisisTmp: (action: Action, filtro?: Pick<AsigGrupoCamposAnalisisDto, 'fecIniAsignacion' | 'fecFinAsignacion' | 'completo'>) => void
 }
 
 export const AsignarExtraccionContext = createContext({} as AsignarExtraccionContextProps)

@@ -1,4 +1,4 @@
-import { ChangeEvent, FC, useEffect, useMemo, useRef, useState } from 'react'
+import { ChangeEvent, FC, ReactElement, useEffect, useMemo, useRef, useState } from 'react'
 
 import {
    Box,
@@ -56,7 +56,7 @@ import {
 } from 'components'
 
 import { AnalizarExtraccionProvider, useAnalizarExtraccionContext } from 'context'
-import { useAnalizarExtraccion, useBreakpoints, useLocalStorage } from 'hooks'
+import { useAnalizarExtraccion, useAuth, useBreakpoints, useLocalStorage } from 'hooks'
 
 import { applyCommaThousands, noty, parseJsonDateToDate, parseJsonTimestampToStrDate, undecorateMetaFieldName } from 'helpers'
 import { RecordsBetweenDatesDto, AsigGrupoCamposAnalisisDto, PrefixMetaFieldName, RegistroTablaDinamicaDto, ProduccionAnalisis } from 'interfaces'
@@ -775,6 +775,8 @@ const FrmAnalizarExtraccion: FC<{ registroDinamicoAsignadoTmpFirstRender: Regist
    const [toRenderFrmAnalizarExtraccion, setToRenderFrmAnalizarExtraccion] = useState(true)
 
    // ► Custom hook's ...
+   const { userCredentials } = useAuth()
+
    const { loadingAsigGrupoCamposAnalisisDb, findAsigById, saveRecordAssigned } = useAnalizarExtraccion()
    const [prevIdRecordAssigned, setPrevIdRecordAssigned] = useLocalStorage('REGISTRO_DINAMICO_ASIGNADO_PREV_ID')
    const [recordAssignedTemplate, setRecordAssignedTemplate] = useLocalStorage('REGISTRO_DINAMICO_ASIGNADO_TEMPLATE')
@@ -841,34 +843,36 @@ const FrmAnalizarExtraccion: FC<{ registroDinamicoAsignadoTmpFirstRender: Regist
 
          <Box mb={ 2 } display='flex' justifyContent='flex-end' gap={ 0.5 }>
 
-            <Button
-               variant='outlined'
-               color='info'
-               startIcon={ <CopyAllRounded /> }
-               disabled={ loadingAsigGrupoCamposAnalisisDb }
-               onClick={ () => { handleSaveRegistroDinamicoAsignadoTmp('SAVE') } }
-            >
-               <Typography variant='h4'>Cargar plantilla</Typography>
-            </Button>
+            <ActionsAuxAnalisis toRender={ userCredentials.grupo === 'DEPURACION' }>
+               <Button
+                  variant='outlined'
+                  color='info'
+                  startIcon={ <CopyAllRounded /> }
+                  disabled={ loadingAsigGrupoCamposAnalisisDb }
+                  onClick={ () => { handleSaveRegistroDinamicoAsignadoTmp('SAVE') } }
+               >
+                  <Typography variant='h4'>Cargar plantilla</Typography>
+               </Button>
 
-            <Button
-               variant='outlined'
-               startIcon={ <CachedRounded /> }
-               disabled={ loadingAsigGrupoCamposAnalisisDb }
-               onClick={ () => { handleSaveRegistroDinamicoAsignadoTmp('FILTER') } }
-            >
-               <Typography variant='h4'>Analisis Anterior</Typography>
-            </Button>
+               <Button
+                  variant='outlined'
+                  startIcon={ <CachedRounded /> }
+                  disabled={ loadingAsigGrupoCamposAnalisisDb }
+                  onClick={ () => { handleSaveRegistroDinamicoAsignadoTmp('FILTER') } }
+               >
+                  <Typography variant='h4'>Analisis Anterior</Typography>
+               </Button>
 
-            <Button
-               variant='contained'
-               color='info'
-               startIcon={ loadingAsigGrupoCamposAnalisisDb ? <CircularProgress size={ 20 } /> : <SaveAsRounded /> }
-               disabled={ loadingAsigGrupoCamposAnalisisDb }
-               onClick={ () => { handleSubmitAndIdRecordAssignedToTemplate() } }
-            >
-               <Typography variant='h4'>Guardar como plantilla</Typography>
-            </Button>
+               <Button
+                  variant='contained'
+                  color='info'
+                  startIcon={ loadingAsigGrupoCamposAnalisisDb ? <CircularProgress size={ 20 } /> : <SaveAsRounded /> }
+                  disabled={ loadingAsigGrupoCamposAnalisisDb }
+                  onClick={ () => { handleSubmitAndIdRecordAssignedToTemplate() } }
+               >
+                  <Typography variant='h4'>Guardar como plantilla</Typography>
+               </Button>
+            </ActionsAuxAnalisis>
 
             <Button
                variant='contained'
@@ -924,6 +928,16 @@ const FrmAnalizarExtraccion: FC<{ registroDinamicoAsignadoTmpFirstRender: Regist
       </>
 
    )
+}
+
+type ActionsAuxAnalisisProps = {
+   children: ReactElement | ReactElement[],
+   toRender: boolean
+}
+
+const ActionsAuxAnalisis: FC<ActionsAuxAnalisisProps> = ({ children, toRender }) => {
+   if (!toRender) return <></>
+   return <>{ children }</>
 }
 
 const InputAnalisis: FC<{k: string}> = ({ k }) => {
