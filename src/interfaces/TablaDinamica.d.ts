@@ -54,6 +54,7 @@ export interface RegistroTablaDinamicaDto {
    analizado: boolean
    terminado: boolean
    revisado: boolean
+   rectificado: boolean
    observacionesCtrlCal: string
    hasFieldError: boolean
 

@@ -182,7 +182,7 @@ const ListaAsignaciones: FC = () => {
    }
 
    // » Dep's ...
-   const isDisabledBtnGenerarRegistros = (asig: AsigGrupoCamposAnalisisDto) => asig.totalPendientes > 0 || asig.ctrlsCalCamposAnalisis.length > 0
+   const isDisabledBtnGenerarRegistros = (asig: AsigGrupoCamposAnalisisDto) => asig.totalAnalizados < asig.totalAsignados || asig.ctrlsCalCamposAnalisis.length > 0
 
    return (
       <>
@@ -246,12 +246,12 @@ const ListaAsignaciones: FC = () => {
 
                            <StandarTooltip title={ `Generar el ${asig.grupo.tablaDinamica?.porcentajeQC}% de registros, para Q.C.` }>
                               <IconButton
-                                 size='small'
+                                 size='medium'
                                  disabled={ isDisabledBtnGenerarRegistros(asig) }
                                  onClick={ () => handleGenerateRecordsToCtrlCal(asig.idAsigGrupo) }
                               >
                                  <Typography
-                                    variant='h6'
+                                    variant='h5'
                                     color={ isDisabledBtnGenerarRegistros(asig) ? '#D2D2D2' : '#004795' }
                                     sx={{ width: 18 }}
                                  >
@@ -499,7 +499,8 @@ const BandejaControlCalidad: FC = () => {
          headerName: 'Id',
          width: 80,
          type: 'number',
-         ...commonGridColDef
+         ...commonGridColDef,
+         renderCell: ({ row }) => applyCommaThousands(row.nId)
       }, {
          field: 'revisado',
          headerName: '¿Revisado?',
@@ -692,18 +693,18 @@ const ControlCalidad: FC = () => {
 }
 
 const InputControlCalidad: FC<{k: string}> = ({ k }) => {
-   // ► CONTEXT ...
+   // ► Context ...
    const {
       asigGrupoCamposAnalisisTmp,
       registroCtrlCalidadTmp
    } = useControlCalidadContext()
 
-   // ► CUSTOM - HOOK'S ...
+   // ► Custom hook's ...
    const { optValoresTiposCurrentGrupoAuth } = useTipoLogico()
    const { saveMetaFieldIdErrorCsv } = useControlCalidad()
    const { findTablaDinamicaByUsrCreador } = useExtraccion()
 
-   // ► DEP'S ...
+   // ► Dep's ...
    const prefix = useMemo(() => k.substring(0, 1) as PrefixMetaFieldName, [k])
 
    const infoFromfieldsAssigned = useMemo(() => {
@@ -738,7 +739,7 @@ const InputControlCalidad: FC<{k: string}> = ({ k }) => {
 
    const isCheckedFieldError = useMemo(() => registroCtrlCalidadTmp.metaFieldIdErrorCsv?.includes(label), [registroCtrlCalidadTmp, label])
 
-   // ► HANDLER'S ...
+   // ► Handler's ...
    const handleChangeFieldError = async (e: ChangeEvent<HTMLInputElement>) => {
       await saveMetaFieldIdErrorCsv({
          asigGrupo: { idAsigGrupo: asigGrupoCamposAnalisisTmp.idAsigGrupo },

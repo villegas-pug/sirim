@@ -82,6 +82,19 @@ interface SetValidationResultOfCtrlCalError {
    payload: string | null
 }
 
+interface SaveRectificadoRecordAssignedLoading {
+   type: '[Control-Calidad] saveRectificadoRecordAssigned loading'
+}
+
+interface SaveRectificadoRecordAssignedSuccess {
+   type: '[Control-Calidad] saveRectificadoRecordAssigned success'
+}
+
+interface SaveRectificadoRecordAssignedError {
+   type: '[Control-Calidad] saveRectificadoRecordAssigned error'
+   payload: string | null
+}
+
 export type ControlCalidadAction =
    | ResponseHttpStatusType
    | SaveCtrlCalCamposAnalisisLoading
@@ -102,3 +115,6 @@ export type ControlCalidadAction =
    | SetValidationResultOfCtrlCalLoading
    | SetValidationResultOfCtrlCalSuccess
    | SetValidationResultOfCtrlCalError
+   | SaveRectificadoRecordAssignedLoading
+   | SaveRectificadoRecordAssignedSuccess
+   | SaveRectificadoRecordAssignedError

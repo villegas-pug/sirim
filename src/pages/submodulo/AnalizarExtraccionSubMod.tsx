@@ -54,14 +54,14 @@ import {
    SpeedDialActionProps,
    StandarTooltip
 } from 'components'
+import { format } from 'date-fns'
 
 import { AnalizarExtraccionProvider, useAnalizarExtraccionContext } from 'context'
-import { useAnalizarExtraccion, useAuth, useBreakpoints, useLocalStorage } from 'hooks'
+import { useAnalizarExtraccion, useAuth, useBreakpoints, useControlCalidad, useLocalStorage } from 'hooks'
 
 import { applyCommaThousands, noty, parseJsonDateToDate, parseJsonTimestampToStrDate, undecorateMetaFieldName } from 'helpers'
 import { RecordsBetweenDatesDto, AsigGrupoCamposAnalisisDto, PrefixMetaFieldName, RegistroTablaDinamicaDto, ProduccionAnalisis } from 'interfaces'
 import { optSelectItemMonthName } from 'constants/calendar'
-import { format } from 'date-fns'
 import { useTipoLogico } from 'hooks/useTipoLogico'
 import { messages, regex } from 'constants/'
 
@@ -88,6 +88,7 @@ export const AnalizarExtraccionSubMod: FC = () => {
 
    // » Effect's ...
    useEffect(() => { setBandejaAnalisisNroPagina(0) }, [])
+   useEffect(() => { findAsigAnalisisByUsr(true) }, [])
 
    // ► Handler's ...
    const handleRefresh = async (asigUnfinished: boolean = false): Promise<void> => {
@@ -269,16 +270,12 @@ const BandejaEntrada: FC = () => {
    // ► CUSTOM - HOOK'S ...
    const {
       asigsGrupoCamposAnalisisDb,
-      findAsigAnalisisByUsr,
       findAsigById,
       findTablaDinamicaByRangoFromIds,
       downloadAnalisadosByDates
    } = useAnalizarExtraccion()
 
    const { currentScreen } = useBreakpoints()
-
-   // ► EFFECT'S ...
-   useEffect(() => { findAsigAnalisisByUsr(true) }, [])
 
    // » DEP'S ...
    const dgColumns = useMemo<GridColDef<AsigGrupoCamposAnalisisDto>[]>(() => [
@@ -528,6 +525,7 @@ const BandejaAnalisis: FC = () => {
    const { currentScreen } = useBreakpoints()
    const { findAllTipoLogico } = useTipoLogico()
    const { setTerminadoProduccionAnalisis } = useAnalizarExtraccion()
+   const { saveRectificadoRecordAssigned } = useControlCalidad()
 
    // ► Effect's ...
    useEffect(() => { findAllTipoLogico() }, [])
@@ -549,19 +547,39 @@ const BandejaAnalisis: FC = () => {
             </IconButton>
          </Tooltip>
       }, {
-         field: '¿Terminado?',
+         field: '>>',
          type: 'boolean',
          width: 90,
          ...commonGridColDef,
          renderCell: ({ row }) => (
-            <Checkbox
-               disabled={ !row.analizado }
-               checked={ row.terminado }
-               onClick={ () => {
-                  setTerminadoProduccionAnalisis(row.idProdAnalisis)
-               } }
-            />
+            <Tooltip title='Terminar analisis' placement='left-start' arrow>
+               <Checkbox
+                  disabled={ !row.analizado }
+                  checked={ row.terminado }
+                  onClick={ () => {
+                     setTerminadoProduccionAnalisis(row.idProdAnalisis)
+                  } }
+               />
+            </Tooltip>
          )
+      }, {
+         field: '>>>',
+         type: 'boolean',
+         width: 90,
+         ...commonGridColDef,
+         renderCell: ({ row }) => {
+            if (!row.hasFieldError) return <></>
+            return (
+               <Tooltip title='Rectificar analisis' placement='left-start' arrow>
+                  <Checkbox
+                     checked={ row.rectificado }
+                     onClick={ () => {
+                        saveRectificadoRecordAssigned(row.idProdAnalisis)
+                     } }
+                  />
+               </Tooltip>
+            )
+         }
       }, {
          field: 'nro',
          headerName: 'Nro',
@@ -573,7 +591,8 @@ const BandejaAnalisis: FC = () => {
          headerName: 'Id',
          width: 80,
          type: 'number',
-         ...commonGridColDef
+         ...commonGridColDef,
+         renderCell: ({ row }) => applyCommaThousands(row.nId)
       }, {
          field: 'hasFieldError',
          headerName: 'Estado Q.C.',
@@ -588,6 +607,13 @@ const BandejaAnalisis: FC = () => {
          type: 'boolean',
          ...commonGridColDef,
          renderCell: ({ row }) => row.analizado ? <CheckRounded color='success' /> : <ClearRounded color='error' />
+      }, {
+         field: 'rectificado',
+         headerName: '¿Rectificado?',
+         width: 150,
+         type: 'boolean',
+         ...commonGridColDef,
+         renderCell: ({ row }) => row.rectificado ? <CheckRounded color='success' /> : <></>
       }, {
          field: 'fechaAnalisis',
          headerName: 'Fecha Analisis',
@@ -971,7 +997,6 @@ const InputAnalisis: FC<{k: string}> = ({ k }) => {
    }, [asigGrupoCamposAnalisisTmp])
 
    const label = useMemo(() => undecorateMetaFieldName(k, 'prefix | underscore | suffix'), [k])
-
    const isFieldError = useMemo(() => registroDinamicoAsignadoTmp.metaFieldIdErrorCsv?.includes(label), [registroDinamicoAsignadoTmp, label])
 
    const restProps = useMemo(() => ({
@@ -984,7 +1009,9 @@ const InputAnalisis: FC<{k: string}> = ({ k }) => {
 
    return (
       <Box
-         sx={{ background: isFieldError ? 'linear-gradient(15deg, #FF0000, #fff 15%)' : '' }}
+         sx={{
+            background: isFieldError ? 'linear-gradient(15deg, #FF0000, #fff 15%)' : ''
+         }}
       >
          {
 

@@ -7,6 +7,7 @@ export interface ProduccionAnalisis {
    completo: boolean
    terminado: boolean
    revisado: boolean
+   rectificado: boolean
    observacionesCtrlCal: string
    metaFieldIdErrorCsv: string
    fechaFin: string

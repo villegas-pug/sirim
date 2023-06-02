@@ -14,7 +14,8 @@ export const useControlCalidad = () => {
       validateRecordAssigned,
       saveMetaFieldIdErrorCsv,
       findAsigGrupoCamposAnalisisById,
-      setValidationResultOfCtrlCal
+      setValidationResultOfCtrlCal,
+      saveRectificadoRecordAssigned
    } = useAppActions()
 
    // ► Handler's ...
@@ -29,6 +30,7 @@ export const useControlCalidad = () => {
       validateRecordAssigned,
       saveMetaFieldIdErrorCsv,
       findAsigGrupoCamposAnalisisById,
-      setValidationResultOfCtrlCal
+      setValidationResultOfCtrlCal,
+      saveRectificadoRecordAssigned
    }
 }

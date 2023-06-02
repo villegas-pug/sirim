@@ -37,12 +37,15 @@ export const controlCalidadReducer = (state: ControlCalidadReducerState = INITIA
       return { ...state, loading: false, tabla: [], error: action.payload }
    case '[Control-Calidad] saveMetaFieldIdErrorCsv loading':
    case '[Control-Calidad] setValidationResultOfCtrlCal loading':
+   case '[Control-Calidad] saveRectificadoRecordAssigned loading':
       return { ...state, loading: true }
    case '[Control-Calidad] saveMetaFieldIdErrorCsv success':
    case '[Control-Calidad] setValidationResultOfCtrlCal success':
+   case '[Control-Calidad] saveRectificadoRecordAssigned success':
       return { ...state, loading: false }
    case '[Control-Calidad] saveMetaFieldIdErrorCsv error':
    case '[Control-Calidad] setValidationResultOfCtrlCal error':
+   case '[Control-Calidad] saveRectificadoRecordAssigned error':
       return { ...state, loading: false, error: action.payload }
    case '[Control-Calidad] findAsigGrupoCamposAnalisisById loading':
       return { ...state, loading: true, error: null }

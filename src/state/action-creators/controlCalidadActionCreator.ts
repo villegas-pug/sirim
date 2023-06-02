@@ -186,3 +186,32 @@ export const setValidationResultOfCtrlCal = (asigGrupoCamposAnalisis: AsigGrupoC
       dispatch({ type: '[http-status] Response status', payload: err?.response?.status })
    }
 }
+
+export const saveRectificadoRecordAssigned = (idProdAnalisis: number) => async (dispatch: Dispatch<ControlCalidadAction>, getState: () => any): Promise<void> => {
+   dispatch({ type: '[Control-Calidad] saveRectificadoRecordAssigned loading' })
+   try {
+      const { usuario: { token } } = getState()
+      const { data: { levelLog, message } } = await api.request<Response<[]>>({
+         method: 'PUT',
+         url: `/microservicio-rimctrlcalidad/setValidationResultOfCtrlCal/${idProdAnalisis}`,
+         headers: {
+            [AUTHORIZATION]: token
+         }
+      })
+
+      switch (levelLog) {
+      case 'SUCCESS':
+         dispatch({ type: '[Control-Calidad] saveRectificadoRecordAssigned success' })
+         noty('success', message)
+         break
+      case 'WARNING':
+      case 'ERROR':
+         dispatch({ type: '[Control-Calidad] saveRectificadoRecordAssigned error', payload: message })
+         noty('error', message)
+         break
+      }
+   } catch (err: any) {
+      dispatch({ type: '[Control-Calidad] saveRectificadoRecordAssigned error', payload: err?.message })
+      dispatch({ type: '[http-status] Response status', payload: err?.response?.status })
+   }
+}
