@@ -257,17 +257,17 @@ const renderShowResultOfQCAction = (asig: AsigGrupoCamposAnalisisDto) => {
 }
 
 const BandejaEntrada: FC = () => {
-   // ► CONTEXT ...
+   // ► Context ...
    const {
       asigGrupoCamposAnalisisTmp,
       handleChangePage,
       handleSaveAsigGrupoCamposAnalisisTmp
    } = useAnalizarExtraccionContext()
 
-   // ► HOOK'S ...
+   // ► Hook's ...
    const modalDownloadAnalizados = useRef({} as SimpleModalRefProps)
 
-   // ► CUSTOM - HOOK'S ...
+   // ► Custom hook's ...
    const {
       asigsGrupoCamposAnalisisDb,
       findAsigById,
@@ -277,7 +277,7 @@ const BandejaEntrada: FC = () => {
 
    const { currentScreen } = useBreakpoints()
 
-   // » DEP'S ...
+   // » Dep's ...
    const dgColumns = useMemo<GridColDef<AsigGrupoCamposAnalisisDto>[]>(() => [
       {
          field: '>',
@@ -413,7 +413,7 @@ const BandejaEntrada: FC = () => {
                pageSize={ currentScreen === 'desktopLarge'
                   ? 8
                   : currentScreen === 'desktopWide'
-                     ? 10
+                     ? 11
                      : 4
                }
                getRowId={ row => row.idAsigGrupo }

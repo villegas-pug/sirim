@@ -55,12 +55,13 @@ import {
    SpeedDialBackdrop,
    BandejaProcesos,
    MyCheckBox,
-   ListPuffLoader
+   ListPuffLoader,
+   Scrollbar
 } from 'components'
 
 import { NuevaDepuracionInfContext, NuevaDepuracionInfProvider, useDepurarExtraccionContext } from 'context'
 
-import { useExtraccion, useTipoLogico } from 'hooks'
+import { useAnalizarExtraccion, useExtraccion, useTipoLogico } from 'hooks'
 import { MetaFieldSqlType, GrupoCamposAnalisis, MetaCampoTablaDinamica, TablaDinamica, TablaDinamicaDto } from 'interfaces'
 import { convertMetaTypeToSqlType, undecorateMetaFieldName } from 'helpers'
 import { messages, regex } from 'constants/'
@@ -71,10 +72,10 @@ const MainPaper = styled(Paper)({
 })
 
 const DepurarExtraccionSubMod: FC = () => {
-   /* » HOOK'S  */
+   // » Hook's ...
    const addTablaRef = useRef({} as HTMLInputElement)
 
-   /* » CUSTOM - HOOK'S  */
+   // » Custom hook's ...
    const {
       loadingExtraccionDb,
       loadingcamposTablaDinamicaDb,
@@ -83,6 +84,8 @@ const DepurarExtraccionSubMod: FC = () => {
       findTablaDinamicaByUsrCreador,
       createTablaExtraccion
    } = useExtraccion()
+
+   const { loadingAsigGrupoCamposAnalisisDb } = useAnalizarExtraccion()
 
    const { findAllTipoLogico } = useTipoLogico()
 
@@ -106,7 +109,7 @@ const DepurarExtraccionSubMod: FC = () => {
       <>
          <BandejaProcesos>
             {/* ► Bases de extracción ... */}
-            <Grid item xs={ 5 }>
+            <Grid item xs={ 6 } lg={ 4 }>
                <MainPaper>
                   <Typography variant='h5' >NUEVA TABLA</Typography>
                   <Divider />
@@ -147,7 +150,7 @@ const DepurarExtraccionSubMod: FC = () => {
                      </Formik>
 
                      {/* ► ... */}
-                     <Box height='57vh' overflow='auto'>
+                     <Box height='60vh' overflow='auto'>
                         <ListaTablasExtraccion />
                      </Box>
 
@@ -156,41 +159,42 @@ const DepurarExtraccionSubMod: FC = () => {
                </MainPaper>
             </Grid>
 
-            {/* ► CAMPOS DE EXTRACCIÓN ...  */}
-            <Grid item xs={ 3 }>
-               <MainPaper>
-                  <Typography variant='h5'>CAMPOS DE EXTRACCIÓN</Typography>
-                  <Divider />
-                  <Box height='75vh' overflow='auto'>
-                     <ListaCamposExtraccion />
-                  </Box>
-               </MainPaper>
-            </Grid>
-
             {/* ► Grupo de Analisis y Campos de Analisis ... */}
-            <Grid item xs={ 4 } container spacing={ 0.5 }>
+            <Grid item container xs={ 6 } lg={ 8 } spacing={ 0.5 }>
 
-               <Grid item xs={ 12 }>
+               {/* ► Campos de extracción ...  */}
+               <Grid item xs={ 12 } lg={ 4 }>
+                  <MainPaper>
+                     <Typography variant='h5'>CAMPOS DE EXTRACCIÓN</Typography>
+                     <Divider />
+                     <Scrollbar>
+                        <ListaCamposExtraccion />
+                     </Scrollbar>
+                  </MainPaper>
+               </Grid>
+
+               <Grid item xs={ 12 } lg={ 3 }>
                   <MainPaper>
                      <Typography variant='h5' >GRUPOS DE ANALISIS</Typography>
                      <Divider />
-                     <Box height='35vh' overflow='auto'>
+                     <Scrollbar>
                         <ListaGrupoAnalisis />
-                     </Box>
+                     </Scrollbar>
                   </MainPaper>
                </Grid>
 
-               <Grid item xs={ 12 }>
+               <Grid item xs={ 12 } lg={ 5 }>
                   <MainPaper>
                      <Typography variant='h5' >CAMPOS DE ANALISIS</Typography>
                      <Divider />
-                     <Box height='35vh' overflow='auto'>
+                     <Scrollbar>
                         <ListaCamposAnalisis />
-                     </Box>
+                     </Scrollbar>
                   </MainPaper>
                </Grid>
 
             </Grid>
+
          </BandejaProcesos>
 
          {/* » Speed-Dial ... */}
@@ -201,13 +205,14 @@ const DepurarExtraccionSubMod: FC = () => {
          { loadingcamposTablaDinamicaDb && <ModalLoader /> }
          { loadingTablaDinamica && <ModalLoader /> }
          { loadingDepuracion && <ModalLoader /> }
+         { loadingAsigGrupoCamposAnalisisDb && <ModalLoader /> }
 
       </>
    )
 }
 
 const ListaTablasExtraccion: FC = () => {
-   /* » HOOK'S  */
+   // » Hook's ...
    const {
       tablaDinamicaDto,
       handleSaveTablaDinamicaDto,
@@ -226,7 +231,7 @@ const ListaTablasExtraccion: FC = () => {
    const [selectedItem, setSelectedItem] = useState(-1)
    const [fileExtraccion, setFileExtraccion] = useState<{ fileName?: string, file?: File } | null>(null)
 
-   /* ► CUSTOM - HOOK'S  */
+   // ► Custom hook's ...
    const {
       extraccionDb,
       depuracion,
@@ -237,11 +242,12 @@ const ListaTablasExtraccion: FC = () => {
       findMetaTablaDinamica,
       uploadExtraccion,
       saveGrupoCamposAnalisis,
-      findTablaDinamicaBySuffixOfField,
       removeAllDepuracion
    } = useExtraccion()
 
-   /* ► EFFECT'S ...  */
+   const { downloadAnalisadosByDates } = useAnalizarExtraccion()
+
+   // ► Effect's ...
    useEffect(() => { // ► Remove: Tabla extracción ...
       if (!isAcceptEliminarTabla) return
 
@@ -266,7 +272,7 @@ const ListaTablasExtraccion: FC = () => {
       removeAllDepuracion() /* ► Clean-up ... */
    }, [depuracion])
 
-   /* ► HANDLER'S... */
+   // ► Handler's ...
    const handleChangeInputFile = ({ target: { files } }: ChangeEvent<HTMLInputElement>) => {
       setFileExtraccion(prev => ({ ...prev, file: files![0] }))
    }
@@ -278,90 +284,91 @@ const ListaTablasExtraccion: FC = () => {
          >
             {
                extraccionDb?.map((tablaDinamica, i) => (
-                  <ListItemFade key={ tablaDinamica.idTabla } i={ i } direction='top' >
-                     <ListItemButton selected={ selectedItem === i }>
-                        <ListItemText
-                           primary={
-                              <Box display='flex' gap={ 1 }>
-                                 <Typography variant='h4'>{ `${i + 1}►` }</Typography>
-                                 <Typography variant='h5'>{ tablaDinamica.nombre }</Typography>
-                              </Box>
-                           }
-                           onClick={ () => {
-                              findMetaTablaDinamica({ nombre: tablaDinamica.nombre })/* ► request ... */
+                  <ListItemButton key={ tablaDinamica.idTabla } selected={ selectedItem === i }>
+
+                     <ListItemText
+                        primary={
+                           <Box display='flex' gap={ 1 }>
+                              <Typography variant='h4'>{ `${i + 1}` }</Typography>
+                              <Typography variant='h6'>{ tablaDinamica.nombre }</Typography>
+                           </Box>
+                        }
+                        onClick={ () => {
+                           findMetaTablaDinamica({ nombre: tablaDinamica.nombre })// ► request ...
+                           handleSaveTablaDinamicaDto(tablaDinamica)
+                           handleSavegruposAnalisisDto(tablaDinamica.idTabla)
+                           handleSaveCamposAnalisisTmp({} as GrupoCamposAnalisis, 'RESET')
+                           setSelectedItem(i)
+                        }
+                        }
+                     />
+
+                     {/* ► Action's ... */}
+                     <ListItemSecondaryAction>
+
+                        <Tooltip title='Modificar nombre' placement='top' arrow>
+                           <IconButton onClick={() => {
                               handleSaveTablaDinamicaDto(tablaDinamica)
-                              handleSavegruposAnalisisDto(tablaDinamica.idTabla)
-                              handleSaveCamposAnalisisTmp({} as GrupoCamposAnalisis, 'RESET')
-                              setSelectedItem(i)
-                           }
-                           }
-                        />
+                              modalEditNombreTabla.current.setOpen(true)
+                           }}>
+                              <EditRounded fontSize='small' />
+                           </IconButton>
+                        </Tooltip>
 
-                        {/* ► Action's ... */}
-                        <ListItemSecondaryAction>
+                        <Tooltip title='Eliminar tabla' placement='top' arrow>
+                           <IconButton onClick={() => {
+                              handleSaveTablaDinamicaDto(tablaDinamica)
+                              confirmEliminarTabla.current.setIsOpen(true)
+                           }}>
+                              <RemoveCircleOutlineRounded fontSize='small' />
+                           </IconButton>
+                        </Tooltip>
 
-                           <Tooltip title='Modificar nombre' placement='top' arrow>
-                              <IconButton onClick={() => {
+                        <Tooltip title='Crear campo extracción' placement='top' arrow>
+                           <IconButton
+                              onClick={() => {
                                  handleSaveTablaDinamicaDto(tablaDinamica)
-                                 modalEditNombreTabla.current.setOpen(true)
-                              }}>
-                                 <EditRounded fontSize='small' />
-                              </IconButton>
-                           </Tooltip>
+                                 modalAddFieldExtraccion.current.setOpen(true)
+                              }}
+                           >
+                              <ViewWeekRounded fontSize='small' />
+                           </IconButton>
+                        </Tooltip>
 
-                           <Tooltip title='Eliminar tabla' placement='top' arrow>
-                              <IconButton onClick={() => {
+                        <Tooltip title='Cargar datos de extracción' placement='top' arrow>
+                           <IconButton
+                              onClick={() => {
+                                 setFileExtraccion({ fileName: tablaDinamica.nombre })
+                                 inputFile.current.click()
+                              }}
+                           >
+                              <UploadOutlined fontSize='small' />
+                           </IconButton>
+                        </Tooltip >
+
+                        <Tooltip title='Descargar datos de extracción' placement='top' arrow>
+                           <IconButton
+                              /* onClick={() => { findTablaDinamicaBySuffixOfField(tablaDinamica.nombre) }} */
+                              onClick={() => { downloadAnalisadosByDates({ nombreTabla: tablaDinamica.nombre, isAssignedTemplate: true }) }}
+                           >
+                              <DownloadRounded fontSize='small' />
+                           </IconButton>
+                        </Tooltip >
+
+                        <Tooltip title='Crear grupo de analisis' placement='top' arrow>
+                           <IconButton
+                              onClick={ () => {
                                  handleSaveTablaDinamicaDto(tablaDinamica)
-                                 confirmEliminarTabla.current.setIsOpen(true)
-                              }}>
-                                 <RemoveCircleOutlineRounded fontSize='small' />
-                              </IconButton>
-                           </Tooltip>
+                                 modalAddGrupoAnalisis.current.setOpen(true)
+                              } }
+                           >
+                              <GroupWorkRounded fontSize='small' />
+                           </IconButton>
+                        </Tooltip>
 
-                           <Tooltip title='Crear campo extracción' placement='top' arrow>
-                              <IconButton
-                                 onClick={() => {
-                                    handleSaveTablaDinamicaDto(tablaDinamica)
-                                    modalAddFieldExtraccion.current.setOpen(true)
-                                 }}
-                              >
-                                 <ViewWeekRounded fontSize='small' />
-                              </IconButton>
-                           </Tooltip>
+                     </ListItemSecondaryAction>
 
-                           <Tooltip title='Cargar datos de extracción' placement='top' arrow>
-                              <IconButton
-                                 onClick={() => {
-                                    setFileExtraccion({ fileName: tablaDinamica.nombre })
-                                    inputFile.current.click()
-                                 }}
-                              >
-                                 <UploadOutlined fontSize='small' />
-                              </IconButton>
-                           </Tooltip >
-
-                           <Tooltip title='Descargar datos de extracción' placement='top' arrow>
-                              <IconButton
-                                 onClick={() => { findTablaDinamicaBySuffixOfField(tablaDinamica.nombre) }}
-                              >
-                                 <DownloadRounded fontSize='small' />
-                              </IconButton>
-                           </Tooltip >
-
-                           <Tooltip title='Crear grupo de analisis' placement='top' arrow>
-                              <IconButton
-                                 onClick={ () => {
-                                    handleSaveTablaDinamicaDto(tablaDinamica)
-                                    modalAddGrupoAnalisis.current.setOpen(true)
-                                 } }
-                              >
-                                 <GroupWorkRounded fontSize='small' />
-                              </IconButton>
-                           </Tooltip>
-
-                        </ListItemSecondaryAction>
-                     </ListItemButton>
-                  </ListItemFade>
+                  </ListItemButton>
                ))
             }
          </List>
@@ -652,14 +659,14 @@ const FrmCrearCampoAnalisis: FC<{ metaCampo?: MetaCampoTablaDinamica}> = ({ meta
 }
 
 const ListaCamposExtraccion: FC = () => {
-   /* » CONTEXT ...  */
+   // » Context ...
    const { tablaDinamicaDto, metaFieldInfoTablaDinamicaTmp } = useContext(NuevaDepuracionInfContext)
 
-   /* » HOOK'S  */
+   // » Hook's ...
    const modalEditarCampo = useRef({} as SimpleModalRefProps)
    const [prevMetaField, setPrevMetaField] = useState({} as Partial<MetaCampoTablaDinamica>)
 
-   /* » CUSTOM - HOOK'S  */
+   // » Custom hook's ...
    const {
       camposExtraccionDb,
       loadingcamposTablaDinamicaDb,
@@ -679,8 +686,8 @@ const ListaCamposExtraccion: FC = () => {
                      <ListItemButton key={ metaCampo.nombre }>
                         <ListItemText primary={
                            <Box display='flex' gap={ 1 }>
-                              <Typography variant='h4'>{ `${i + 1}►` }</Typography>
-                              <Typography variant='h5'>{ metaCampo.nombre }</Typography>
+                              <Typography variant='h4'>{ `${i + 1}` }</Typography>
+                              <Typography variant='h6'>{ metaCampo.nombre }</Typography>
                            </Box>
                         }
                         />
@@ -802,8 +809,8 @@ const ListaGrupoAnalisis:FC = () => {
                         <ListItemText
                            primary={
                               <Box display='flex' gap={ 1 }>
-                                 <Typography variant='h4'>{ `${i + 1}►` }</Typography>
-                                 <Typography variant='h5'>{ grupo.nombre }</Typography>
+                                 <Typography variant='h4'>{ `${i + 1}` }</Typography>
+                                 <Typography variant='h6'>{ grupo.nombre }</Typography>
                               </Box>
                            }
                            onClick={ () => {
@@ -909,20 +916,20 @@ const ListaGrupoAnalisis:FC = () => {
 }
 
 const ListaCamposAnalisis: FC = () => {
-   /* » CONTEXT ...  */
+   // » Context ...
    const {
       tablaDinamicaDto,
       grupoAnalisisTmp,
       camposAnalisisTmp
    } = useDepurarExtraccionContext()
 
-   /* » HOOK'S  */
+   // » Hook's ...
    const modalEliminarCampo = useRef({} as SimpleModalRefProps)
    const confirmEliminarCampo = useRef({} as ConfirmDialogRefProps)
    const [prevMetaField, setPrevMetaField] = useState({} as MetaCampoTablaDinamica)
    const [hasAcceptedEliminarCampo, setHasAcceptedEliminarCampo] = useState(false)
 
-   /* » CUSTOM - HOOK'S  */
+   // » Custom hook's ...
    const {
       loadingcamposTablaDinamicaDb,
       loadingExtraccionDb,
@@ -931,7 +938,7 @@ const ListaCamposAnalisis: FC = () => {
 
    const { optTiposCurrentGrupoAuth } = useTipoLogico()
 
-   /* ► EFFEC'S ... */
+   // ► Effect's ...
    useEffect(() => { /* ► Si confirma eliminar el grupo ... */
       if (!hasAcceptedEliminarCampo) return
 
@@ -958,8 +965,8 @@ const ListaCamposAnalisis: FC = () => {
                      <ListItemButton key={ metaCampo.nombre }>
                         <ListItemText primary={
                            <Box display='flex' gap={ 1 }>
-                              <Typography variant='h4'>{ `${i + 1}►` }</Typography>
-                              <Typography variant='h5'>{ metaCampo.nombre }</Typography>
+                              <Typography variant='h4'>{ `${i + 1}` }</Typography>
+                              <Typography variant='h6'>{ metaCampo.nombre }</Typography>
                            </Box>
                         }
                         />

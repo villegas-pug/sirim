@@ -2,7 +2,7 @@ import toast, { Toast, ToastType } from 'react-hot-toast'
 
 const optToast: Partial<Toast> = {
    duration: 4000,
-   position: 'bottom-right'
+   position: 'bottom-center'
 }
 
 export const noty = (type: ToastType, message: string = '') => {

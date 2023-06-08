@@ -10,8 +10,8 @@ import { FC, ReactElement, useState } from 'react'
 
 const CustomSpeedDial = styled(SpeedDial)({
    position: 'fixed',
-   right: 10,
-   bottom: 10
+   right: 2.5,
+   bottom: 2.5
 })
 
 export type SpeedDialActionProps = {

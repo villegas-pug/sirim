@@ -8,7 +8,7 @@ type MyScrollbarsProps = {
 
 export const Scrollbar: FC<MyScrollbarsProps> = ({ children }) => {
    return (
-      <Scrollbars style={{ height: '93%' }}>
+      <Scrollbars style={{ height: '91%' }}>
          { children }
       </Scrollbars>
 
