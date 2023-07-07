@@ -401,19 +401,19 @@ type FrmAsignProps = {
 }
 
 const FrmAsign: FC<FrmAsignProps> = ({ rangoAsignacion, index = 0 }) => {
-   /* ► CONTEXT-HOOK ...  */
+   // ► Context hook's ...
    const {
       grupoCamposAnalisisTmp,
       rangosAvailableToAssignTmp
    } = useAsignarExtraccionContext()
 
-   /* ► HOOK'S  */
+   // ► Hook's ...
    // eslint-disable-next-line no-undef
    const debaunceRef = useRef<NodeJS.Timeout>()
    const [isEnabled, setIsEnabled] = useState(true)
    const [isEnabledDebaunce, setIsEnabledDebaunce] = useState(true)
 
-   /* ► CUSTOM-HOOK'S ... */
+   // ► Custom hook's ...
    const { userscurrentGroupDb } = useAuth()
    const {
       errorTablaDinamicaDb,
@@ -423,7 +423,7 @@ const FrmAsign: FC<FrmAsignProps> = ({ rangoAsignacion, index = 0 }) => {
       assignedToGrupoAnalisis
    } = useAsignarExtraccion()
 
-   /* ► EFFECT'S ... */
+   // ► Effect's ...
    useEffect(() => {
       if (isEnabled) return
       if (debaunceRef.current) clearTimeout(debaunceRef.current)
@@ -433,10 +433,10 @@ const FrmAsign: FC<FrmAsignProps> = ({ rangoAsignacion, index = 0 }) => {
       }
    }, [isEnabled])
 
-   /* ► DEP'S ...  */
+   // ► Dep's ...
    const isDisabledFrmAsign = loadingTablaDinamicaDb || rangosAvailableToAssignTmp.length === 0
 
-   /* ► CONDITIONAL-RENDER ... */
+   // ► Conditional render ...
    if (!isEnabledDebaunce) return <></>
 
    return (
@@ -446,7 +446,8 @@ const FrmAsign: FC<FrmAsignProps> = ({ rangoAsignacion, index = 0 }) => {
                initialValues={{
                   usrAnalista: {} as Usuario,
                   regAnalisisIni: rangoAsignacion?.regAnalisisIni || '' as any,
-                  regAnalisisFin: rangoAsignacion?.regAnalisisFin || '' as any
+                  regAnalisisFin: rangoAsignacion?.regAnalisisFin || '' as any,
+                  fechaAsignacion: format(new Date(), 'yyyy-MM-dd')
                }}
                validationSchema={ Yup.object({
                   usrAnalista: Yup.object().nullable().required('¡Requerido!'),
@@ -455,14 +456,15 @@ const FrmAsign: FC<FrmAsignProps> = ({ rangoAsignacion, index = 0 }) => {
                      .max(Yup.ref('regAnalisisFin'), '¡Debe ser menor al máximo!'),
                   regAnalisisFin: Yup.number().required('¡Requerido!')
                      .min(Yup.ref('regAnalisisIni'), '¡Debe ser mayor o igual al mínimo!')
-                     .max(totalRegistrosTablaDinamica, '¡No debe exceder al total de registros!')
+                     .max(totalRegistrosTablaDinamica, '¡No debe exceder al total de registros!'),
+                  fechaAsignacion: Yup.date().required('¡Campo requerido!')
                })}
                onSubmit={ async (values: Partial<AsigGrupoCamposAnalisisDto>, meta): Promise<void> => {
                   const { idGrupo } = grupoCamposAnalisisTmp
                   await assignedToGrupoAnalisis({ ...values, grupo: { idGrupo } })
                   await findTablaDinamicaByUsrCreador()
                   meta.resetForm()
-                  /* ► Si no existe errores del lado del servidor y el Componente fué creado masivamente  ... */
+                  // ► Si no existe errores del lado del servidor y el componente fué creado masivamente  ...
                   if (!errorTablaDinamicaDb && Boolean(rangoAsignacion)) setIsEnabled(false)
                } }>
                {(props) => (
@@ -475,6 +477,7 @@ const FrmAsign: FC<FrmAsignProps> = ({ rangoAsignacion, index = 0 }) => {
                      >
                         <MyTextField type='number' name='regAnalisisIni' label='Rango inicial' width={ 12 } focused />
                         <MyTextField type='number' name='regAnalisisFin' label='Rango final' width={ 12 } />
+                        <MyTextField type='date' name='fechaAsignacion' label='Fecha asignación' width={ 10 } />
                         <MyAutocomplete name='usrAnalista' label='Analista' width={ 30 } opt={ userscurrentGroupDb } { ...props } />
                         <Button
                            type='submit'

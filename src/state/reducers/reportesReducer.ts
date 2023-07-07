@@ -59,7 +59,7 @@ export const reportesReducer = (state: ReportesState = INITIAL_STATE, action: Re
    case '[Reportes] getRptNacionalidadControlMigratorio error':
       return { ...state, loading: false, rptNacionalidadControlMigratorioDto: [], error: action.payload }
    case '[Reportes] getRptProduccionDiaria loading':
-      return { ...state, loading: true, error: null }
+      return { ...state, loading: true, rptProduccionDiaria: [], error: null }
    case '[Reportes] getRptProduccionDiaria success':
       return { ...state, loading: false, rptProduccionDiaria: action.payload, error: null }
    case '[Reportes] getRptProduccionDiaria error':

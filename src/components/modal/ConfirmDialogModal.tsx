@@ -18,7 +18,7 @@ type Props = {
 }
 
 export const ConfirmDialogModal = forwardRef<ConfirmDialogRefProps, Props>(({ title, setIsAccept }, ref) => {
-   /* » HOOK'S  */
+   // » Hook's ...
    const [isOpen, setIsOpen] = useState(false)
 
    useImperativeHandle(ref, () => ({
@@ -26,7 +26,7 @@ export const ConfirmDialogModal = forwardRef<ConfirmDialogRefProps, Props>(({ ti
       setIsOpen
    }), [isOpen])
 
-   /* » HANDLER'S */
+   // » Handler's ...
    const handleAcceptDialog = () => { setIsAccept(true); setIsOpen(false) }
    const handleCancelDialog = () => { setIsAccept(false); setIsOpen(false) }
 
@@ -39,8 +39,8 @@ export const ConfirmDialogModal = forwardRef<ConfirmDialogRefProps, Props>(({ ti
                </Typography>
             </DialogTitle>
             <DialogActions>
-               <Button onClick={handleAcceptDialog}>Aceptar</Button>
-               <Button onClick={handleCancelDialog}>Cancelar</Button>
+               <Button onClick={ handleAcceptDialog }>Aceptar</Button>
+               <Button onClick={ handleCancelDialog }>Cancelar</Button>
             </DialogActions>
          </Dialog>
       </>

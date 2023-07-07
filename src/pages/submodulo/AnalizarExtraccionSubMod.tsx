@@ -12,7 +12,6 @@ import {
    TextField,
    Tooltip,
    Typography,
-   Checkbox,
    FormControlLabel
 } from '@mui/material'
 import {
@@ -57,7 +56,7 @@ import {
 import { format } from 'date-fns'
 
 import { AnalizarExtraccionProvider, useAnalizarExtraccionContext } from 'context'
-import { useAnalizarExtraccion, useAuth, useBreakpoints, useControlCalidad, useLocalStorage } from 'hooks'
+import { useAnalizarExtraccion, useAuth, useBreakpoints, useLocalStorage } from 'hooks'
 
 import { applyCommaThousands, noty, parseJsonDateToDate, parseJsonTimestampToStrDate, undecorateMetaFieldName } from 'helpers'
 import { RecordsBetweenDatesDto, AsigGrupoCamposAnalisisDto, PrefixMetaFieldName, RegistroTablaDinamicaDto, ProduccionAnalisis } from 'interfaces'
@@ -524,8 +523,8 @@ const BandejaAnalisis: FC = () => {
    // ► Custom hook's ...
    const { currentScreen } = useBreakpoints()
    const { findAllTipoLogico } = useTipoLogico()
-   const { setTerminadoProduccionAnalisis } = useAnalizarExtraccion()
-   const { saveRectificadoRecordAssigned } = useControlCalidad()
+   /* const { setTerminadoProduccionAnalisis } = useAnalizarExtraccion()
+   const { saveRectificadoRecordAssigned } = useControlCalidad() */
 
    // ► Effect's ...
    useEffect(() => { findAllTipoLogico() }, [])
@@ -546,7 +545,7 @@ const BandejaAnalisis: FC = () => {
                <QueryStatsRounded />
             </IconButton>
          </Tooltip>
-      }, {
+      }, /* {
          field: '>>',
          type: 'boolean',
          width: 90,
@@ -580,7 +579,7 @@ const BandejaAnalisis: FC = () => {
                </Tooltip>
             )
          }
-      }, {
+      }, */{
          field: 'nro',
          headerName: 'Nro',
          width: 50,
@@ -607,14 +606,14 @@ const BandejaAnalisis: FC = () => {
          type: 'boolean',
          ...commonGridColDef,
          renderCell: ({ row }) => row.analizado ? <CheckRounded color='success' /> : <ClearRounded color='error' />
-      }, {
+      }, /* {
          field: 'rectificado',
          headerName: '¿Rectificado?',
          width: 150,
          type: 'boolean',
          ...commonGridColDef,
          renderCell: ({ row }) => row.rectificado ? <CheckRounded color='success' /> : <></>
-      }, {
+      }, */ {
          field: 'fechaAnalisis',
          headerName: 'Fecha Analisis',
          width: 180,

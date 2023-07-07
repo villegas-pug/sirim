@@ -107,7 +107,7 @@ export const ControlCalidadProvider: FC<{ children: ReactElement | ReactElement[
       handleActionAsigsGrupoCamposAnalisisTmp('RESET')
    }, [])
 
-   // ► HANDLER'S ...
+   // ► Handler's ...
    const handleActionAsigsGrupoCamposAnalisisTmp = (action: Action, usrAnalista?: Usuario) => {
       switch (action) {
       case 'SAVE':
@@ -246,6 +246,7 @@ const findAsigsGrupoCamposAnalisisByParams = (asigs: AsigGrupoCamposAnalisisDto[
       .filter(({ fechaAsignacion, ctrlCalConforme }) => {
          return fechaAsignacion >= filtro.fecIniAsignacion && fechaAsignacion <= filtro.fecFinAsignacion && ctrlCalConforme === Boolean(filtro.ctrlCalConforme)
       })
+      .sort((a, b) => new Date(a.fechaAsignacion).getTime() - new Date(b.fechaAsignacion).getTime())
 
    return asigsGrupoCamposAnalisis
 }
@@ -257,7 +258,7 @@ const getUsrFromAsigsGrupoCamposAnalisisTmp = (asigs: AsigGrupoCamposAnalisisDto
    return usr
 }
 
-/* ► Private - Method's ... */
+// ► Private - Method's ...
 type SomeFieldsFromProduccionAnalisis = { [key: number]: Pick<RegistroTablaDinamicaDto, 'revisado' | 'observacionesCtrlCal' | 'metaFieldIdErrorCsv'> }
 const assignPropsToTablaCtrlCalTmp = (asigGrupoCamposAnalisis: AsigGrupoCamposAnalisisDto, tablaCtrlCalidad: RegistroTablaDinamicaDto[]): RegistroTablaDinamicaDto[] => {
    // ► Dep's: ...
